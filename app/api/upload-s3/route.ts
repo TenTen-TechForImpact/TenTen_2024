@@ -23,10 +23,13 @@ export async function POST(req: NextRequest) {
 
     const file = formData.get("file") as File;
 
+    const arrayBuffer = await file.arrayBuffer(); // 파일 내용을 ArrayBuffer로 변환
+    const buffer = Buffer.from(arrayBuffer);
+
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: `uploads/${file.name}`,
-      Body: file.stream(),
+      Body: buffer,
       ContentType: "audio/wav",
     };
 
