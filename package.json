@@ -11,6 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.666.0",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
     "aws-sdk": "^2.1691.0",
     "formidable": "^3.5.1",
     "next": "^14.2.14",

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import { createClient } from "@/utils/supabase/component";
 
 // Type for handling file input
 interface FileInput {
@@ -8,6 +9,8 @@ interface FileInput {
 }
 
 export default function UploadRecording() {
+  const supabase = createClient();
+
   const [fileInput, setFileInput] = useState<FileInput>({ file: null });
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
@@ -32,14 +35,29 @@ export default function UploadRecording() {
     formData.append("file", fileInput.file);
 
     try {
+      setUploadStatus("Uploading file...");
       const response = await fetch("/api/upload-s3", {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
+        setUploadStatus("Inserting data into Supabase...");
         const data = await response.json();
-        setUploadStatus(`File uploaded successfully: ${data.fileUrl}`);
+        const fileUrl = data.fileUrl;
+        // Insert into supabase
+        const { error } = await supabase
+          .from("Recording")
+          .insert({ file_url: fileUrl });
+        if (error) {
+          throw new Error(
+            `Error inserting data into Supabase: ${error.message}`
+          );
+        }
+
+        setUploadStatus(
+          `File uploaded successfully and saved to DB: ${data.fileUrl}`
+        );
       } else {
         setUploadStatus("File upload failed.");
       }

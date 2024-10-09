@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const uploadParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: `uploads/${file.name}`,
+      Key: `recordings/${file.name}`,
       Body: buffer,
       ContentType: "audio/wav",
     };
