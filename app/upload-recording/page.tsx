@@ -58,6 +58,7 @@ export default function UploadRecording() {
         setUploadStatus(
           `File uploaded successfully and saved to DB: ${data.fileUrl}`
         );
+        // TODO: request to ai server to get summary
       } else {
         setUploadStatus("File upload failed.");
       }
