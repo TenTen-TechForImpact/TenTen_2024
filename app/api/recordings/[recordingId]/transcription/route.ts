@@ -11,7 +11,12 @@ export const config = {
   },
 };
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { recordingId: string } }
+) {
+  const { recordingId } = params;
+  // TODO: download wavfile from s3
   try {
     const authToken = await getAuthToken();
     // const response = await getTranscription(authToken, req.body.toString());
