@@ -10,7 +10,7 @@ export default async function Recordings() {
     console.log("clicked");
     try {
       console.log("Requesting transcription...");
-      const response = await fetch("/api/get-transcription", {
+      const response = await fetch("/api/transcription", {
         method: "POST",
         body: "",
       });
