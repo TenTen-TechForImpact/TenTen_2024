@@ -6,6 +6,11 @@ import FormData from "form-data";
 import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
+import { Readable } from "stream";
+import stream from "stream";
+import { promisify } from "util";
+
+const pipeline = promisify(stream.pipeline);
 
 const supabase = createClient();
 
@@ -31,9 +36,10 @@ export async function POST(
 
   // Run STT
   try {
-    const audioFileBuffer = await downloadWavFile(recordingId);
+    const recordingFileBuffer = await downloadRecordingFile(recordingId);
+    // TODO: if there are keywords, put them in the config
     const authToken = await getAuthToken();
-    const utterances = await getTranscription(authToken, audioFileBuffer);
+    const utterances = await getTranscription(authToken, recordingFileBuffer);
     console.log("Transcription:", utterances);
     // TODO: Save transcription to DB - Utterances
     return NextResponse.json({
@@ -47,24 +53,71 @@ export async function POST(
 }
 
 // download wav file from S3 and return buffer
-async function downloadWavFile(recordingId: string): Promise<Buffer> {
+async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   const downloadParams = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: `recordings/${recordingId}.wav`,
   };
   const command = new GetObjectCommand(downloadParams);
-  const { Body } = await s3Client.send(command);
+  // const { Body } = await s3Client.send(command);
+  const response = await s3Client.send(command);
 
-  const chunks: Uint8Array[] = [];
-  const readableStream = Body as ReadableStream;
-  const reader = readableStream.getReader();
-  let result = await reader.read();
-  while (!result.done) {
-    chunks.push(result.value);
-    result = await reader.read();
+  if (!response.Body) {
+    throw new Error("No body returned from S3");
   }
 
+  const chunks: Uint8Array[] = [];
+  await pipeline(
+    response.Body as Readable,
+    new stream.Writable({
+      write(chunk, _encoding, callback) {
+        chunks.push(chunk);
+        callback();
+      },
+    })
+  );
+
   return Buffer.concat(chunks);
+
+  // const stream = Body as Readable;
+  // const chunks: Uint8Array[] = [];
+  // for await (const chunk of stream) {
+  //   chunks.push(chunk);
+  // }
+  // console.log(Body);
+
+  // if (Body instanceof Readable) {
+  //   // console.log("-------------------");
+  //   // console.log(Body);
+  //   // return new Promise<Buffer>((resolve, reject) => {
+  //   //   const chunks: Uint8Array[] = [];
+  //   //   Body.on("data", (chunk) => chunks.push(chunk));
+  //   //   Body.on("end", () => resolve(Buffer.concat(chunks)));
+  //   //   Body.on("error", reject);
+  //   // });
+  // } else {
+  //   throw new Error("Body is not a Node.js Readable stream.");
+  // }
+  // if (Body instanceof Readable) {
+  //   // TODO: return buffer
+  //   return new Promise((resolve, reject) => {
+  //     const chunks: Uint8Array[] = [];
+  //     Body.on("data", (chunk) => {
+  //       chunks.push(chunk);
+  //     });
+
+  //     Body.on("end", () => {
+  //       resolve(Buffer.concat(chunks));
+  //     });
+
+  //     Body.on("error", (err) => {
+  //       reject(err);
+  //     });
+  //   });
+  // } else {
+  //   throw new Error("Unexpected Body type returned from S3");
+  // }
+  // return Buffer.concat(chunks);
 }
 
 async function getAuthToken() {
