@@ -4,6 +4,18 @@ import qs from "qs";
 import fs from "fs";
 import FormData from "form-data";
 import path from "path";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { createClient } from "@/utils/supabase/component";
+
+const supabase = createClient();
+
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 export const config = {
   api: {
@@ -16,21 +28,43 @@ export async function POST(
   { params }: { params: { recordingId: string } }
 ) {
   const { recordingId } = params;
-  // TODO: download wavfile from s3
-  try {
-    const authToken = await getAuthToken();
-    // const response = await getTranscription(authToken, req.body.toString());
-    const filePath = path.join(process.cwd(), "public", "simulation1.wav");
-    const response = await getTranscription(authToken, filePath);
 
+  // Run STT
+  try {
+    const audioFileBuffer = await downloadWavFile(recordingId);
+    const authToken = await getAuthToken();
+    const utterances = await getTranscription(authToken, audioFileBuffer);
+    console.log("Transcription:", utterances);
+    // TODO: Save transcription to DB - Utterances
     return NextResponse.json({
       message: "---- successfully",
-      transcription: response,
+      transcription: utterances,
     });
   } catch (error) {
     console.error("--- error:", error);
     return NextResponse.json({ error: "--- failed" }, { status: 500 });
   }
+}
+
+// download wav file from S3 and return buffer
+async function downloadWavFile(recordingId: string): Promise<Buffer> {
+  const downloadParams = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: `recordings/${recordingId}.wav`,
+  };
+  const command = new GetObjectCommand(downloadParams);
+  const { Body } = await s3Client.send(command);
+
+  const chunks: Uint8Array[] = [];
+  const readableStream = Body as ReadableStream;
+  const reader = readableStream.getReader();
+  let result = await reader.read();
+  while (!result.done) {
+    chunks.push(result.value);
+    result = await reader.read();
+  }
+
+  return Buffer.concat(chunks);
 }
 
 async function getAuthToken() {
@@ -61,9 +95,13 @@ async function getAuthToken() {
   }
 }
 
-async function getTranscription(auth_token, audioFilePath) {
+async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
   const formData = new FormData();
-  formData.append("file", fs.createReadStream(audioFilePath));
+  formData.append(
+    "file",
+    new Blob([audioFileBuffer], { type: "audio/wav" }),
+    "recording.wav"
+  );
   formData.append(
     "config",
     JSON.stringify({
@@ -91,13 +129,17 @@ async function getTranscription(auth_token, audioFilePath) {
     console.log("Transcription request sent:", transcribeId);
 
     // 전사 결과 조회
-    await checkTranscriptionResult(auth_token, transcribeId);
+    const results = await checkTranscriptionResult(auth_token, transcribeId);
+    return results;
   } catch (error) {
     console.error("Error during transcription request:", error);
   }
 }
 
-async function checkTranscriptionResult(auth_token, transcribeId) {
+async function checkTranscriptionResult(
+  auth_token,
+  transcribeId
+): Promise<any> {
   try {
     // 일정 시간 대기 (예: 5초)
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -113,7 +155,8 @@ async function checkTranscriptionResult(auth_token, transcribeId) {
     );
 
     if (response.data.status === "completed") {
-      console.log("Transcription result:", response.data.results);
+      console.log("Transcription completed");
+      return response.data.results;
     } else if (response.data.status === "transcribing") {
       console.log("Transcription is still in progress. Retrying...");
       await checkTranscriptionResult(auth_token, transcribeId); // 재귀 호출로 재시도
