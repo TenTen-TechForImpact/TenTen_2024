@@ -3,14 +3,9 @@ import axios from "axios";
 import qs from "qs";
 import fs from "fs";
 import FormData from "form-data";
-import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
 import { Readable } from "stream";
-import stream from "stream";
-import { promisify } from "util";
-
-const pipeline = promisify(stream.pipeline);
 
 const supabase = createClient();
 
@@ -21,6 +16,16 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
+
+const defaultKeywords = [
+  "스테로이드",
+  "타이레놀",
+  "항생제",
+  "진통소염제",
+  "항히스타민제",
+  "알레르기",
+  "비염",
+];
 
 export const config = {
   api: {
@@ -36,10 +41,54 @@ export async function POST(
 
   // Run STT
   try {
+    // download recording file from S3
     const recordingFileBuffer = await downloadRecordingFile(recordingId);
-    // TODO: if there are keywords, put them in the config
+    // get keywords
+    const {
+      data: { session_id: sessionId },
+      error: sessionIdError,
+    } = await supabase
+      .from("Recording")
+      .select("session_id")
+      .eq("id", recordingId)
+      .single();
+
+    if (sessionIdError) {
+      throw new Error(
+        `Error fetching session_id by recording_id: ${sessionIdError.message}`
+      );
+    }
+
+    if (!sessionId) {
+      throw new Error("Session ID not found for the given recording ID.");
+    }
+
+    const { data: drugs, error: drugsError } = await supabase
+      .from("Session")
+      .select("prescription_drugs, other_drugs")
+      .eq("id", sessionId);
+
+    if (drugsError) {
+      throw new Error(`Error fetching drugs: ${drugsError.message}`);
+    }
+
+    console.log(drugs);
+    const prescription_drugs: string[] = drugs[0]?.prescription_drugs ?? [];
+    const other_drugs: string[] = drugs[0]?.other_drugs ?? [];
+
+    const keywords = [
+      ...defaultKeywords,
+      ...prescription_drugs,
+      ...other_drugs,
+    ];
+    // get auth token
     const authToken = await getAuthToken();
-    const utterances = await getTranscription(authToken, recordingFileBuffer);
+    // get transcription with keywords
+    const utterances = await getTranscription(
+      authToken,
+      recordingFileBuffer,
+      keywords
+    );
     // TODO: Save transcription to DB - Utterances
     return NextResponse.json({
       message: "---- successfully",
@@ -101,7 +150,11 @@ async function getAuthToken() {
   }
 }
 
-async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
+async function getTranscription(
+  auth_token: string,
+  audioFileBuffer: Buffer,
+  keywords: string[]
+) {
   const formData = new FormData();
 
   formData.append("file", audioFileBuffer, {
@@ -117,6 +170,7 @@ async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
       diarization: {
         spk_count: 2,
       },
+      keywords: keywords,
     })
   );
 
