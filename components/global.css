@@ -14,11 +14,14 @@
   --padding-small: 8px;
   --padding-medium: 20px;
   --padding-page: 55px;
-  --border-radius: 8px;
+  --border-medium: 20px;
+  --border-large: 30px;
   --header-height: 60px;
 }
 
-body {
+body,
+h1,
+h2 {
   margin: 0;
   padding: 0;
   box-sizing: border-box;

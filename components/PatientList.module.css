@@ -4,7 +4,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
 }
 
 .listHeader {
@@ -15,7 +14,7 @@
 }
 
 .title {
-  color: #87ceeb; /* 하늘색 제목 */
+  color: #3563e9;
   font-size: var(--font-size-large);
 }
 

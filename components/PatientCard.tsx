@@ -21,7 +21,7 @@ const PatientCard: React.FC<PatientProps> = ({ name, age, gender }) => (
       <div className={styles.patientName}>
         <img
           src="/images/ic_fluent_person_24_filled.svg"
-          alt="Person Icon"
+          alt=""
           className={styles.icon}
         />
         <span>{name}</span>
@@ -29,7 +29,7 @@ const PatientCard: React.FC<PatientProps> = ({ name, age, gender }) => (
       <div className={styles.patientDetails}>
         <img
           src="/images/ic_fluent_info_24_regular.svg"
-          alt="Info Icon"
+          alt=""
           className={styles.icon}
         />
         <span>{`만 ${age}세 | ${gender}`}</span>
