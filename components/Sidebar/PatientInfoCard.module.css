@@ -4,4 +4,45 @@
   padding: var(--padding-medium);
   border-radius: var(--border-medium);
   margin-bottom: var(--padding-medium);
+  border: 1px solid #ccc;
+  /* 테두리 추가 */
+}
+
+.infoHeader {
+  display: flex;
+  align-items: center;
+}
+
+.patientIcon {
+  margin-right: 12px;
+}
+
+.patientText {
+  display: flex;
+  flex-direction: column;
+}
+
+.patientName {
+  font-size: var(--font-size-large);
+  /* 이름은 큰 글씨로 */
+  font-weight: var(--font-weight-bold);
+  /* 이름을 진하게 */
+  color: #000;
+}
+
+.name {
+  font-size: var(--font-size-large);
+  /* 이름은 큰 글씨 */
+}
+
+.patientLabel {
+  font-size: var(--font-size-small);
+  /* "환자"는 작은 글씨 */
+}
+
+.patientDetails {
+  font-size: var(--font-size-small);
+  /* 작은 글씨 */
+  color: #6c757d;
+  /* 회색 */
 }

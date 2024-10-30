@@ -2,16 +2,41 @@
 .consultationRecordPage {
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
-.layout {
+.contentWrapper {
   display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--secondary-color);
+  padding: var(--padding-medium);
+  position: fixed;
+  top: var(--header-height);
   height: calc(100vh - var(--header-height));
+  overflow-y: auto;
 }
 
 .mainContent {
+  margin-left: 250px;
+  margin-right: 300px;
+  /* 오른쪽 메모바 너비 확보 */
   flex: 1;
-  margin-left: 300px;
-  margin-top: var(--header-height);
-  /* 사이드바의 넓이만큼 왼쪽 여백 추가 */
+  overflow-y: auto;
+  padding: var(--padding-medium);
+  padding-top: calc(var(--header-height) + var(--padding-medium));
+}
+
+.rightSidebar {
+  width: 300px;
+  background-color: var(--secondary-color);
+  padding: var(--padding-medium);
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
 }

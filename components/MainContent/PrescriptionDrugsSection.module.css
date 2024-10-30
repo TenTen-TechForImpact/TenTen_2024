@@ -1,0 +1,71 @@
+/* src/components/MainContent/PrescriptionDrugsSection.module.css */
+.section {
+  margin-bottom: var(--padding-medium);
+  padding: var(--padding-medium);
+  background: #fff;
+  border-radius: var(--border-medium);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--padding-small);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--padding-medium);
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+.table th {
+  background: var(--secondary-color);
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #d9534f;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.inputContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: var(--padding-small);
+}
+
+.inputField {
+  padding: 8px;
+  font-size: var(--font-size-medium);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.selectField {
+  padding: 8px;
+  font-size: var(--font-size-medium);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.addButton {
+  padding: 12px;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: var(--font-size-medium);
+}

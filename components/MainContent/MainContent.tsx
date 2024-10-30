@@ -2,54 +2,66 @@
 "use client";
 
 import React from 'react';
+import PersonalInfoSection from './PersonalInfoSection';
+import PreQuestionsSection from './PreQuestionsSection';
+import PrescriptionDrugsSection from './PrescriptionDrugsSection';
+import OTCAndSupplementsSection from './OTCAndSupplementsSection';
+import PharmacistInterventionSection from './PharmacistInterventionSection';
+import CareNotesSection from './CareNotesSection';
 import styles from './MainContent.module.css';
 
 interface MainContentProps {
   isFollowUp: boolean;
+  onCompleteFirstSession: () => void;
+  patientInfo: any;
+  setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
+  preQuestions: string[];
+  setPreQuestions: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const MainContent: React.FC<MainContentProps> = ({ isFollowUp }) => {
+const MainContent: React.FC<MainContentProps> = ({
+  isFollowUp,
+  onCompleteFirstSession,
+  patientInfo,
+  setPatientInfo,
+  preQuestions,
+  setPreQuestions,
+}) => {
   return (
     <div className={styles.mainContent}>
       {!isFollowUp && (
         <>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>환자 상세 정보</h3>
-            <textarea placeholder="환자 상세 정보를 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>상담 전 질문</h3>
-            <textarea placeholder="상담 전 질문을 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>처방 의약품</h3>
-            <textarea placeholder="처방 의약품 정보를 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>일반의약품+건강기능식품</h3>
-            <textarea placeholder="일반의약품+건강기능식품 정보를 입력하세요" className={styles.textarea}></textarea>
-          </div>
+          <section id="patientInfo" className={styles.section}>
+            <PersonalInfoSection patientInfo={patientInfo} setPatientInfo={setPatientInfo} />
+          </section>
+          <section id="preQuestions" className={styles.section}>
+            <PreQuestionsSection preQuestions={preQuestions} setPreQuestions={setPreQuestions} />
+          </section>
+          <section id="prescriptionDrugs" className={styles.section}>
+            <PrescriptionDrugsSection />
+          </section>
+          <section id="otcAndSupplements" className={styles.section}>
+            <OTCAndSupplementsSection />
+          </section>
+          <button className={styles.completeButton} onClick={onCompleteFirstSession}>
+            1차 상담 완료
+          </button>
         </>
       )}
-
       {isFollowUp && (
         <>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>처방 의약품</h3>
-            <textarea placeholder="처방 의약품 정보를 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>일반의약품+건강기능식품</h3>
-            <textarea placeholder="일반의약품+건강기능식품 정보를 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>약사 중재 내용</h3>
-            <textarea placeholder="약사 중재 내용을 입력하세요" className={styles.textarea}></textarea>
-          </div>
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>돌봄 노트</h3>
-            <textarea placeholder="돌봄 노트를 입력하세요" className={styles.textarea}></textarea>
-          </div>
+          <section id="prescriptionDrugs" className={styles.section}>
+            <PrescriptionDrugsSection />
+          </section>
+          <section id="otcAndSupplements" className={styles.section}>
+            <OTCAndSupplementsSection />
+          </section>
+          <section id="pharmacistIntervention" className={styles.section}>
+            <PharmacistInterventionSection />
+          </section>
+          <section id="careNotes" className={styles.section}>
+            <CareNotesSection />
+          </section>
         </>
       )}
     </div>

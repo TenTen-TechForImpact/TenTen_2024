@@ -1,0 +1,26 @@
+/* src/components/Sidebar/FirstSessionSummary.module.css */
+.summaryContainer {
+  background-color: #fff;
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  padding: var(--padding-medium);
+}
+
+.title {
+  font-size: var(--font-size-large);
+  margin-bottom: var(--padding-small);
+}
+
+.section {
+  margin-bottom: var(--padding-medium);
+}
+
+.section h4 {
+  font-size: var(--font-size-medium);
+  margin-bottom: var(--padding-small);
+}
+
+.section p {
+  font-size: var(--font-size-medium);
+  margin: 0;
+}

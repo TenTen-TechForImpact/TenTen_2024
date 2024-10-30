@@ -2,7 +2,7 @@
 // 전체 페이지 레이아웃과 환자 리스트 포함
 
 import React from "react";
-import Header from "./Header";
+import Header from "./Header/Header";
 import PatientList from "./PatientList";
 import styles from "./MainPage.module.css";
 

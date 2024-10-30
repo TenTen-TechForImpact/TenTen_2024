@@ -9,6 +9,7 @@
   --font-size-extra-large: 32px;
   --font-size-large: 24px;
   --font-size-medium: 16px;
+  --font-size-small: 12px;
   --font-weight-bold: 600;
   --font-weight-normal: 400;
   --padding-small: 8px;
@@ -21,7 +22,8 @@
 
 body,
 h1,
-h2 {
+h2,
+p {
   margin: 0;
   padding: 0;
   box-sizing: border-box;

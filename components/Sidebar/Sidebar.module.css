@@ -3,7 +3,6 @@
   width: 250px;
   background-color: var(--secondary-color);
   padding: var(--padding-medium);
-  border-radius: var(--border-medium);
   height: calc(100vh - var(--header-height));
   position: fixed;
   /* 사이드바를 고정시킴 */
