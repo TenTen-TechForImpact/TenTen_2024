@@ -72,7 +72,6 @@ export async function POST(
       throw new Error(`Error fetching drugs: ${drugsError.message}`);
     }
 
-    console.log(drugs);
     const prescription_drugs: string[] = drugs[0]?.prescription_drugs ?? [];
     const other_drugs: string[] = drugs[0]?.other_drugs ?? [];
 
@@ -84,12 +83,44 @@ export async function POST(
     // get auth token
     const authToken = await getAuthToken();
     // get transcription with keywords
-    const utterances = await getTranscription(
+    const { utterances } = await getTranscription(
       authToken,
       recordingFileBuffer,
       keywords
     );
+
     // TODO: Save transcription to DB - Utterances
+    console.log("start inserting utterances", utterances);
+    for (let i = 0; i < utterances.length; i++) {
+      console.log("inserting utterance", i + 1);
+      const utterance = utterances[i];
+
+      const { start_at, duration, spk, spk_type, msg } = utterance;
+
+      // sequence_num은 1부터 시작하며, 각 반복마다 증가합니다.
+      const sequence_num = i + 1;
+
+      const { error } = await supabase.from("Utterance").insert({
+        recording_id: recordingId, // 외래 키로 사용되는 recording ID
+        sequence_num: sequence_num, // 각 utterance의 순서 번호
+        started_at: start_at, // 시작 시간
+        duration: duration, // 지속 시간
+        speaker_num: spk, // 화자 번호
+        speaker: spk_type, // 화자 유형
+        msg: msg, // 메시지 내용
+        created_at: new Date(), // 현재 시간으로 설정
+        modified_at: new Date(), // 현재 시간으로 설정
+      });
+
+      if (error) {
+        console.error("Error inserting utterance:", error);
+        throw new Error(
+          `Failed to insert utterance at sequence ${sequence_num}`
+        );
+      }
+    }
+    console.log("inserted utterances");
+
     return NextResponse.json({
       message: "---- successfully",
       transcription: utterances,
