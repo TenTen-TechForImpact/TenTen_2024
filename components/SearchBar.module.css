@@ -1,0 +1,9 @@
+/* SearchBar.module.css - 검색 바 스타일 */
+
+.searchBar {
+  flex-grow: 1;
+  padding: var(--padding-small) 12px;
+  font-size: var(--font-size-medium);
+  border-radius: var(--border-radius);
+  border: 1px solid #ccc;
+}
