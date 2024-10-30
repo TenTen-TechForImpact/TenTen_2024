@@ -40,7 +40,6 @@ export async function POST(
     // TODO: if there are keywords, put them in the config
     const authToken = await getAuthToken();
     const utterances = await getTranscription(authToken, recordingFileBuffer);
-    console.log("Transcription:", utterances);
     // TODO: Save transcription to DB - Utterances
     return NextResponse.json({
       message: "---- successfully",
@@ -59,65 +58,19 @@ async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
     Key: `recordings/${recordingId}.wav`,
   };
   const command = new GetObjectCommand(downloadParams);
-  // const { Body } = await s3Client.send(command);
-  const response = await s3Client.send(command);
+  const { Body } = await s3Client.send(command);
 
-  if (!response.Body) {
-    throw new Error("No body returned from S3");
+  if (Body instanceof Readable) {
+    // TODO: return buffer
+    const chunks: Uint8Array[] = [];
+    // `Readable` 스트림을 async iterator로 읽어들이기
+    for await (const chunk of Body) {
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  } else {
+    throw new Error("Unexpected Body type returned from S3");
   }
-
-  const chunks: Uint8Array[] = [];
-  await pipeline(
-    response.Body as Readable,
-    new stream.Writable({
-      write(chunk, _encoding, callback) {
-        chunks.push(chunk);
-        callback();
-      },
-    })
-  );
-
-  return Buffer.concat(chunks);
-
-  // const stream = Body as Readable;
-  // const chunks: Uint8Array[] = [];
-  // for await (const chunk of stream) {
-  //   chunks.push(chunk);
-  // }
-  // console.log(Body);
-
-  // if (Body instanceof Readable) {
-  //   // console.log("-------------------");
-  //   // console.log(Body);
-  //   // return new Promise<Buffer>((resolve, reject) => {
-  //   //   const chunks: Uint8Array[] = [];
-  //   //   Body.on("data", (chunk) => chunks.push(chunk));
-  //   //   Body.on("end", () => resolve(Buffer.concat(chunks)));
-  //   //   Body.on("error", reject);
-  //   // });
-  // } else {
-  //   throw new Error("Body is not a Node.js Readable stream.");
-  // }
-  // if (Body instanceof Readable) {
-  //   // TODO: return buffer
-  //   return new Promise((resolve, reject) => {
-  //     const chunks: Uint8Array[] = [];
-  //     Body.on("data", (chunk) => {
-  //       chunks.push(chunk);
-  //     });
-
-  //     Body.on("end", () => {
-  //       resolve(Buffer.concat(chunks));
-  //     });
-
-  //     Body.on("error", (err) => {
-  //       reject(err);
-  //     });
-  //   });
-  // } else {
-  //   throw new Error("Unexpected Body type returned from S3");
-  // }
-  // return Buffer.concat(chunks);
 }
 
 async function getAuthToken() {
@@ -150,11 +103,12 @@ async function getAuthToken() {
 
 async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
   const formData = new FormData();
-  formData.append(
-    "file",
-    new Blob([audioFileBuffer], { type: "audio/wav" }),
-    "recording.wav"
-  );
+
+  formData.append("file", audioFileBuffer, {
+    filename: "recording.wav",
+    contentType: "audio/wav",
+  });
+
   formData.append(
     "config",
     JSON.stringify({
@@ -212,9 +166,10 @@ async function checkTranscriptionResult(
       return response.data.results;
     } else if (response.data.status === "transcribing") {
       console.log("Transcription is still in progress. Retrying...");
-      await checkTranscriptionResult(auth_token, transcribeId); // 재귀 호출로 재시도
+      return await checkTranscriptionResult(auth_token, transcribeId); // 재귀 호출로 재시도
     } else {
       console.error("Transcription failed:", response.data);
+      return null;
     }
   } catch (error) {
     console.error("Error retrieving transcription result:", error);
