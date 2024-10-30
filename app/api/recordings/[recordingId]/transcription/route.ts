@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import qs from "qs";
-import fs from "fs";
 import FormData from "form-data";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
@@ -33,6 +32,7 @@ export const config = {
   },
 };
 
+// POST: Request STT to returnzero
 export async function POST(
   req: NextRequest,
   { params }: { params: { recordingId: string } }
