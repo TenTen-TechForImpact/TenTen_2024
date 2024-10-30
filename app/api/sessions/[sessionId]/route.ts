@@ -36,3 +36,33 @@ export async function GET(
   // 조회된 세션 데이터를 JSON 형식으로 반환
   return NextResponse.json(session);
 }
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { sessionId: string } }
+) {
+  const { sessionId } = params;
+
+  // 요청에서 수정할 데이터 가져오기
+  const updatedData = await req.json();
+
+  // 세션 정보 수정
+  console.log("Updating session with ID:", sessionId);
+  const { data: session, error } = await supabase
+    .from("Session") // Session 테이블에서
+    .update(updatedData) // 업데이트할 데이터
+    .eq("id", sessionId) // sessionId와 일치하는 항목을 업데이트합니다.
+    .single(); // 단일 레코드를 반환합니다.
+
+  // 에러 처리
+  if (error) {
+    console.error("Error updating session:", error.message);
+    return NextResponse.json(
+      { error: "Error updating session"},
+      { status: 500 }
+    );
+  }
+
+  // 수정된 세션 데이터를 JSON 형식으로 반환
+  return NextResponse.json(session);
+}
