@@ -44,59 +44,37 @@ export async function POST(
     // download recording file from S3
     const recordingFileBuffer = await downloadRecordingFile(recordingId);
     // get keywords
-    const {
-      data: { session_id: sessionId },
-      error: sessionIdError,
-    } = await supabase
-      .from("Recording")
-      .select("session_id")
-      .eq("id", recordingId)
-      .single();
-
-    if (sessionIdError) {
-      throw new Error(
-        `Error fetching session_id by recording_id: ${sessionIdError.message}`
-      );
-    }
-
-    if (!sessionId) {
-      throw new Error("Session ID not found for the given recording ID.");
-    }
-
-    const { data: drugs, error: drugsError } = await supabase
-      .from("Session")
-      .select("prescription_drugs, other_drugs")
-      .eq("id", sessionId);
-
-    if (drugsError) {
-      throw new Error(`Error fetching drugs: ${drugsError.message}`);
-    }
-
-    console.log(drugs);
-    const prescription_drugs: string[] = drugs[0]?.prescription_drugs ?? [];
-    const other_drugs: string[] = drugs[0]?.other_drugs ?? [];
-
-    const keywords = [
-      ...defaultKeywords,
-      ...prescription_drugs,
-      ...other_drugs,
-    ];
+    const keywords = await getKeywords(recordingId);
     // get auth token
     const authToken = await getAuthToken();
     // get transcription with keywords
-    const utterances = await getTranscription(
+    const { utterances } = await getTranscription(
       authToken,
       recordingFileBuffer,
       keywords
     );
-    // TODO: Save transcription to DB - Utterances
+
+    // insert utterances into Utterance table
+    try {
+      await insertUtterances(recordingId, utterances);
+    } catch (dbError) {
+      console.error("Database insert error:", dbError);
+      return NextResponse.json(
+        { error: "Database insert failed" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
-      message: "---- successfully",
+      message: "Created transcription successfully",
       transcription: utterances,
     });
   } catch (error) {
-    console.error("--- error:", error);
-    return NextResponse.json({ error: "--- failed" }, { status: 500 });
+    console.error("Creating transcription error:", error);
+    return NextResponse.json(
+      { error: "Creating transcription failed" },
+      { status: 500 }
+    );
   }
 }
 
@@ -120,6 +98,41 @@ async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   } else {
     throw new Error("Unexpected Body type returned from S3");
   }
+}
+
+async function getKeywords(recordingId: string): Promise<string[]> {
+  const {
+    data: { session_id: sessionId },
+    error: sessionIdError,
+  } = await supabase
+    .from("Recording")
+    .select("session_id")
+    .eq("id", recordingId)
+    .single();
+
+  if (sessionIdError) {
+    throw new Error(
+      `Error fetching session_id by recording_id: ${sessionIdError.message}`
+    );
+  }
+
+  if (!sessionId) {
+    throw new Error("Session ID not found for the given recording ID.");
+  }
+
+  const { data: drugs, error: drugsError } = await supabase
+    .from("Session")
+    .select("prescription_drugs, other_drugs")
+    .eq("id", sessionId);
+
+  if (drugsError) {
+    throw new Error(`Error fetching drugs: ${drugsError.message}`);
+  }
+
+  const prescription_drugs: string[] = drugs[0]?.prescription_drugs ?? [];
+  const other_drugs: string[] = drugs[0]?.other_drugs ?? [];
+
+  return [...defaultKeywords, ...prescription_drugs, ...other_drugs];
 }
 
 async function getAuthToken() {
@@ -227,5 +240,32 @@ async function checkTranscriptionResult(
     }
   } catch (error) {
     console.error("Error retrieving transcription result:", error);
+  }
+}
+
+async function insertUtterances(recordingId: string, utterances) {
+  for (let i = 0; i < utterances.length; i++) {
+    const utterance = utterances[i];
+
+    const { start_at, duration, spk, spk_type, msg } = utterance;
+
+    const sequence_num = i + 1;
+
+    const { error } = await supabase.from("Utterance").insert({
+      recording_id: recordingId, // 외래 키로 사용되는 recording ID
+      sequence_num: sequence_num, // 각 utterance의 순서 번호
+      started_at: start_at, // 시작 시간
+      duration: duration, // 지속 시간
+      speaker_num: spk, // 화자 번호
+      speaker: spk_type, // 화자 유형
+      msg: msg, // 메시지 내용
+      created_at: new Date(), // 현재 시간으로 설정
+      modified_at: new Date(), // 현재 시간으로 설정
+    });
+
+    if (error) {
+      console.error("Error inserting utterance:", error);
+      throw new Error(`Failed to insert utterance at sequence ${sequence_num}`);
+    }
   }
 }
