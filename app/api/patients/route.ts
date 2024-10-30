@@ -5,24 +5,18 @@ import { createClient } from "@/utils/supabase/component";
 const supabase = createClient();
 
 export async function POST(req: NextRequest) {
-  console.log("------------------------1");
   try {
     // 요청 바디에서 JSON 데이터를 파싱
     const { name, date_of_birth, gender, phone_number, organization } =
       await req.json();
 
-    console.log("------------------------2");
-
     // 필수 데이터가 있는지 확인
     if (!name || !gender || !phone_number) {
-      console.log("------------------------9");
-
       return NextResponse.json(
         { error: "Some required fields not exist" },
         { status: 400 }
       );
     }
-    console.log("------------------------3");
 
     // Patient 테이블에 데이터 삽입
     const { data, error } = await supabase
@@ -47,7 +41,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("------------------------4");
     // 성공적으로 삽입되면 생성된 데이터 반환
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
