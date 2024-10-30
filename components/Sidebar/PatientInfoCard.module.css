@@ -1,0 +1,7 @@
+/* src/components/Sidebar/PatientInfoCard.module.css */
+.patientInfoCard {
+  background-color: var(--secondary-color);
+  padding: var(--padding-medium);
+  border-radius: var(--border-medium);
+  margin-bottom: var(--padding-medium);
+}

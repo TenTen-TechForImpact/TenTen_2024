@@ -1,0 +1,17 @@
+/* src/app/ConsultationRecordPage.module.css */
+.consultationRecordPage {
+  display: flex;
+  flex-direction: column;
+}
+
+.layout {
+  display: flex;
+  height: calc(100vh - var(--header-height));
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 300px;
+  margin-top: var(--header-height);
+  /* 사이드바의 넓이만큼 왼쪽 여백 추가 */
+}

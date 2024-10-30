@@ -1,7 +1,15 @@
 // app/page.tsx
 
-import MainPage from "../components/MainPage";
+"use client";
+
+import { Provider } from "react-redux";
+import store from "../store/store";
+import ConsultationRecordPage from "./ConsultationRecordPage";
 
 export default function Page() {
-  return <MainPage />;
+  return (
+    <Provider store={store}>
+      <ConsultationRecordPage />
+    </Provider>
+  );
 }

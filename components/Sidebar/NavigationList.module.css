@@ -1,0 +1,22 @@
+/* src/components/Sidebar/NavigationList.module.css */
+.navigationList {
+  list-style: none;
+  padding: 0;
+}
+
+.navItem {
+  padding: var(--padding-small);
+  cursor: pointer;
+}
+
+.navButton {
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  padding: 0;
+}
+
+.penIcon {
+  margin-left: 8px;
+}
