@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 var(--padding-page);
+  padding-left: var(--padding-page);
   line-height: var(--header-height);
   border-bottom: 2px solid #e5e5ea;
   background-color: #fff;
@@ -23,5 +23,4 @@
   background: linear-gradient(90deg, #32cd32, #8a2be2);
   -webkit-background-clip: text;
   color: transparent;
-  margin-left: 0;
 }

@@ -18,9 +18,25 @@ const PatientList: React.FC = () => {
   const handleSortChange = (value: string) => setSortOption(value);
 
   const patients = [
-    { id: 1, name: "홍길동", age: 30, gender: "남" },
-    { id: 2, name: "김철수", age: 25, gender: "남" },
+    { id: 1, name: "홍길동", gender: "남", birthDate: "1970-05-15" },
+    { id: 2, name: "김철수", gender: "남", birthDate: "1963-08-13" },
+    { id: 3, name: "이순신", gender: "남", birthDate: "1960-04-15" },
+    { id: 4, name: "장보고", gender: "남", birthDate: "1970-06-25" },
   ];
+
+  const calculateAge = (birthDate: string) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
 
   return (
     <div className={styles.patientListContainer}>
@@ -49,7 +65,7 @@ const PatientList: React.FC = () => {
           <PatientCard
             key={patient.id}
             name={patient.name}
-            age={patient.age}
+            age={calculateAge(patient.birthDate)}
             gender={patient.gender}
           />
         ))}

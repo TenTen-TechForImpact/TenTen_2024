@@ -2,8 +2,11 @@
 
 .searchBar {
   flex-grow: 1;
-  padding: var(--padding-small) 12px;
-  font-size: var(--font-size-medium);
-  border-radius: var(--border-radius);
+  font-size: var(--font-size-large);
+  border-radius: var(--border-large);
   border: 1px solid #ccc;
+  background-color: #d3d3d3;
+  height: 57px;
+  padding-left: var(--font-size-large);
+  margin: 24px 0;
 }

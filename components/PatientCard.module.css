@@ -58,10 +58,6 @@
     brightness(104%) contrast(103%);
 }
 
-.detailButton:hover {
-  opacity: 0.85;
-}
-
 .patientName,
 .patientDetails,
 .avatarContainer {

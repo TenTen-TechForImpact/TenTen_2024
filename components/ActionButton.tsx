@@ -7,8 +7,6 @@ interface ActionButtonProps {
   width?: number;
   height?: number;
   fontSize?: number;
-  backgroundColor?: string;
-  color?: string;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
@@ -17,8 +15,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   width = 150,
   height = 57,
   fontSize = 24,
-  backgroundColor = "#0511F2",
-  color = "#FFFFFF",
 }) => (
   <button
     className={styles.actionButton}
@@ -26,8 +22,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     style={{
       width: `${width}px`,
       height: `${height}px`,
-      backgroundColor,
-      color,
       fontSize: `${fontSize}px`,
     }}
   >
