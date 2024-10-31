@@ -1,7 +1,7 @@
 // app/patients/[id]/page.tsx
 
 import React from "react";
-import MainPage from "@/App/MainPage";
+import MainPage from "@/app/MainPage";
 
 const PatientDetail = ({ params }: { params: { id: string } }) => {
   const patientId = Number(params.id);
