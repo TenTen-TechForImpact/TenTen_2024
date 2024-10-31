@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import qs from "qs";
-import fs from "fs";
 import FormData from "form-data";
-import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
+import { Readable } from "stream";
 
 const supabase = createClient();
 
@@ -17,12 +16,23 @@ const s3Client = new S3Client({
   },
 });
 
+const defaultKeywords = [
+  "스테로이드",
+  "타이레놀",
+  "항생제",
+  "진통소염제",
+  "항히스타민제",
+  "알레르기",
+  "비염",
+];
+
 export const config = {
   api: {
     bodyParser: false, // FormData 사용 시 bodyParser 비활성화
   },
 };
 
+// POST: Request STT to returnzero
 export async function POST(
   req: NextRequest,
   { params }: { params: { recordingId: string } }
@@ -31,23 +41,45 @@ export async function POST(
 
   // Run STT
   try {
-    const audioFileBuffer = await downloadWavFile(recordingId);
+    // download recording file from S3
+    const recordingFileBuffer = await downloadRecordingFile(recordingId);
+    // get keywords
+    const keywords = await getKeywords(recordingId);
+    // get auth token
     const authToken = await getAuthToken();
-    const utterances = await getTranscription(authToken, audioFileBuffer);
-    console.log("Transcription:", utterances);
-    // TODO: Save transcription to DB - Utterances
+    // get transcription with keywords
+    const { utterances } = await getTranscription(
+      authToken,
+      recordingFileBuffer,
+      keywords
+    );
+
+    // insert utterances into Utterance table
+    try {
+      await insertUtterances(recordingId, utterances);
+    } catch (dbError) {
+      console.error("Database insert error:", dbError);
+      return NextResponse.json(
+        { error: "Database insert failed" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
-      message: "---- successfully",
+      message: "Created transcription successfully",
       transcription: utterances,
     });
   } catch (error) {
-    console.error("--- error:", error);
-    return NextResponse.json({ error: "--- failed" }, { status: 500 });
+    console.error("Creating transcription error:", error);
+    return NextResponse.json(
+      { error: "Creating transcription failed" },
+      { status: 500 }
+    );
   }
 }
 
 // download wav file from S3 and return buffer
-async function downloadWavFile(recordingId: string): Promise<Buffer> {
+async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   const downloadParams = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: `recordings/${recordingId}.wav`,
@@ -55,16 +87,52 @@ async function downloadWavFile(recordingId: string): Promise<Buffer> {
   const command = new GetObjectCommand(downloadParams);
   const { Body } = await s3Client.send(command);
 
-  const chunks: Uint8Array[] = [];
-  const readableStream = Body as ReadableStream;
-  const reader = readableStream.getReader();
-  let result = await reader.read();
-  while (!result.done) {
-    chunks.push(result.value);
-    result = await reader.read();
+  if (Body instanceof Readable) {
+    // TODO: return buffer
+    const chunks: Uint8Array[] = [];
+    // `Readable` 스트림을 async iterator로 읽어들이기
+    for await (const chunk of Body) {
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  } else {
+    throw new Error("Unexpected Body type returned from S3");
+  }
+}
+
+async function getKeywords(recordingId: string): Promise<string[]> {
+  const {
+    data: { session_id: sessionId },
+    error: sessionIdError,
+  } = await supabase
+    .from("Recording")
+    .select("session_id")
+    .eq("id", recordingId)
+    .single();
+
+  if (sessionIdError) {
+    throw new Error(
+      `Error fetching session_id by recording_id: ${sessionIdError.message}`
+    );
   }
 
-  return Buffer.concat(chunks);
+  if (!sessionId) {
+    throw new Error("Session ID not found for the given recording ID.");
+  }
+
+  const { data: drugs, error: drugsError } = await supabase
+    .from("Session")
+    .select("prescription_drugs, other_drugs")
+    .eq("id", sessionId);
+
+  if (drugsError) {
+    throw new Error(`Error fetching drugs: ${drugsError.message}`);
+  }
+
+  const prescription_drugs: string[] = drugs[0]?.prescription_drugs ?? [];
+  const other_drugs: string[] = drugs[0]?.other_drugs ?? [];
+
+  return [...defaultKeywords, ...prescription_drugs, ...other_drugs];
 }
 
 async function getAuthToken() {
@@ -95,13 +163,18 @@ async function getAuthToken() {
   }
 }
 
-async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
+async function getTranscription(
+  auth_token: string,
+  audioFileBuffer: Buffer,
+  keywords: string[]
+) {
   const formData = new FormData();
-  formData.append(
-    "file",
-    new Blob([audioFileBuffer], { type: "audio/wav" }),
-    "recording.wav"
-  );
+
+  formData.append("file", audioFileBuffer, {
+    filename: "recording.wav",
+    contentType: "audio/wav",
+  });
+
   formData.append(
     "config",
     JSON.stringify({
@@ -110,6 +183,7 @@ async function getTranscription(auth_token: string, audioFileBuffer: Buffer) {
       diarization: {
         spk_count: 2,
       },
+      keywords: keywords,
     })
   );
 
@@ -159,11 +233,39 @@ async function checkTranscriptionResult(
       return response.data.results;
     } else if (response.data.status === "transcribing") {
       console.log("Transcription is still in progress. Retrying...");
-      await checkTranscriptionResult(auth_token, transcribeId); // 재귀 호출로 재시도
+      return await checkTranscriptionResult(auth_token, transcribeId); // 재귀 호출로 재시도
     } else {
       console.error("Transcription failed:", response.data);
+      return null;
     }
   } catch (error) {
     console.error("Error retrieving transcription result:", error);
+  }
+}
+
+async function insertUtterances(recordingId: string, utterances) {
+  for (let i = 0; i < utterances.length; i++) {
+    const utterance = utterances[i];
+
+    const { start_at, duration, spk, spk_type, msg } = utterance;
+
+    const sequence_num = i + 1;
+
+    const { error } = await supabase.from("Utterance").insert({
+      recording_id: recordingId, // 외래 키로 사용되는 recording ID
+      sequence_num: sequence_num, // 각 utterance의 순서 번호
+      started_at: start_at, // 시작 시간
+      duration: duration, // 지속 시간
+      speaker_num: spk, // 화자 번호
+      speaker: spk_type, // 화자 유형
+      msg: msg, // 메시지 내용
+      created_at: new Date(), // 현재 시간으로 설정
+      modified_at: new Date(), // 현재 시간으로 설정
+    });
+
+    if (error) {
+      console.error("Error inserting utterance:", error);
+      throw new Error(`Failed to insert utterance at sequence ${sequence_num}`);
+    }
   }
 }
