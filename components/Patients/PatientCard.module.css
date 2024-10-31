@@ -1,7 +1,5 @@
-/* PatientCard.module.css */
-
 .patientCard {
-  position: relative; /* 절대 위치를 위해 position 설정 */
+  position: relative;
   display: flex;
   align-items: center;
   background-color: #e5e5ea;
@@ -58,7 +56,38 @@
   font-size: 24px;
   font-weight: 400;
   color: #000;
-  margin-top: 30px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.phoneIconContainer {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.phoneTooltip {
+  visibility: hidden;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 1;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.phoneIconContainer:hover .phoneTooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .patientDetails {

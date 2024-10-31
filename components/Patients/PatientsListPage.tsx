@@ -85,6 +85,25 @@ const PatientsListPage = () => {
     }
   };
 
+  // 환자 삭제 함수
+  const handleDeletePatient = async (id: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/patients/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete patient");
+      setPatients((prevPatients) =>
+        prevPatients.filter((patient) => patient.id !== id)
+      );
+    } catch (err) {
+      console.error("Error:", err);
+      setError("환자를 삭제하는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (value: string) => {
     setSortOption(value);
@@ -144,7 +163,9 @@ const PatientsListPage = () => {
               name={patient.name}
               age={calculateAge(patient.date_of_birth)}
               gender={patient.gender}
+              phone_number={patient.phone_number}
               organization={patient.organization}
+              onDelete={() => handleDeletePatient(patient.id)}
             />
           ))
         )}
