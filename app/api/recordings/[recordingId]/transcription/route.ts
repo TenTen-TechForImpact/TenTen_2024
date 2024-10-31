@@ -26,11 +26,7 @@ const defaultKeywords = [
   "비염",
 ];
 
-export const config = {
-  api: {
-    bodyParser: false, // FormData 사용 시 bodyParser 비활성화
-  },
-};
+export const runtime = "nodejs";
 
 // POST: Request STT to returnzero
 export async function POST(
@@ -48,11 +44,21 @@ export async function POST(
     // get auth token
     const authToken = await getAuthToken();
     // get transcription with keywords
+    const sttStatus = await getSttStatus(recordingId);
+    if (sttStatus !== "pending") {
+      console.error("Transcription already in progress or completed");
+      return NextResponse.json(
+        { error: "Transcription already in progress or completed" },
+        { status: 400 }
+      );
+    }
+    await setSttStatus(recordingId, "in_progress");
     const { utterances } = await getTranscription(
       authToken,
       recordingFileBuffer,
       keywords
     );
+    await setSttStatus(recordingId, "completed");
 
     // insert utterances into Utterance table
     try {
@@ -268,4 +274,26 @@ async function insertUtterances(recordingId: string, utterances) {
       throw new Error(`Failed to insert utterance at sequence ${sequence_num}`);
     }
   }
+}
+
+async function setSttStatus(recordingId: string, status: string) {
+  supabase
+    .from("Recording")
+    .update({ stt_status: status })
+    .eq("id", recordingId);
+}
+
+async function getSttStatus(recordingId: string) {
+  const { data, error } = await supabase
+    .from("Recording")
+    .select("stt_status")
+    .eq("id", recordingId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching stt_status:", error);
+    return null;
+  }
+
+  return data.stt_status;
 }
