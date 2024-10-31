@@ -98,7 +98,8 @@ export async function DELETE(
     const { data, error: patientError } = await supabase
       .from("Patient") // Patient 테이블에서
       .delete()
-      .eq("id", patientId); // "id" 필드와 patientId가 일치하는 레코드 삭제
+      .eq("id", patientId)
+      .select("*"); // "id" 필드와 patientId가 일치하는 레코드 삭제
 
     // 에러 처리
     if (patientError) {
@@ -110,7 +111,7 @@ export async function DELETE(
     }
 
     // 환자 데이터가 없는 경우 (이미 삭제된 환자)
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 

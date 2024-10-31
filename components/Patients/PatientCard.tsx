@@ -7,11 +7,11 @@ import DeleteModal from "../DeleteModal";
 import styles from "./PatientCard.module.css";
 
 interface PatientProps {
-  id: number;
+  id: string;
   name: string;
   age: number;
   gender: string;
-  onDelete: (id: number) => void; // 삭제 함수
+  onDelete: (id: string) => void; // 삭제 함수
 }
 
 const PatientCard: React.FC<PatientProps> = ({
@@ -83,7 +83,7 @@ const PatientCard: React.FC<PatientProps> = ({
 
       {showDeleteModal && (
         <DeleteModal
-          message="삭제하시겠습니까?"
+          // message="삭제하시겠습니까?" // erroneous code
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
         />
