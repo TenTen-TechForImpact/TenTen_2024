@@ -19,7 +19,7 @@
 }
 
 .deleteButton {
-  background: red;
+  background: rgb(216, 68, 68);
   color: white;
   border: none;
   border-radius: 50%;
@@ -31,7 +31,6 @@
   text-align: center;
 }
 
-/* 나머지 기존 스타일 */
 .avatarContainer {
   width: 200px;
   height: 200px;
@@ -83,6 +82,7 @@
 
 .patientName,
 .patientDetails,
-.avatarContainer {
+.avatarContainer,
+.deleteButton {
   user-select: none;
 }
