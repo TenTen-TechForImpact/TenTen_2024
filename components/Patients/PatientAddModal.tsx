@@ -5,9 +5,9 @@ interface PatientAddModalProps {
   onClose: () => void;
   onSubmit: (patientData: {
     name: string;
-    birthDate: string;
+    date_of_birth: string;
     gender: string;
-    phoneNumber: string;
+    phone_number: string;
     organization: string;
   }) => void;
 }
@@ -48,20 +48,26 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
     const newErrors: { [key: string]: string } = {};
     if (!name) newErrors.name = "이름을 입력하세요";
     if (!birthYear || !birthMonth || !birthDay)
-      newErrors.birthDate = "생년월일을 입력하세요";
+      newErrors.date_of_birth = "생년월일을 입력하세요";
     if (!gender) newErrors.gender = "성별을 입력하세요";
-    if (!phoneNumber) newErrors.phoneNumber = "전화번호를 입력하세요";
+    if (!phoneNumber) newErrors.phone_number = "전화번호를 입력하세요";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    const birthDate = `${birthYear}-${birthMonth.padStart(
+    const date_of_birth = `${birthYear}-${birthMonth.padStart(
       2,
       "0"
     )}-${birthDay.padStart(2, "0")}`;
-    onSubmit({ name, birthDate, gender, phoneNumber, organization });
+    onSubmit({
+      name,
+      date_of_birth,
+      gender,
+      phone_number: phoneNumber,
+      organization,
+    });
     onClose();
   };
 
@@ -109,8 +115,8 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
             className={`${styles.inputField} ${styles.dateInput}`}
           />
         </div>
-        {errors.birthDate && (
-          <div className={styles.errorMessage}>{errors.birthDate}</div>
+        {errors.date_of_birth && (
+          <div className={styles.errorMessage}>{errors.date_of_birth}</div>
         )}
 
         <input
@@ -131,8 +137,8 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
           onChange={(e) => setPhoneNumber(e.target.value)}
           className={styles.inputField}
         />
-        {errors.phoneNumber && (
-          <div className={styles.errorMessage}>{errors.phoneNumber}</div>
+        {errors.phone_number && (
+          <div className={styles.errorMessage}>{errors.phone_number}</div>
         )}
 
         <input
