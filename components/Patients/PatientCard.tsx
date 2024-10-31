@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import ActionButton from "../ActionButton";
+import DeleteModal from "../DeleteModal";
 import styles from "./PatientCard.module.css";
 
 interface PatientProps {
@@ -10,17 +11,43 @@ interface PatientProps {
   name: string;
   age: number;
   gender: string;
+  onDelete: (id: number) => void; // 삭제 함수
 }
 
-const PatientCard: React.FC<PatientProps> = ({ id, name, age, gender }) => {
+const PatientCard: React.FC<PatientProps> = ({
+  id,
+  name,
+  age,
+  gender,
+  onDelete,
+}) => {
   const router = useRouter();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleViewDetails = () => {
     router.push(`/patients/${id}`);
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(id);
+    setShowDeleteModal(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
   return (
     <div className={styles.patientCard}>
+      <div className={styles.deleteButtonContainer}>
+        <button className={styles.deleteButton} onClick={handleDeleteClick}>
+          X
+        </button>
+      </div>
       <div className={styles.avatarContainer}>
         <img
           src="/images/old_woman_color_light.svg"
@@ -53,6 +80,14 @@ const PatientCard: React.FC<PatientProps> = ({ id, name, age, gender }) => {
           fontSize={24}
         />
       </div>
+
+      {showDeleteModal && (
+        <DeleteModal
+          message="삭제하시겠습니까?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
     </div>
   );
 };
