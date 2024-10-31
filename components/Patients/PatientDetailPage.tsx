@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import SessionCard from "./SessionCard";
+import Header from "../Header/Header";
 import styles from "./PatientDetailPage.module.css";
 
 const PatientDetailPage: React.FC<{ patientId: number }> = ({ patientId }) => {
@@ -44,6 +45,7 @@ const PatientDetailPage: React.FC<{ patientId: number }> = ({ patientId }) => {
 
   return (
     <div className={styles.detailPage}>
+      <Header />
       <h2>환자 상세 정보</h2>
       {error && <div className={styles.errorMessage}>{error}</div>}
       <div className={styles.sessionContainer}>

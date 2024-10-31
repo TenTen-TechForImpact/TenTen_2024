@@ -10,7 +10,6 @@ const MainPage: React.FC = () => {
   return (
     <div className={styles.mainPage}>
       <Header />
-      <h1 className={styles.title}>늘품가치 약사님의 TenTen 페이지</h1>
       <PatientsListPage />
     </div>
   );
