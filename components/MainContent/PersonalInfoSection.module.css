@@ -1,0 +1,59 @@
+/* src/components/MainContent/PersonalInfoSection.module.css */
+.section {
+  margin-bottom: var(--padding-medium);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-large);
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--padding-small);
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-medium);
+}
+
+.infoSection {
+  margin-bottom: var(--padding-medium);
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-small);
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--padding-small);
+}
+
+.label {
+  font-weight: bold;
+}
+
+.inputField {
+  width: 100%;
+  padding: var(--padding-small);
+  border: 1px solid var(--secondary-color);
+  border-radius: 4px;
+}
+
+.textField {
+  padding: var(--padding-small);
+  background-color: var(--secondary-color);
+  border-radius: 4px;
+}
+
+.grayText {
+  color: gray;
+}

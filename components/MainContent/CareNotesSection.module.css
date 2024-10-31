@@ -1,0 +1,39 @@
+/* src/components/MainContent/PrescriptionDrugsSection.module.css */
+.section {
+  margin-bottom: var(--padding-medium);
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.titleContainer h3 {
+  flex: 1;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #007bff;
+}
+
+.content {
+  margin-top: var(--padding-small);
+}
+
+.text {
+  padding: 8px;
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: var(--font-size-medium);
+}
