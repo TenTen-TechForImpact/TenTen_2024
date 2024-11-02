@@ -8,6 +8,19 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  position: relative;
+}
+
+.sessionCard {
+  background: var(--secondary-color);
+  border-radius: var(--border-medium);
+  padding: 20px;
+  width: 270px;
+  height: 157px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 .cardHeader {
@@ -22,4 +35,23 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
+}
+
+.deleteButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.deleteButton {
+  background: rgb(216, 68, 68);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
 }

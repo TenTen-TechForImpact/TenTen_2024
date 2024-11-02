@@ -1,15 +1,45 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import ActionButton from "../ActionButton";
+import DeleteModal from "../DeleteModal"; // Import the DeleteModal component
 import styles from "./SessionCard.module.css";
 
 interface SessionCardProps {
+  id: string;
   date: string;
   onViewDetails: () => void;
+  onDelete: (id: string) => void;
 }
 
-const SessionCard: React.FC<SessionCardProps> = ({ date, onViewDetails }) => {
+const SessionCard: React.FC<SessionCardProps> = ({
+  id,
+  date,
+  onViewDetails,
+  onDelete,
+}) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(id);
+    setShowDeleteModal(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
   return (
     <div className={styles.sessionCard}>
+      <div className={styles.deleteButtonContainer}>
+        <button className={styles.deleteButton} onClick={handleDeleteClick}>
+          X
+        </button>
+      </div>
       <div className={styles.cardHeader}>
         <span>상담 날짜: {date}</span>
       </div>
@@ -29,6 +59,14 @@ const SessionCard: React.FC<SessionCardProps> = ({ date, onViewDetails }) => {
           fontSize={16}
         />
       </div>
+
+      {showDeleteModal && (
+        <DeleteModal
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          deleteName="상담 카드"
+        />
+      )}
     </div>
   );
 };

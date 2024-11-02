@@ -105,6 +105,7 @@ const PatientCard: React.FC<PatientProps> = ({
         <DeleteModal
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+          deleteName="환자 카드"
         />
       )}
     </div>
