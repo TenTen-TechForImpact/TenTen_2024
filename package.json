@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "npm install",
-    "build": "next build"
+    "build": "next build",
+    "start": "node_modules/next/dist/bin/next start -p $PORT"
   },
   "keywords": [],
   "author": "",
