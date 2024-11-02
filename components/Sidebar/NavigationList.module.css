@@ -20,3 +20,9 @@
 .penIcon {
   margin-left: 8px;
 }
+
+.recordIcon {
+  margin-left: 5px;
+  color: red;
+  /* 녹음 중임을 강조하기 위해 빨간색 */
+}

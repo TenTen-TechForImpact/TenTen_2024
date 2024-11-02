@@ -1,4 +1,5 @@
 // src/components/MainContent/MainContent.tsx
+
 "use client";
 
 import React from 'react';
@@ -8,11 +9,13 @@ import PrescriptionDrugsSection from './PrescriptionDrugsSection';
 import OTCAndSupplementsSection from './OTCAndSupplementsSection';
 import PharmacistInterventionSection from './PharmacistInterventionSection';
 import CareNotesSection from './CareNotesSection';
+import RecordingSection from './RecordingSection'; // 녹음 섹션 추가
 import styles from './MainContent.module.css';
 
 interface MainContentProps {
   isFollowUp: boolean;
   onCompleteFirstSession: () => void;
+  onRecordingStatusChange: (isRecording: boolean) => void; // 녹음 상태 변경 함수
   patientInfo: any;
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
   preQuestions: string[];
@@ -22,6 +25,7 @@ interface MainContentProps {
 const MainContent: React.FC<MainContentProps> = ({
   isFollowUp,
   onCompleteFirstSession,
+  onRecordingStatusChange, // 녹음 상태 변경 함수
   patientInfo,
   setPatientInfo,
   preQuestions,
@@ -29,6 +33,11 @@ const MainContent: React.FC<MainContentProps> = ({
 }) => {
   return (
     <div className={styles.mainContent}>
+      <section id="recording" className={styles.section}>
+        {/* onRecordingStatusChange 전달 */}
+        <RecordingSection onRecordingStatusChange={onRecordingStatusChange} />
+      </section>
+
       {!isFollowUp && (
         <>
           <section id="patientInfo" className={styles.section}>
@@ -48,6 +57,7 @@ const MainContent: React.FC<MainContentProps> = ({
           </button>
         </>
       )}
+
       {isFollowUp && (
         <>
           <section id="prescriptionDrugs" className={styles.section}>
