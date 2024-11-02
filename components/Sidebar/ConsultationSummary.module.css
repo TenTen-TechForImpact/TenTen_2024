@@ -1,7 +1,0 @@
-/* src/components/Sidebar/ConsultationSummary.module.css */
-.consultationSummary {
-  background-color: var(--secondary-color);
-  padding: var(--padding-medium);
-  border-radius: var(--border-medium);
-  height: calc(100vh - var(--header-height));
-}

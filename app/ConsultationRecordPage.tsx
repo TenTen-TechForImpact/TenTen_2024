@@ -170,7 +170,6 @@ const ConsultationRecordPage: React.FC = () => {
         </main>
         {isFollowUp && (
           <aside className={styles.rightSidebar}>
-            // ConsultationRecordPage.tsx
             <FirstSessionSummary
               patientInfo={patientInfo}
               preQuestions={preQuestions}
