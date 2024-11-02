@@ -3,5 +3,7 @@
 .sortOptions {
   padding: var(--padding-small);
   font-size: var(--font-size-medium);
-  border-radius: var(--border-radius);
+  width: 100px;
+  user-select: none;
+  text-align: center;
 }

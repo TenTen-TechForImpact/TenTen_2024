@@ -16,13 +16,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isFollowUp }) => {
     name: "김철수",
     gender: "Male",
     birthDate: "1995-02-10",
-    phoneNumber: "01012345678"
+    phoneNumber: "01012345678",
   };
 
   return (
     <aside className={styles.sidebar}>
       <PatientInfoCard patientInfo={patientInfo} />
-      <NavigationList isFirstSession={!isFollowUp} />
+      <NavigationList isFollowUp={isFollowUp} />
       {isFollowUp && <ConsultationSummary />}
     </aside>
   );

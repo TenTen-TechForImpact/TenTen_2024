@@ -1,37 +1,57 @@
 .sessionCard {
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 10px;
-  margin: 10px;
-  width: calc(33% - 20px); /* 3개가 가로로 표시될 수 있도록 설정 */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  background: var(--secondary-color);
+  border-radius: var(--border-medium);
+  padding: 20px;
+  width: 270px;
+  height: 157px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 버튼과 내용 사이에 공간 유지 */
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.sessionCard {
+  background: var(--secondary-color);
+  border-radius: var(--border-medium);
+  padding: 20px;
+  width: 270px;
+  height: 157px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 .cardHeader {
-  display: flex;
-  justify-content: space-between; /* 날짜와 제목 사이 공간 */
   font-weight: bold;
+  text-align: center;
+  font-size: 20px;
+  user-select: none;
 }
 
-.viewButton {
-  margin-top: 10px;
-  background-color: var(--accent-color); /* 색상 변경 */
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px;
-  cursor: pointer;
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-.saveButton {
-  margin-top: 5px;
-  background-color: var(--accent-color); /* 색상 변경 */
-  color: #fff;
+.deleteButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.deleteButton {
+  background: rgb(216, 68, 68);
+  color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px;
+  border-radius: 50%;
   cursor: pointer;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
 }

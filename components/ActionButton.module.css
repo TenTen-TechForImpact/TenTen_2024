@@ -9,6 +9,7 @@
   text-align: center;
   background-color: #0511f2;
   color: #ffffff;
+  user-select: none;
 }
 
 .actionButton:hover {

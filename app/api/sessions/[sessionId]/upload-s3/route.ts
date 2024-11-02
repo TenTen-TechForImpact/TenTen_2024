@@ -12,11 +12,7 @@ const s3Client = new S3Client({
   },
 });
 
-export const config = {
-  api: {
-    bodyParser: false, // FormData 사용 시 bodyParser 비활성화
-  },
-};
+export const runtime = "nodejs";
 
 export async function POST(
   req: NextRequest,

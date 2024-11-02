@@ -7,11 +7,13 @@ import DeleteModal from "../DeleteModal";
 import styles from "./PatientCard.module.css";
 
 interface PatientProps {
-  id: number;
+  id: string;
   name: string;
   age: number;
   gender: string;
-  onDelete: (id: number) => void; // 삭제 함수
+  phone_number: string;
+  organization: string;
+  onDelete: (id: string) => void;
 }
 
 const PatientCard: React.FC<PatientProps> = ({
@@ -19,6 +21,8 @@ const PatientCard: React.FC<PatientProps> = ({
   name,
   age,
   gender,
+  organization,
+  phone_number,
   onDelete,
 }) => {
   const router = useRouter();
@@ -63,6 +67,14 @@ const PatientCard: React.FC<PatientProps> = ({
             className={styles.icon}
           />
           <span>{name}</span>
+          <div className={styles.phoneIconContainer}>
+            <img
+              src="/images/ic_fluent_call_24_filled.svg"
+              alt="Phone Icon"
+              className={styles.icon}
+            />
+            <div className={styles.phoneTooltip}>{phone_number}</div>
+          </div>
         </div>
         <div className={styles.patientDetails}>
           <img
@@ -70,10 +82,18 @@ const PatientCard: React.FC<PatientProps> = ({
             alt=""
             className={styles.icon}
           />
-          <span>{`만 ${age}세 | ${gender}`}</span>
+          <span>{`${age}세 | ${gender}`}</span>
+        </div>
+        <div className={styles.patientDetails}>
+          <img
+            src="/images/ic_fluent_building_24_filled.svg"
+            alt=""
+            className={styles.icon}
+          />
+          <span>{organization}</span>
         </div>
         <ActionButton
-          text="상세 내용 보기"
+          text="상담 목록 보기"
           onClick={handleViewDetails}
           width={192}
           height={50}
@@ -83,9 +103,9 @@ const PatientCard: React.FC<PatientProps> = ({
 
       {showDeleteModal && (
         <DeleteModal
-          message="삭제하시겠습니까?"
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
+          deleteName="환자 카드"
         />
       )}
     </div>

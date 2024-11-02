@@ -16,10 +16,23 @@
 .title {
   color: #3563e9;
   font-size: var(--font-size-large);
+  user-select: none;
+}
+
+.patientListContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .patientList {
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px);
+  border-radius: 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  overflow-x: hidden;
 }

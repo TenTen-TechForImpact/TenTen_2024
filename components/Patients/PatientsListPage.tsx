@@ -27,7 +27,7 @@ const PatientsListPage = () => {
 
   useEffect(() => {
     fetchPatients();
-  }, [sortOption]);
+  }, []);
 
   // API를 통해 환자 목록을 가져오는 함수
   const fetchPatients = async () => {
@@ -44,6 +44,20 @@ const PatientsListPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 정렬 함수
+  const sortPatients = (patients: Patient[]) => {
+    return [...patients].sort((a, b) => {
+      if (sortOption === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "age") {
+        const ageA = calculateAge(a.date_of_birth);
+        const ageB = calculateAge(b.date_of_birth);
+        return ageA - ageB;
+      }
+      return 0;
+    });
   };
 
   // API를 통해 새 환자를 추가하는 함수
@@ -79,7 +93,6 @@ const PatientsListPage = () => {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete patient");
-
       setPatients((prevPatients) =>
         prevPatients.filter((patient) => patient.id !== id)
       );
@@ -89,6 +102,11 @@ const PatientsListPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 정렬 옵션 변경 핸들러
+  const handleSortChange = (value: string) => {
+    setSortOption(value);
   };
 
   return (
@@ -111,10 +129,10 @@ const PatientsListPage = () => {
         <h2 className={styles.title}>전체 환자 목록</h2>
         <SortOptions
           options={[
-            { value: "name", label: "이름순" },
-            { value: "age", label: "나이순" },
+            { value: "name", label: "이름 순" },
+            { value: "age", label: "나이 순" },
           ]}
-          onChange={(e) => setSortOption(e.target.value)}
+          onChange={(value) => setSortOption(value)}
         />
       </div>
 
@@ -131,23 +149,25 @@ const PatientsListPage = () => {
         {loading ? (
           <p>Loading patients...</p>
         ) : (
-          patients
-            .filter(
+          sortPatients(
+            patients.filter(
               (patient) =>
                 patient.name?.includes(searchTerm) ||
                 patient.phone_number?.includes(searchTerm) ||
                 patient.organization?.includes(searchTerm)
             )
-            .map((patient) => (
-              <PatientCard
-                key={patient.id}
-                id={patient.id}
-                name={patient.name}
-                age={calculateAge(patient.date_of_birth)}
-                gender={patient.gender}
-                onDelete={() => handleDeletePatient(patient.id)} // 삭제 함수 전달
-              />
-            ))
+          ).map((patient) => (
+            <PatientCard
+              key={patient.id}
+              id={patient.id}
+              name={patient.name}
+              age={calculateAge(patient.date_of_birth)}
+              gender={patient.gender}
+              phone_number={patient.phone_number}
+              organization={patient.organization}
+              onDelete={() => handleDeletePatient(patient.id)}
+            />
+          ))
         )}
       </div>
     </div>

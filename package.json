@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "prebuild": "npm install",
+    "build": "next build"
   },
   "keywords": [],
   "author": "",

@@ -1,21 +1,72 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import ActionButton from "../ActionButton";
+import DeleteModal from "../DeleteModal"; // Import the DeleteModal component
 import styles from "./SessionCard.module.css";
 
 interface SessionCardProps {
+  id: string;
   date: string;
   onViewDetails: () => void;
+  onDelete: (id: string) => void;
 }
 
-const SessionCard: React.FC<SessionCardProps> = ({ date, onViewDetails }) => {
+const SessionCard: React.FC<SessionCardProps> = ({
+  id,
+  date,
+  onViewDetails,
+  onDelete,
+}) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(id);
+    setShowDeleteModal(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
   return (
     <div className={styles.sessionCard}>
-      <div className={styles.cardHeader}>
-        <span>{date}</span>
+      <div className={styles.deleteButtonContainer}>
+        <button className={styles.deleteButton} onClick={handleDeleteClick}>
+          X
+        </button>
       </div>
-      <button className={styles.viewButton} onClick={onViewDetails}>
-        상담 내용 보기
-      </button>
-      <button className={styles.saveButton}>저장하기</button>
+      <div className={styles.cardHeader}>
+        <span>상담 날짜: {date}</span>
+      </div>
+      <div className={styles.buttonContainer}>
+        <ActionButton
+          text="상담 내용 보기"
+          onClick={onViewDetails}
+          width={250}
+          height={50}
+          fontSize={16}
+        />
+        <ActionButton
+          text="저장하기"
+          onClick={() => {}}
+          width={250}
+          height={50}
+          fontSize={16}
+        />
+      </div>
+
+      {showDeleteModal && (
+        <DeleteModal
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+          deleteName="상담 카드"
+        />
+      )}
     </div>
   );
 };
