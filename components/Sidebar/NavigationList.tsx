@@ -2,45 +2,42 @@
 "use client";
 
 import React, { useState } from "react";
-import PatientInfoCard from "./PatientInfoCard"; // 환자 정보 카드 컴포넌트 임포트
+import { FaPencilAlt, FaMicrophone } from "react-icons/fa"; // 아이콘 추가
+import PatientInfoCard from "./PatientInfoCard";
 import styles from "./NavigationList.module.css";
 
 interface NavigationListProps {
   isFollowUp: boolean;
+  isRecording: boolean; // 녹음 상태 추가
 }
 
-const NavigationList: React.FC<NavigationListProps> = ({ isFollowUp }) => {
+const NavigationList: React.FC<NavigationListProps> = ({ isFollowUp, isRecording }) => {
   const [selectedId, setSelectedId] = useState<string>("");
 
   const topics = isFollowUp
     ? [
-        { id: "prescriptionDrugs", title: "처방 의약품" },
-        { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
-        { id: "pharmacistIntervention", title: "약사 중재 내용" },
-        { id: "careNotes", title: "돌봄 노트" },
-      ]
+      { id: "recording", title: "녹음하기" },
+      { id: "prescriptionDrugs", title: "처방 의약품" },
+      { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
+      { id: "pharmacistIntervention", title: "약사 중재 내용" },
+      { id: "careNotes", title: "돌봄 노트" },
+    ]
     : [
-        { id: "patientInfo", title: "환자 상세 정보" },
-        { id: "preQuestions", title: "상담 전 질문" },
-        { id: "prescriptionDrugs", title: "처방 의약품" },
-        { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
-      ];
+      { id: "recording", title: "녹음하기" },
+      { id: "patientInfo", title: "환자 상세 정보" },
+      { id: "preQuestions", title: "상담 전 질문" },
+      { id: "prescriptionDrugs", title: "처방 의약품" },
+      { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
+    ];
 
   const handleNavigationClick = (id: string) => {
     setSelectedId(id);
-    console.log("Hi");
 
     const element = document.getElementById(id);
     if (element) {
-      console.log("Why");
       const rootStyles = getComputedStyle(document.documentElement);
-      const headerHeight = parseInt(
-        rootStyles.getPropertyValue("--header-height"),
-        10
-      );
-
-      const offsetPosition =
-        element.getBoundingClientRect().top + window.scrollY - headerHeight;
+      const headerHeight = parseInt(rootStyles.getPropertyValue("--header-height"), 10);
+      const offsetPosition = element.getBoundingClientRect().top + window.scrollY - headerHeight;
 
       window.scrollTo({
         top: offsetPosition,
@@ -64,13 +61,11 @@ const NavigationList: React.FC<NavigationListProps> = ({ isFollowUp }) => {
       <ol>
         {topics.map((t) => (
           <li key={t.id} className={styles.navItem}>
-            <button
-              onClick={() => handleNavigationClick(t.id)}
-              className={styles.navButton}
-            >
+            <button onClick={() => handleNavigationClick(t.id)} className={styles.navButton}>
               {t.title}
             </button>
-            {selectedId === t.id && <span className={styles.penIcon}>✏️</span>}
+            {selectedId === t.id && <FaPencilAlt className={styles.penIcon} />}
+            {t.id === "recording" && isRecording && <FaMicrophone className={styles.recordIcon} />}
           </li>
         ))}
       </ol>
