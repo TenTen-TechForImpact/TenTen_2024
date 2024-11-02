@@ -34,7 +34,10 @@ const MainContent: React.FC<MainContentProps> = ({
   return (
     <div className={styles.mainContent}>
       <section id="recording" className={styles.section}>
-        <RecordingSection onRecordingStatusChange={onRecordingStatusChange} />
+        <RecordingSection
+          onRecordingStatusChange={onRecordingStatusChange}
+          sessionId={"임시ID"}
+        />
       </section>
 
       {!isFollowUp && (

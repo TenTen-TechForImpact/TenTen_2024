@@ -1,7 +1,4 @@
-// src/app/ConsultationRecordPage.tsx
-"use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
@@ -91,23 +88,16 @@ const ConsultationRecordPage: React.FC = () => {
   });
 
   const [preQuestions, setPreQuestions] = useState<string[]>([]);
-
-  // Sample data for session summary
   const [sessionSummaryData, setSessionSummaryData] = useState([
+    // Sample data for 1차 상담의 음성 요약
     {
       topic_id: 1,
-      start_time: "0분 0초",
-      end_time: "1분 50초",
       content: "Q. 당뇨약을 줄이는 게 현실적인가요?",
-      related_scripts: [
-        {
-          time: "1분 24초",
-          content:
-            "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요. 이게 뭔가? 그래서 그만큼 지금 이 약을.",
-        },
-      ],
     },
-    // Add more items as needed
+    {
+      topic_id: 2,
+      content: "Q. 운동 계획을 어떻게 세우는 게 좋을까요?",
+    },
   ]);
 
   const handleCompleteFirstSession = () => {
@@ -148,6 +138,7 @@ const ConsultationRecordPage: React.FC = () => {
             <FirstSessionSummary
               patientInfo={patientInfo}
               preQuestions={preQuestions}
+              sessionSummaryData={sessionSummaryData} // 새로운 prop 전달
             />
           </aside>
         )}
