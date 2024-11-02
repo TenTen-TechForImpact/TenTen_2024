@@ -1,68 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
 import Header from "../components/Header/Header";
 import styles from "./ConsultationRecordPage.module.css";
 
-// Helper function to summarize patient info
-const summarizePatientInfo = (info: any) => {
-  return {
-    disease:
-      Array.isArray(info.disease) && info.disease.length > 0
-        ? info.disease.join(", ")
-        : "없음",
-    smokingStatus:
-      info.smoking.status === "예"
-        ? `흡연 기간: ${info.smoking.duration || "N/A"}년, 평균 흡연량: ${
-            info.smoking.packsPerDay || "N/A"
-          }갑`
-        : "비흡연",
-    alcoholStatus:
-      info.drinking.status === "예"
-        ? `음주 횟수: ${
-            info.drinking.frequencyPerWeek || "N/A"
-          }회/주, 1회 음주량: ${info.drinking.amountPerSession || "N/A"}병`
-        : "비음주",
-    exercise:
-      info.exercise.status === "예"
-        ? `운동 횟수: ${info.exercise.selectedOption || "N/A"}, 운동 종류: ${
-            info.exercise.exerciseType?.join(", ") || "N/A"
-          }`
-        : "운동 안 함",
-    diet:
-      info.diet.status === "예"
-        ? `균형 잡힌 식사: 하루 ${info.diet.selectedOption || "N/A"}회`
-        : "불규칙한 식사",
-    livingCondition:
-      info.livingCondition.status === "아니오"
-        ? `동거 가족 구성원: ${info.livingCondition.familyMembers || "N/A"}`
-        : "독거",
-    medicationAssistants:
-      info.medicationAssistants.selectedOption === "기타"
-        ? `기타: ${info.medicationAssistants.otherText || "N/A"}`
-        : info.medicationAssistants.selectedOption || "N/A",
-    medicationStorage:
-      info.medicationStorage.status === "예"
-        ? `보관 장소: ${info.medicationStorage.location || "N/A"}`
-        : "보관 장소 없음",
-    prescriptionStorage: info.prescriptionStorage === "예" ? "보관" : "미보관",
-    allergies: info.allergies.hasAllergies
-      ? `알레르기 항목: ${info.allergies.suspectedItems?.join(", ") || "N/A"}`
-      : "알러지 없음",
-    adverseDrugReactions: info.adverseDrugReactions.hasAdverseDrugReactions
-      ? `의심 약물: ${
-          info.adverseDrugReactions.suspectedMedications?.join(", ") || "N/A"
-        }, 증상: ${
-          info.adverseDrugReactions.reactionDetails?.join(", ") || "N/A"
-        }`
-      : "약물 부작용 없음",
-  };
-};
-
 const ConsultationRecordPage: React.FC = () => {
   // 상담 데이터 상태 관리
-  const [isFollowUp, setIsFollowUp] = useState(false);
+  const [activeTab, setActiveTab] = useState<"firstSession" | "followUp">(
+    "firstSession"
+  );
+  const [isFirstSessionCompleted, setIsFirstSessionCompleted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [patientInfo, setPatientInfo] = useState({
     birthDate: "",
@@ -100,31 +48,35 @@ const ConsultationRecordPage: React.FC = () => {
     },
   ]);
 
-  const handleCompleteFirstSession = () => {
-    if (patientInfo.birthDate && preQuestions.length > 0) {
-      setIsFollowUp(true);
-    } else {
-      alert("모든 정보를 입력해주세요.");
-    }
-  };
-
   const handleRecordingStatusChange = (recordingStatus: boolean) => {
     setIsRecording(recordingStatus);
   };
 
-  // Summarize patientInfo for FirstSessionSummary
-  const summarizedPatientInfo = summarizePatientInfo(patientInfo);
+  const handleCompleteFirstSession = () => {
+    // 1차 상담이 완료되었을 때 상태 업데이트
+    setIsFirstSessionCompleted(true);
+    setActiveTab("followUp"); // 자동으로 2차 상담으로 전환
+  };
+
+  const handleTabChange = (tab: "firstSession" | "followUp") => {
+    setActiveTab(tab);
+  };
 
   return (
     <div className={styles.consultationRecordPage}>
       <Header />
       <div className={styles.contentWrapper}>
         <aside className={styles.sidebar}>
-          <NavigationList isFollowUp={isFollowUp} isRecording={isRecording} />
+          <NavigationList
+            activeTab={activeTab}
+            isRecording={isRecording}
+            isFirstSessionCompleted={isFirstSessionCompleted}
+            onTabChange={handleTabChange}
+          />
         </aside>
         <main className={styles.mainContent}>
           <MainContent
-            isFollowUp={isFollowUp}
+            isFollowUp={activeTab === "followUp"}
             onCompleteFirstSession={handleCompleteFirstSession}
             onRecordingStatusChange={handleRecordingStatusChange}
             patientInfo={patientInfo}
@@ -133,12 +85,12 @@ const ConsultationRecordPage: React.FC = () => {
             setPreQuestions={setPreQuestions}
           />
         </main>
-        {isFollowUp && (
+        {isFirstSessionCompleted && (
           <aside className={styles.rightSidebar}>
             <FirstSessionSummary
               patientInfo={patientInfo}
               preQuestions={preQuestions}
-              sessionSummaryData={sessionSummaryData} // 새로운 prop 전달
+              sessionSummaryData={sessionSummaryData}
             />
           </aside>
         )}
