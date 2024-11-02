@@ -22,12 +22,9 @@ const PharmacistInterventionSection: React.FC<
           content: "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
         },
         {
-          time: "1분 24초",
-          content: "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
-        },
-        {
-          time: "1분 24초",
-          content: "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
+          time: "1분 38초",
+          content:
+            "줄이시는 게 발생한 문제를 해소하는 데 큰 도움이 될 거거든요.",
         },
       ],
     },

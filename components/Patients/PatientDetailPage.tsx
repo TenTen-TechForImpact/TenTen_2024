@@ -72,7 +72,7 @@ const PatientDetailPage: React.FC = () => {
               key={session.id}
               id={session.id}
               date={session.date}
-              onViewDetails={() => router.push(`../sessions`)}
+              onViewDetails={() => router.push(`../sessions`)} // 임시로 session으로 보낸다
               onDelete={handleDeleteSession}
             />
           ))
