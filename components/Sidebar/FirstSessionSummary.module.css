@@ -1,4 +1,3 @@
-/* src/components/Sidebar/FirstSessionSummary.module.css */
 .summaryContainer {
   background-color: #fff;
   border: 1px solid var(--secondary-color);
@@ -23,4 +22,12 @@
 .section p {
   font-size: var(--font-size-medium);
   margin: 0;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.value {
+  font-weight: normal;
 }

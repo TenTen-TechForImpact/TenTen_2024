@@ -1,38 +1,52 @@
-// src/components/MainContent/CareNotesSection.tsx
-import React, { useState } from 'react';
-import { FaPencilAlt, FaSave } from 'react-icons/fa';
-import styles from './CareNotesSection.module.css';
+import React, { useState } from "react";
+import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar"; // Summary Bar 임포트
+import styles from "./CareNotesSection.module.css";
 
-const CareNotesSection: React.FC = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [careNotes, setCareNotes] = useState("돌봄 노트를 입력하세요.");
+interface CareNotesSectionProps {
+  onAddContent: (content: string) => void;
+}
 
-  const handleIconClick = () => {
-    if (isEditing) {
-      console.log("저장되었습니다.");
-    }
-    setIsEditing(!isEditing);
+const CareNotesSection: React.FC<CareNotesSectionProps> = ({
+  onAddContent,
+}) => {
+  const [careNotes, setCareNotes] = useState("");
+  const sessionSummaryData = [
+    {
+      topic_id: 1,
+      start_time: "0분 0초",
+      end_time: "1분 50초",
+      content: "Q. 당뇨약을 줄이는 게 현실적인가요?",
+      related_scripts: [
+        {
+          time: "1분 24초",
+          content: "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
+        },
+      ],
+    },
+  ];
+
+  const handleBlur = () => {
+    // 저장 로직 (예: 서버로 전송하거나 콘솔에 출력)
+    console.log("Care Notes 저장됨:", careNotes);
   };
 
   return (
     <div className={styles.section}>
-      <div className={styles.titleContainer}>
-        <h3>돌봄 노트</h3>
-        <button className={styles.iconButton} onClick={handleIconClick}>
-          {isEditing ? <FaSave /> : <FaPencilAlt />}
-        </button>
-      </div>
-      <div className={styles.content}>
-        {isEditing ? (
-          <textarea
-            value={careNotes}
-            onChange={(e) => setCareNotes(e.target.value)}
-            className={styles.textarea}
-          />
-        ) : (
-          <p className={styles.text}>{careNotes}</p>
-        )}
-      </div>
+      <h3 className={styles.title}>돌봄 노트</h3>
+      <textarea
+        value={careNotes}
+        onChange={(e) => setCareNotes(e.target.value)}
+        onBlur={handleBlur} // focus가 빠질 때 저장
+        className={styles.textarea}
+        placeholder="돌봄 노트를 입력하세요."
+      />
+      <ConsultationSummaryBar
+        sessionSummary={sessionSummaryData}
+        onAddContent={(content) => {
+          setCareNotes((prev) => `${prev}\n${content}`);
+          onAddContent(content);
+        }}
+      />
     </div>
   );
 };

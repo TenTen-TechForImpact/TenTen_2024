@@ -1,18 +1,17 @@
-// src/components/MainContent/MainContent.tsx
-"use client";
-
-import React from 'react';
-import PersonalInfoSection from './PersonalInfoSection';
-import PreQuestionsSection from './PreQuestionsSection';
-import PrescriptionDrugsSection from './PrescriptionDrugsSection';
-import OTCAndSupplementsSection from './OTCAndSupplementsSection';
-import PharmacistInterventionSection from './PharmacistInterventionSection';
-import CareNotesSection from './CareNotesSection';
-import styles from './MainContent.module.css';
+import React from "react";
+import PersonalInfoSection from "./PersonalInfoSection";
+import PreQuestionsSection from "./PreQuestionsSection";
+import PrescriptionDrugsSection from "./PrescriptionDrugsSection";
+import OTCAndSupplementsSection from "./OTCAndSupplementsSection";
+import CareNotesSection from "./CareNotesSection";
+import PharmacistInterventionSection from "./PharmacistInterventionSection";
+import RecordingSection from "./RecordingSection"; // 기존 섹션 유지
+import styles from "./MainContent.module.css";
 
 interface MainContentProps {
   isFollowUp: boolean;
   onCompleteFirstSession: () => void;
+  onRecordingStatusChange: (isRecording: boolean) => void;
   patientInfo: any;
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
   preQuestions: string[];
@@ -22,20 +21,38 @@ interface MainContentProps {
 const MainContent: React.FC<MainContentProps> = ({
   isFollowUp,
   onCompleteFirstSession,
+  onRecordingStatusChange,
   patientInfo,
   setPatientInfo,
   preQuestions,
   setPreQuestions,
 }) => {
+  const handleAddContent = (content: string) => {
+    console.log("추가된 content:", content);
+  };
+
   return (
     <div className={styles.mainContent}>
+      <section id="recording" className={styles.section}>
+        <RecordingSection
+          onRecordingStatusChange={onRecordingStatusChange}
+          sessionId={"임시ID"}
+        />
+      </section>
+
       {!isFollowUp && (
         <>
           <section id="patientInfo" className={styles.section}>
-            <PersonalInfoSection patientInfo={patientInfo} setPatientInfo={setPatientInfo} />
+            <PersonalInfoSection
+              patientInfo={patientInfo}
+              setPatientInfo={setPatientInfo}
+            />
           </section>
           <section id="preQuestions" className={styles.section}>
-            <PreQuestionsSection preQuestions={preQuestions} setPreQuestions={setPreQuestions} />
+            <PreQuestionsSection
+              preQuestions={preQuestions}
+              setPreQuestions={setPreQuestions}
+            />
           </section>
           <section id="prescriptionDrugs" className={styles.section}>
             <PrescriptionDrugsSection />
@@ -43,11 +60,15 @@ const MainContent: React.FC<MainContentProps> = ({
           <section id="otcAndSupplements" className={styles.section}>
             <OTCAndSupplementsSection />
           </section>
-          <button className={styles.completeButton} onClick={onCompleteFirstSession}>
+          <button
+            className={styles.completeButton}
+            onClick={onCompleteFirstSession}
+          >
             1차 상담 완료
           </button>
         </>
       )}
+
       {isFollowUp && (
         <>
           <section id="prescriptionDrugs" className={styles.section}>
@@ -57,10 +78,10 @@ const MainContent: React.FC<MainContentProps> = ({
             <OTCAndSupplementsSection />
           </section>
           <section id="pharmacistIntervention" className={styles.section}>
-            <PharmacistInterventionSection />
+            <PharmacistInterventionSection onAddContent={handleAddContent} />
           </section>
           <section id="careNotes" className={styles.section}>
-            <CareNotesSection />
+            <CareNotesSection onAddContent={handleAddContent} />
           </section>
         </>
       )}

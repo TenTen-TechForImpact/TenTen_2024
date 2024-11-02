@@ -1,71 +1,51 @@
-/* src/components/MainContent/OTCAndSupplementsSection.module.css */
 .section {
-  margin-bottom: var(--padding-medium);
-  padding: var(--padding-medium);
-  background: #fff;
-  border-radius: var(--border-medium);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: #f9f9f9;
 }
 
-.sectionTitle {
-  font-size: var(--font-size-large);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--padding-small);
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #333;
 }
 
-.table {
+.textarea {
   width: 100%;
-  border-collapse: collapse;
-  margin-bottom: var(--padding-medium);
-}
-
-.table th,
-.table td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ccc;
-}
-
-.table th {
-  background: var(--secondary-color);
-}
-
-.deleteButton {
-  background: none;
-  border: none;
-  color: #d9534f;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.inputContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: var(--padding-small);
-}
-
-.inputField {
-  padding: 8px;
-  font-size: var(--font-size-medium);
+  height: 120px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  flex: 1;
-}
-
-.selectField {
   padding: 8px;
-  font-size: var(--font-size-medium);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex: 1;
+  font-size: 14px;
+  color: #333;
+  resize: vertical;
 }
 
-.addButton {
-  padding: 12px;
-  background: var(--primary-color);
+.textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.2);
+}
+
+.button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: var(--font-size-medium);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.summaryBarWrapper {
+  margin-top: 16px;
 }
