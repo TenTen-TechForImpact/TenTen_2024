@@ -95,7 +95,7 @@ export async function PUT(
     }
 
     // 업데이트된 환자 정보 반환
-    return NextResponse.json(data, { status: 200 }); // 조회, 업데이트는 200
+    return NextResponse.json(data, { status: 200 });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(
