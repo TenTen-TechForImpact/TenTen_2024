@@ -1,46 +1,40 @@
-// src/components/MainContent/MainContent.tsx
-
-"use client";
-
 import React from "react";
 import PersonalInfoSection from "./PersonalInfoSection";
 import PreQuestionsSection from "./PreQuestionsSection";
 import PrescriptionDrugsSection from "./PrescriptionDrugsSection";
 import OTCAndSupplementsSection from "./OTCAndSupplementsSection";
-import PharmacistInterventionSection from "./PharmacistInterventionSection";
 import CareNotesSection from "./CareNotesSection";
-import RecordingSection from "./RecordingSection"; // 녹음 섹션 추가
+import PharmacistInterventionSection from "./PharmacistInterventionSection";
+import RecordingSection from "./RecordingSection"; // 기존 섹션 유지
 import styles from "./MainContent.module.css";
 
 interface MainContentProps {
   isFollowUp: boolean;
   onCompleteFirstSession: () => void;
-  onRecordingStatusChange: (isRecording: boolean) => void; // 녹음 상태 변경 함수
+  onRecordingStatusChange: (isRecording: boolean) => void;
   patientInfo: any;
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
   preQuestions: string[];
-  onPreQuestionsFocus: () => void;
-  onPreQuestionsBlur: () => void;
   setPreQuestions: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
   isFollowUp,
   onCompleteFirstSession,
-  onRecordingStatusChange, // 녹음 상태 변경 함수
+  onRecordingStatusChange,
   patientInfo,
   setPatientInfo,
   preQuestions,
   setPreQuestions,
 }) => {
+  const handleAddContent = (content: string) => {
+    console.log("추가된 content:", content);
+  };
+
   return (
     <div className={styles.mainContent}>
       <section id="recording" className={styles.section}>
-        {/* onRecordingStatusChange 전달 */}
-        <RecordingSection
-          onRecordingStatusChange={onRecordingStatusChange}
-          sessionId="TODO임시id" /*TODO*/
-        />
+        <RecordingSection onRecordingStatusChange={onRecordingStatusChange} />
       </section>
 
       {!isFollowUp && (
@@ -81,10 +75,10 @@ const MainContent: React.FC<MainContentProps> = ({
             <OTCAndSupplementsSection />
           </section>
           <section id="pharmacistIntervention" className={styles.section}>
-            <PharmacistInterventionSection />
+            <PharmacistInterventionSection onAddContent={handleAddContent} />
           </section>
           <section id="careNotes" className={styles.section}>
-            <CareNotesSection />
+            <CareNotesSection onAddContent={handleAddContent} />
           </section>
         </>
       )}

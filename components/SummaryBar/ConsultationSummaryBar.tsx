@@ -1,7 +1,5 @@
-// src/components/SummaryBar/ConsultationSummaryBar.tsx
-
-import React, { useState } from 'react';
-import styles from './ConsultationSummaryBar.module.css';
+import React, { useState } from "react";
+import styles from "./ConsultationSummaryBar.module.css";
 
 interface RelatedScript {
   time: string;
@@ -18,52 +16,54 @@ interface SessionSummaryItem {
 
 interface ConsultationSummaryBarProps {
   sessionSummary: SessionSummaryItem[];
-  onAddToPreQuestions: (content: string) => void;
+  onAddContent: (content: string) => void;
 }
 
 const ConsultationSummaryBar: React.FC<ConsultationSummaryBarProps> = ({
   sessionSummary,
-  onAddToPreQuestions,
+  onAddContent,
 }) => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const toggleExpand = (index: number) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
   return (
     <div className={styles.summaryBar}>
-      <h2 className={styles.title}>텐텐이 요약한 상담 내용</h2>
+      <h2 className={styles.title}>요약된 상담 내용</h2>
       {sessionSummary.map((item, index) => (
-        <SummaryItem key={index} item={item} onAddToPreQuestions={onAddToPreQuestions} />
-      ))}
-    </div>
-  );
-};
-
-const SummaryItem: React.FC<{ item: SessionSummaryItem; onAddToPreQuestions: (content: string) => void }> = ({ item, onAddToPreQuestions }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const handleAddClick = () => {
-    onAddToPreQuestions(item.content);
-  };
-
-  return (
-    <div className={styles.summaryItem}>
-      <div className={styles.summaryContent}>
-        <p>{item.content}</p>
-        <button onClick={toggleExpand} className={styles.expandButton}>
-          {isExpanded ? '▲' : '▼'}
-        </button>
-        <button onClick={handleAddClick} className={styles.addButton}>추가</button>
-      </div>
-      {isExpanded && (
-        <div className={styles.relatedScripts}>
-          {item.related_scripts.map((script, index) => (
-            <div key={index} className={styles.scriptItem}>
-              <p><strong>{script.time}:</strong> {script.content}</p>
+        <div key={item.topic_id} className={styles.summaryItem}>
+          <div className={styles.summaryHeader}>
+            <div className={styles.summaryContent}>{item.content}</div>
+            <div className={styles.buttons}>
+              <button
+                onClick={() => toggleExpand(index)}
+                className={styles.expandButton}
+              >
+                {expandedIndex === index ? "접기 ▲" : "펼치기 ▼"}
+              </button>
+              <button
+                onClick={() => onAddContent(item.content)}
+                className={styles.addButton}
+              >
+                추가하기
+              </button>
             </div>
-          ))}
+          </div>
+          {expandedIndex === index && (
+            <div className={styles.relatedScripts}>
+              {item.related_scripts.map((script, scriptIndex) => (
+                <div key={scriptIndex} className={styles.scriptItem}>
+                  <p>
+                    <strong>{script.time}:</strong> {script.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      ))}
     </div>
   );
 };

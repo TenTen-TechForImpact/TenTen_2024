@@ -1,14 +1,11 @@
 // src/app/ConsultationRecordPage.tsx
 "use client";
 
-import { useEffect } from "react";
-
-import React, { useState } from "react";
+import { useState } from "react";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
 import Header from "../components/Header/Header";
-import SummaryBar from "../components/SummaryBar/ConsultationSummaryBar"; // Import SummaryBar
 import styles from "./ConsultationRecordPage.module.css";
 
 // Helper function to summarize patient info
@@ -17,7 +14,7 @@ const summarizePatientInfo = (info: any) => {
     disease:
       Array.isArray(info.disease) && info.disease.length > 0
         ? info.disease.join(", ")
-        : "없음", // 다중 선택된 질병을 쉼표로 구분하여 표시
+        : "없음",
     smokingStatus:
       info.smoking.status === "예"
         ? `흡연 기간: ${info.smoking.duration || "N/A"}년, 평균 흡연량: ${
@@ -70,7 +67,6 @@ const ConsultationRecordPage: React.FC = () => {
   // 상담 데이터 상태 관리
   const [isFollowUp, setIsFollowUp] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [showSummaryBar, setShowSummaryBar] = useState(false); // New state for SummaryBar visibility
   const [patientInfo, setPatientInfo] = useState({
     birthDate: "",
     contact: "",
@@ -93,11 +89,6 @@ const ConsultationRecordPage: React.FC = () => {
     medicationStorage: { status: "아니오", location: "" },
     prescriptionStorage: "아니오",
   });
-
-  // 상태 변경 시 patientInfo 로그 출력
-  useEffect(() => {
-    console.log("Updated patientInfo:", patientInfo);
-  }, [patientInfo]);
 
   const [preQuestions, setPreQuestions] = useState<string[]>([]);
 
@@ -131,14 +122,6 @@ const ConsultationRecordPage: React.FC = () => {
     setIsRecording(recordingStatus);
   };
 
-  const handlePreQuestionsFocus = () => {
-    setShowSummaryBar(true); // Show SummaryBar when entering pre-questions
-  };
-
-  const handlePreQuestionsBlur = () => {
-    setShowSummaryBar(false); // Hide SummaryBar when leaving pre-questions
-  };
-
   // Summarize patientInfo for FirstSessionSummary
   const summarizedPatientInfo = summarizePatientInfo(patientInfo);
 
@@ -158,15 +141,7 @@ const ConsultationRecordPage: React.FC = () => {
             setPatientInfo={setPatientInfo}
             preQuestions={preQuestions}
             setPreQuestions={setPreQuestions}
-            onPreQuestionsFocus={handlePreQuestionsFocus} // Pass focus handler
-            onPreQuestionsBlur={handlePreQuestionsBlur} // Pass blur handler
           />
-          {showSummaryBar && (
-            <SummaryBar
-              sessionSummary={sessionSummaryData}
-              onAddToPreQuestions={() => {}}
-            />
-          )}
         </main>
         {isFollowUp && (
           <aside className={styles.rightSidebar}>
