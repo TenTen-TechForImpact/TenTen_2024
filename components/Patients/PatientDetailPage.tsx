@@ -45,7 +45,14 @@ const PatientDetailPage: React.FC = () => {
   const handleAddSession = () => {
     const today = new Date();
     const formattedDate = today.toLocaleDateString("en-CA");
+    // 이미 같은 날짜의 세션이 존재하는지 확인
+    const existingSession = sessions.find((session) => session.date === formattedDate);
+    if (existingSession) {
+      alert("이미 오늘 날짜에 생성된 상담 카드가 있습니다.");
+      return;
+    }
 
+    // 중복이 없을 경우 새 세션 생성
     const newSession = { id: `${sessions.length + 1}`, date: formattedDate };
     setSessions((prevSessions) => [newSession, ...prevSessions]);
   };

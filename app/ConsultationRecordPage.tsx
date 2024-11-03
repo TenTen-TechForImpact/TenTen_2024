@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
