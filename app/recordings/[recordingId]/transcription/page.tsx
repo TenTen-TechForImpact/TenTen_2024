@@ -1,7 +1,5 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/component";
-
 interface Props {
   params: { recordingId: string };
 }

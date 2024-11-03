@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./PatientsListPage.module.css";
-import SearchBar from "@/components/SearchBar";
-import ActionButton from "@/components/ActionButton";
-import SortOptions from "@/components/SortOptions";
-import PatientCard from "@/components/Patients/PatientCard";
-import PatientAddModal from "@/components/Patients/PatientAddModal";
+import SearchBar from "../../components/SearchBar";
+import ActionButton from "../../components/ActionButton";
+import SortOptions from "../../components/SortOptions";
+import PatientCard from "../../components/Patients/PatientCard";
+import PatientAddModal from "../../components/Patients/PatientAddModal";
 
 interface Patient {
   id: string;
