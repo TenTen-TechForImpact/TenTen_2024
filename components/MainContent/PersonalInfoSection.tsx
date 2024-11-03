@@ -386,27 +386,39 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
 
   // 질문 목록
   const questions: Question[] = [
-    { label: "참여자 성명", field: "name", type: "text" },
-    { label: "생년월일", field: "birthDate", type: "text" },
-    { label: "연락처", field: "contact", type: "text" },
+    { label: "참여자 성명", field: "personal_info.name", type: "text" },
+    { label: "생년월일", field: "personal_info.date_of_birth", type: "text" },
+    { label: "연락처", field: "personal_info.phone_number", type: "text" },
     {
       label: "의료보장형태",
-      field: "insuranceType",
+      field: "consultation_info.insurance_type",
       type: "radio",
       options: ["건강보험", "의료급여", "보훈", "비급여"],
     },
-    { label: "최초 상담일", field: "initialConsultDate", type: "text" },
-    { label: "상담일", field: "currentConsultDate", type: "text" },
-    { label: "상담 차수", field: "consultSessionNumber", type: "text" },
+    {
+      label: "최초 상담일",
+      field: "consultation_info.initial_consult_date",
+      type: "text",
+    },
+    {
+      label: "상담일",
+      field: "consultation_info.current_consult_date",
+      type: "text",
+    },
+    {
+      label: "상담 차수",
+      field: "consultation_info.consult_session_number",
+      type: "text",
+    },
     {
       label: "상담 약사",
-      field: "pharmacistName",
+      field: "consultation_info.pharmacist_names",
       type: "multipleText",
       count: 3,
     },
     {
       label: "앓고 있는 질병",
-      field: "diseases",
+      field: "medical_conditions.chronic_diseases.disease_names",
       type: "multiCheckbox",
       options: [
         "고혈압",
@@ -431,68 +443,100 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         "뇌경색",
       ],
     },
-    { label: "기타", field: "additionalDiseaseInfo", type: "text" },
-    { label: "과거 질병 및 수술 이력", field: "medicalHistory", type: "text" },
-    { label: "주요 불편한 증상", field: "symptoms", type: "text" },
+    {
+      label: "기타",
+      field: "medical_conditions.chronic_diseases.additional_info",
+      type: "text",
+    },
+    {
+      label: "과거 질병 및 수술 이력",
+      field: "medical_conditions.medical_history",
+      type: "text",
+    },
+    {
+      label: "주요 불편한 증상",
+      field: "medical_conditions.symptoms",
+      type: "text",
+    },
     {
       label: "알러지",
-      field: "allergies",
+      field: "medical_conditions.allergies.has_allergies",
       type: "yesNoWithText",
       subFields: [
-        { label: "알레르기 의심 식품 또는 약물", field: "suspectedItem" },
+        {
+          label: "알레르기 의심 식품 또는 약물",
+          field: "medical_conditions.allergies.suspected_items",
+        },
       ],
     },
     {
       label: "약물 부작용",
-      field: "adverseDrugReactions",
+      field:
+        "medical_conditions.adverse_drug_reactions.has_adverse_drug_reactions",
       type: "yesNoWithText",
       subFields: [
-        { label: "부작용 의심 약물", field: "suspectedMedication" },
-        { label: "부작용 증상", field: "reactionDetail" },
+        {
+          label: "부작용 의심 약물",
+          field:
+            "medical_conditions.adverse_drug_reactions.suspected_medications",
+        },
+        {
+          label: "부작용 증상",
+          field: "medical_conditions.adverse_drug_reactions.reaction_details",
+        },
       ],
     },
     {
       label: "흡연",
-      field: "smoking",
+      field: "lifestyle.smoking.is_smoking",
       type: "yesNoWithText",
       subFields: [
-        { label: "흡연 기간 (년)", field: "duration" },
-        { label: "평균 흡연량 (갑)", field: "packsPerDay" },
+        {
+          label: "흡연 기간 (년)",
+          field: "lifestyle.smoking.duration_in_years",
+        },
+        { label: "평균 흡연량 (갑)", field: "lifestyle.smoking.pack_per_day" },
       ],
     },
     {
       label: "음주",
-      field: "drinking",
+      field: "lifestyle.alcohol.is_drinking",
       type: "yesNoWithText",
       subFields: [
-        { label: "음주 횟수 (주)", field: "frequencyPerWeek" },
-        { label: "1회 음주량 (병)", field: "amountPerSession" },
+        { label: "음주 횟수 (주)", field: "lifestyle.alcohol.drinks_per_week" },
+        {
+          label: "1회 음주량 (병)",
+          field: "lifestyle.alcohol.amount_per_drink",
+        },
       ],
     },
     {
       label: "일주일에 30분 이상 운동을 하십니까?",
-      field: "exercise",
+      field: "lifestyle.exercise.is_exercising",
       type: "yesNoWithSingleCheckbox",
-      options: ["주 1회", "주 2회", "주 3회", "주 4회 이상", "아니요"],
+      options: ["주 1회", "주 2회", "주 3회", "주 4회 이상"],
       subFields: [
-        { label: "규칙적으로 하는 운동 종류", field: "exerciseType" },
+        {
+          label: "규칙적으로 하는 운동 종류",
+          field: "lifestyle.exercise.exercise_types",
+        },
       ],
     },
     {
       label: "매일 규칙적이고 균형 잡힌 식사를 하십니까?",
-      field: "diet",
+      field: "lifestyle.diet.is_balanced_meal",
       type: "yesNoWithSingleCheckbox",
-      options: ["하루 1회", "하루 2회", "하루 3회", "매일 불규칙함"],
+      options: ["하루 1회", "하루 2회", "하루 3회"],
     },
     {
       label: "독거 여부",
-      field: "livingCondition",
+      field: "medication_management.living_condition.living_alone",
       type: "yesNoWithConditionalText",
     },
     {
       label:
         "주로 약을 챙겨먹는 사람이 누구입니까? (투약보조자 유무 판별 질문)",
-      field: "medicationAssistants",
+      field: "medication_management.living_condition.medication_assistants",
       type: "multiCheckboxWithOther",
       options: [
         "본인",
@@ -506,13 +550,19 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     },
     {
       label: "가정 내 별도의 약 보관 장소가 있습니까?",
-      field: "medicationStorage",
+      field: "medication_management.medication_storage.has_medication_storage",
       type: "yesNoWithText",
-      subFields: [{ label: "보관 장소", field: "location" }],
+      subFields: [
+        {
+          label: "보관 장소",
+          field: "medication_management.medication_storage.location",
+        },
+      ],
     },
     {
       label: "만일을 위해 처방전/설명서를 보관합니까?",
-      field: "prescriptionStorage",
+      field:
+        "medication_management.prescription_storage.is_prescription_stored",
       type: "yesNo",
     },
   ];

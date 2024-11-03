@@ -13,26 +13,70 @@ const ConsultationRecordPage: React.FC = () => {
   const [isFirstSessionCompleted, setIsFirstSessionCompleted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [patientInfo, setPatientInfo] = useState({
-    birthDate: "",
-    contact: "",
-    date: "",
-    pharmacistName: "",
-    diseases: [], // 배열로 초기화
-    additionalDiseaseInfo: "",
-    allergies: { status: "아니오", suspectedItem: "" },
-    adverseDrugReactions: {
-      status: "아니오",
-      suspectedMedication: "",
-      reactionDetail: "",
+    personal_info: {
+      name: "",
+      date_of_birth: "",
+      phone_number: "",
     },
-    smoking: { status: "아니오", duration: "", packsPerDay: "" },
-    drinking: { status: "아니오", frequencyPerWeek: "", amountPerSession: "" },
-    exercise: { status: "아니오", selectedOption: "", exerciseType: [] }, // 배열로 초기화
-    diet: { status: "아니오", selectedOption: "" },
-    livingCondition: { status: "예", familyMembers: "" },
-    medicationAssistants: { selectedOption: "본인", otherText: "" },
-    medicationStorage: { status: "아니오", location: "" },
-    prescriptionStorage: "아니오",
+    consultation_info: {
+      insurance_type: "",
+      initial_consult_date: "",
+      current_consult_date: "",
+      consult_session_number: "",
+      pharmacist_names: ["", "", ""], // 최대 3명의 약사 이름
+    },
+    medical_conditions: {
+      chronic_diseases: {
+        disease_names: [], // 배열로 초기화
+        additional_info: "",
+      },
+      medical_history: "",
+      symptoms: "",
+      allergies: {
+        has_allergies: false,
+        suspected_items: [], // 배열로 초기화
+      },
+      adverse_drug_reactions: {
+        has_adverse_drug_reactions: false,
+        suspected_medications: [], // 배열로 초기화
+        reaction_details: [], // 배열로 초기화
+      },
+    },
+    lifestyle: {
+      smoking: {
+        is_smoking: false,
+        duration_in_years: "", // 숫자 값이어야 하면 나중에 변환
+        pack_per_day: "", // 숫자 값이어야 하면 나중에 변환
+      },
+      alcohol: {
+        is_drinking: false,
+        drinks_per_week: "", // 숫자 값이어야 하면 나중에 변환
+        amount_per_drink: "",
+      },
+      exercise: {
+        is_exercising: false,
+        exercise_frequency: "", // 선택 옵션: 주 1회, 주 2회 등
+        exercise_types: [], // 배열로 초기화
+      },
+      diet: {
+        is_balanced_meal: false,
+        balanced_meals_per_day: "", // 선택 옵션
+      },
+    },
+    medication_management: {
+      living_condition: {
+        living_alone: true,
+        family_members: [], // 배열로 초기화
+        medication_assistants: [], // 배열로 초기화
+      },
+      medication_storage: {
+        has_medication_storage: false,
+        location: "",
+      },
+      prescription_storage: {
+        is_prescription_stored: false,
+      },
+    },
   });
 
   const [preQuestions, setPreQuestions] = useState<string[]>([]);
@@ -55,7 +99,7 @@ const ConsultationRecordPage: React.FC = () => {
   const handleCompleteFirstSession = () => {
     // 1차 상담이 완료되었을 때 상태 업데이트
     setIsFirstSessionCompleted(true);
-    setActiveTab("followUp"); // 자동으로 2차 상담으로 전환
+    setActiveTab("followUp"); // 자동으로 2차 상담으로 전환. 나중에는 그냥 patient 페이지로 나가는 식으로?
   };
 
   const handleTabChange = (tab: "firstSession" | "followUp") => {
