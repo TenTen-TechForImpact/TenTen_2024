@@ -1,18 +1,25 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./PatientAddModal.module.css";
 
+interface PatientData {
+  id?: string;
+  name: string;
+  date_of_birth: string;
+  gender: string;
+  phone_number: string;
+  organization: string;
+}
+
 interface PatientAddModalProps {
+  patient?: PatientData;
+  isEditMode?: boolean;
   onClose: () => void;
-  onSubmit: (patientData: {
-    name: string;
-    date_of_birth: string;
-    gender: string;
-    phone_number: string;
-    organization: string;
-  }) => void;
+  onSubmit: (patientData: PatientData) => void;
 }
 
 const PatientAddModal: React.FC<PatientAddModalProps> = ({
+  patient,
+  isEditMode = false,
   onClose,
   onSubmit,
 }) => {
@@ -28,17 +35,31 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
 
+  // 수정 모드일 때 초기값 설정
+  useEffect(() => {
+    if (isEditMode && patient) {
+      setName(patient.name);
+      setGender(patient.gender);
+      setPhoneNumber(patient.phone_number);
+      setOrganization(patient.organization);
+      const [year, month, day] = patient.date_of_birth.split("-");
+      setBirthYear(year);
+      setBirthMonth(month);
+      setBirthDay(day);
+    }
+  }, [isEditMode, patient]);
+
   const handleBirthDateInput = (
     e: React.ChangeEvent<HTMLInputElement>,
     type: string
   ) => {
-    const value = e.target.value.replace(/\D/g, ""); // 숫자만 입력 가능
+    const value = e.target.value.replace(/\D/g, "");
     if (type === "year") {
       setBirthYear(value);
-      if (value.length === 4) monthRef.current?.focus(); // 연도 입력 완료 시 월로 이동
+      if (value.length === 4) monthRef.current?.focus();
     } else if (type === "month") {
       setBirthMonth(value);
-      if (value.length === 2) dayRef.current?.focus(); // 월 입력 완료 시 일로 이동
+      if (value.length === 2) dayRef.current?.focus();
     } else if (type === "day") {
       setBirthDay(value);
     }
@@ -62,6 +83,7 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
       "0"
     )}-${birthDay.padStart(2, "0")}`;
     onSubmit({
+      id: patient?.id,
       name,
       date_of_birth,
       gender,
@@ -74,7 +96,7 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2>새 환자 추가</h2>
+        <h2>{isEditMode ? "환자 정보 수정" : "새 환자 추가"}</h2>
 
         <input
           type="text"
@@ -150,7 +172,7 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
         />
 
         <button onClick={handleSubmit} className={styles.primaryButton}>
-          추가
+          {isEditMode ? "수정" : "추가"}
         </button>
         <button onClick={onClose} className={styles.secondaryButton}>
           취소
