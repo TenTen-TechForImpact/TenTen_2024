@@ -32,7 +32,7 @@ export async function GET(
     const { data: sessions, error: sessionError } = await supabase
       .from("Session") // Session 테이블에서
       .select("*") // 모든 필드를 선택합니다.
-      .eq("patient_id", patientId); // patient_Id와 patientId가 일치하는 항목을 가져옵니다.
+      .eq("patient_Id", patientId); // patient_Id와 patientId가 일치하는 항목을 가져옵니다.
 
     // 세션 반환 중 에러 처리
     if (sessionError) {
