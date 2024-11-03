@@ -1,9 +1,8 @@
-// src/utils/Recording/audioRecorder.ts
-
 class AudioRecorder {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
   private isRecording = false;
+  private isPaused = false; // 일시정지 상태 추가
 
   // 녹음 시작 메서드
   async startRecording(): Promise<void> {
@@ -18,6 +17,7 @@ class AudioRecorder {
 
     this.mediaRecorder.start();
     this.isRecording = true; // 녹음 중 상태로 설정
+    this.isPaused = false; // 녹음 시작 시 일시정지 해제
   }
 
   // 녹음 종료 메서드
@@ -30,6 +30,7 @@ class AudioRecorder {
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
         this.isRecording = false; // 녹음 상태 초기화
+        this.isPaused = false; // 종료 시 일시정지 해제
         resolve(audioBlob);
       };
 
@@ -37,9 +38,30 @@ class AudioRecorder {
     });
   }
 
+  // 녹음 일시정지 메서드
+  pauseRecording(): void {
+    if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
+      this.mediaRecorder.pause();
+      this.isPaused = true;
+    }
+  }
+
+  // 녹음 재개 메서드
+  resumeRecording(): void {
+    if (this.mediaRecorder && this.mediaRecorder.state === "paused") {
+      this.mediaRecorder.resume();
+      this.isPaused = false;
+    }
+  }
+
   // 녹음 상태 반환
   getRecordingStatus(): boolean {
     return this.isRecording;
+  }
+
+  // 일시정지 상태 반환
+  getPauseStatus(): boolean {
+    return this.isPaused;
   }
 
   // 녹음 상태 초기화
@@ -47,6 +69,7 @@ class AudioRecorder {
     this.mediaRecorder = null;
     this.audioChunks = [];
     this.isRecording = false;
+    this.isPaused = false;
   }
 }
 

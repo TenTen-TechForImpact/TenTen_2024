@@ -1,6 +1,5 @@
-// src/components/MainContent/RecordingSection.tsx
 import React, { useState, useRef } from "react";
-import { FaMicrophone, FaStop, FaRedo, FaUpload } from "react-icons/fa";
+import { FaMicrophone, FaPause, FaPlay, FaRedo, FaUpload, FaCheck } from "react-icons/fa";
 import AudioRecorder from "../../utils/Recording/audioRecorder";
 import styles from "./RecordingSection.module.css";
 
@@ -14,28 +13,44 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
   sessionId,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const recorderRef = useRef<AudioRecorder>(new AudioRecorder());
 
-  const handleStartRecording = async () => {
-    try {
-      await recorderRef.current.startRecording();
-      setIsRecording(true);
+  const handleStartOrPauseRecording = async () => {
+    if (!isRecording) {
+      // 녹음 시작
+      try {
+        await recorderRef.current.startRecording();
+        setIsRecording(true);
+        setIsPaused(false);
+        onRecordingStatusChange(true);
+      } catch (error) {
+        console.error("녹음 시작 실패:", error);
+      }
+    } else if (isPaused) {
+      // 녹음 재개
+      recorderRef.current.resumeRecording();
+      setIsPaused(false);
       onRecordingStatusChange(true);
-    } catch (error) {
-      console.error("녹음 시작 실패:", error);
+    } else {
+      // 녹음 일시정지
+      recorderRef.current.pauseRecording();
+      setIsPaused(true);
+      onRecordingStatusChange(false);
     }
   };
 
-  const handleStopRecording = async () => {
+  const handleCompleteRecording = async () => {
     try {
       const audioBlob = await recorderRef.current.stopRecording();
       const url = URL.createObjectURL(audioBlob);
-      setAudioURL(url);
+      setAudioURL(url); // 녹음 완료 시 재생바에 사용될 URL 설정
       setIsRecording(false);
+      setIsPaused(false);
       onRecordingStatusChange(false);
     } catch (error) {
-      console.error("녹음 중지 실패:", error);
+      console.error("녹음 완료 실패:", error);
     }
   };
 
@@ -43,6 +58,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     recorderRef.current.resetRecording();
     setAudioURL(null);
     setIsRecording(false);
+    setIsPaused(false);
     onRecordingStatusChange(false);
   };
 
@@ -84,13 +100,30 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       <div className={styles.buttonContainer}>
         <button
           className={styles.startStopButton}
-          onClick={isRecording ? handleStopRecording : handleStartRecording}
+          onClick={handleStartOrPauseRecording}
         >
-          {isRecording ? <FaStop /> : <FaMicrophone />}
+          {isRecording
+            ? isPaused
+              ? <FaPlay />
+              : <FaPause />
+            : <FaMicrophone />}
           <span className={styles.buttonLabel}>
-            {isRecording ? "정지" : "녹음하기"}
+            {isRecording
+              ? isPaused
+                ? "재개"
+                : "일시정지"
+              : "녹음하기"}
           </span>
         </button>
+        {isRecording && (
+          <button
+            className={styles.completeButton}
+            onClick={handleCompleteRecording}
+          >
+            <FaCheck />
+            <span className={styles.buttonLabel}>녹음 완료</span>
+          </button>
+        )}
         <button
           className={styles.resetButton}
           onClick={handleResetRecording}
