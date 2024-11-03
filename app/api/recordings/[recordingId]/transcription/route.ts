@@ -3,7 +3,7 @@ import axios from "axios";
 import qs from "qs";
 import FormData from "form-data";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { createClient } from "@/utils/supabase/component";
+import { createClient } from "../../../../../utils/supabase/component";
 import { Readable } from "stream";
 
 const supabase = createClient();

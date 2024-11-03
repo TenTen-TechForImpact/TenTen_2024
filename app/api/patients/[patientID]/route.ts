@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/component";
+import { createClient } from "../../../../utils/supabase/component";
 
 // Supabase 클라이언트 생성
 const supabase = createClient();

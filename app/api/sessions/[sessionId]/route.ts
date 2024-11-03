@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/component";
+import { createClient } from "../../../../utils/supabase/component";
 
 // Supabase 클라이언트 생성
 const supabase = createClient();
@@ -58,7 +58,7 @@ export async function PUT(
   if (error) {
     console.error("Error updating session:", error.message);
     return NextResponse.json(
-      { error: "Error updating session"},
+      { error: "Error updating session" },
       { status: 500 }
     );
   }
