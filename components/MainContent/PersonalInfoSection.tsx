@@ -9,18 +9,21 @@ interface PersonalInfoSectionProps {
 type QuestionType =
   | "text"
   | "yesNo"
+  | "radio"
   | "multiCheckbox"
   | "multiCheckboxWithOther"
   | "yesNoWithText"
   | "yesNoWithSingleCheckbox"
-  | "yesNoWithConditionalText";
+  | "yesNoWithConditionalText"
+  | "multipleText";
 
 interface Question {
   label: string;
   field: string;
   type: QuestionType;
-  options?: string[]; // For multiCheckbox and yesNoWithSingleCheckbox
+  options?: string[];
   subFields?: { label: string; field: string }[];
+  count?: number;
 }
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
@@ -47,6 +50,28 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             />
           </div>
         );
+      case "radio":
+        return (
+          <div className={styles.infoItem}>
+            <label className={styles.label}>{label}</label>
+            <div className={styles.radioContainer}>
+              {options?.map((option, index) => (
+                <label key={index} className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name={field}
+                    value={option}
+                    checked={patientInfo[field] === option}
+                    onChange={() => handleInputChange(field, option)}
+                    className={styles.radioInput}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </div>
+        );
+
       case "multiCheckbox":
         return (
           <div className={styles.infoItem}>
@@ -327,7 +352,33 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             )}
           </div>
         );
-
+      case "multipleText":
+        return (
+          <div className={styles.infoItem}>
+            <label className={styles.label}>{label}</label>
+            <div className={styles.multipleTextContainer}>
+              {Array.from({ length: question.count || 1 }).map(
+                (
+                  _,
+                  index // Use 'question.count' here
+                ) => (
+                  <input
+                    key={index}
+                    type="text"
+                    value={patientInfo[field]?.[index] || ""}
+                    onChange={(e) => {
+                      const newValues = [...(patientInfo[field] || [])];
+                      newValues[index] = e.target.value;
+                      handleInputChange(field, newValues);
+                    }}
+                    className={styles.inputField}
+                    placeholder={`약사 ${index + 1}`}
+                  />
+                )
+              )}
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -335,12 +386,24 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
 
   // 질문 목록
   const questions: Question[] = [
-    // 기존 질문들
     { label: "참여자 성명", field: "name", type: "text" },
     { label: "생년월일", field: "birthDate", type: "text" },
     { label: "연락처", field: "contact", type: "text" },
-    { label: "상담일", field: "date", type: "text" },
-    { label: "상담 약사", field: "pharmacistName", type: "text" },
+    {
+      label: "의료보장형태",
+      field: "insuranceType",
+      type: "radio",
+      options: ["건강보험", "의료급여", "보훈", "비급여"],
+    },
+    { label: "최초 상담일", field: "initialConsultDate", type: "text" },
+    { label: "상담일", field: "currentConsultDate", type: "text" },
+    { label: "상담 차수", field: "consultSessionNumber", type: "text" },
+    {
+      label: "상담 약사",
+      field: "pharmacistName",
+      type: "multipleText",
+      count: 3,
+    },
     {
       label: "앓고 있는 질병",
       field: "diseases",
@@ -368,7 +431,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         "뇌경색",
       ],
     },
-    { label: "기타 의견", field: "additionalDiseaseInfo", type: "text" },
+    { label: "기타", field: "additionalDiseaseInfo", type: "text" },
+    { label: "과거 질병 및 수술 이력", field: "medicalHistory", type: "text" },
+    { label: "주요 불편한 증상", field: "symptoms", type: "text" },
     {
       label: "알러지",
       field: "allergies",

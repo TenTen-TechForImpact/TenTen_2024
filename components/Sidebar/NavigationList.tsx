@@ -70,7 +70,7 @@ const NavigationList: React.FC<NavigationListProps> = ({
       />
       <div className={styles.tabHeader}>
         <h2 className={styles.tabTitle}>
-          {activeTab === "followUp" ? "2차 상담" : "1차 상담"}
+          {activeTab === "followUp" ? "약사 상담" : "사전 접수"}
         </h2>
         {isFirstSessionCompleted && (
           <div className={styles.tabButtons}>
