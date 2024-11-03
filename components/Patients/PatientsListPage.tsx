@@ -65,7 +65,6 @@ const PatientsListPage = () => {
   const handleAddPatient = async (patientData: Omit<Patient, "id">) => {
     setLoading(true);
     try {
-      console.log(JSON.stringify(patientData));
       const response = await fetch("/api/patients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,7 +109,6 @@ const PatientsListPage = () => {
   const handleUpdatePatient = async (patientData: Patient) => {
     setLoading(true);
     try {
-      console.log(JSON.stringify(patientData));
       const response = await fetch(`/api/patients/${patientData.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
