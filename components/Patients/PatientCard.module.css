@@ -14,9 +14,13 @@
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  gap: 8px;
+  /* 삭제 버튼과 펜 아이콘 사이 간격 */
 }
 
-.deleteButton {
+.deleteButton,
+.editButton {
   background: rgb(216, 68, 68);
   color: white;
   border: none;
@@ -27,6 +31,11 @@
   font-size: 16px;
   line-height: 24px;
   text-align: center;
+}
+
+.editButton {
+  background: rgb(68, 123, 216);
+  /* 수정 버튼의 색상 */
 }
 
 .avatarContainer {
@@ -105,13 +114,13 @@
   height: 30px;
   margin-right: 8px;
   vertical-align: middle;
-  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(223deg)
-    brightness(104%) contrast(103%);
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(223deg) brightness(104%) contrast(103%);
 }
 
 .patientName,
 .patientDetails,
 .avatarContainer,
-.deleteButton {
+.deleteButton,
+.editButton {
   user-select: none;
 }

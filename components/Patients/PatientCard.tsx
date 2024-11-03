@@ -14,6 +14,7 @@ interface PatientProps {
   phone_number: string;
   organization: string;
   onDelete: (id: string) => void;
+  onEdit: (patient: { id: string; name: string; age: number; gender: string; phone_number: string; organization: string }) => void;
 }
 
 const PatientCard: React.FC<PatientProps> = ({
@@ -24,6 +25,7 @@ const PatientCard: React.FC<PatientProps> = ({
   organization,
   phone_number,
   onDelete,
+  onEdit,
 }) => {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -45,11 +47,18 @@ const PatientCard: React.FC<PatientProps> = ({
     setShowDeleteModal(false);
   };
 
+  const handleEditClick = () => {
+    onEdit({ id, name, age, gender, phone_number, organization });
+  };
+
   return (
     <div className={styles.patientCard}>
       <div className={styles.deleteButtonContainer}>
         <button className={styles.deleteButton} onClick={handleDeleteClick}>
           X
+        </button>
+        <button className={styles.editButton} onClick={handleEditClick}>
+          ✎
         </button>
       </div>
       <div className={styles.avatarContainer}>
