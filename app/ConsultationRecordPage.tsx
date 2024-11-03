@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import NavigationList from "../components/Sidebar/NavigationList";
@@ -25,51 +25,51 @@ const ConsultationRecordPage: React.FC = () => {
       initial_consult_date: "",
       current_consult_date: "",
       consult_session_number: "",
-      pharmacist_names: ["", "", ""], // 최대 3명의 약사 이름
+      pharmacist_names: ["", "", ""],
     },
     medical_conditions: {
       chronic_diseases: {
-        disease_names: [], // 배열로 초기화
+        disease_names: [],
         additional_info: "",
       },
       medical_history: "",
       symptoms: "",
       allergies: {
         has_allergies: false,
-        suspected_items: [], // 배열로 초기화
+        suspected_items: [],
       },
       adverse_drug_reactions: {
         has_adverse_drug_reactions: false,
-        suspected_medications: [], // 배열로 초기화
-        reaction_details: [], // 배열로 초기화
+        suspected_medications: [],
+        reaction_details: [],
       },
     },
     lifestyle: {
       smoking: {
         is_smoking: false,
-        duration_in_years: "", // 숫자 값이어야 하면 나중에 변환
-        pack_per_day: "", // 숫자 값이어야 하면 나중에 변환
+        duration_in_years: "",
+        pack_per_day: "",
       },
       alcohol: {
         is_drinking: false,
-        drinks_per_week: "", // 숫자 값이어야 하면 나중에 변환
+        drinks_per_week: "",
         amount_per_drink: "",
       },
       exercise: {
         is_exercising: false,
-        exercise_frequency: "", // 선택 옵션: 주 1회, 주 2회 등
-        exercise_types: [], // 배열로 초기화
+        exercise_frequency: "",
+        exercise_types: [],
       },
       diet: {
         is_balanced_meal: false,
-        balanced_meals_per_day: "", // 선택 옵션
+        balanced_meals_per_day: "",
       },
     },
     medication_management: {
       living_condition: {
         living_alone: true,
-        family_members: [], // 배열로 초기화
-        medication_assistants: [], // 배열로 초기화
+        family_members: [],
+        medication_assistants: [],
       },
       medication_storage: {
         has_medication_storage: false,
