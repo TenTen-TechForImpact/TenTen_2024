@@ -118,9 +118,10 @@ const PatientDetailPage: React.FC = () => {
         {sessions && sessions.length > 0 ? (
           sessions.map((session) => (
             <SessionCard
+              key={session.id}
               id={session.id}
               dateTime={session.session_datetime}
-              onViewDetails={() => router.push(`../sessions`)} // 임시로 session으로 보낸다
+              onViewDetails={() => router.push(`../sessions/${session.id}`)}
               onDelete={handleDeleteSession}
             />
           ))

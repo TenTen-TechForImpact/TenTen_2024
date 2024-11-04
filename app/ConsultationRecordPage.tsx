@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
@@ -8,6 +9,10 @@ import Header from "../components/Header/Header";
 import styles from "./ConsultationRecordPage.module.css";
 
 const ConsultationRecordPage: React.FC = () => {
+  //sessionId 획득
+  const pathname = usePathname();
+  const sessionId = pathname.split("/").pop();
+
   // 상담 데이터 상태 관리
   const [activeTab, setActiveTab] = useState<"firstSession" | "followUp">(
     "firstSession"
@@ -93,6 +98,155 @@ const ConsultationRecordPage: React.FC = () => {
       content: "Q. 운동 계획을 어떻게 세우는 게 좋을까요?",
     },
   ]);
+
+  useEffect(() => {
+    const fetchAndUpdateData = async () => {
+      try {
+        // 데이터 가져오기
+        const response = await fetch(`/api/sessions/${sessionId}`);
+        const data = await response.json();
+
+        // 데이터가 불완전할 경우에만 PATCH 요청 수행
+        if (isDataInvalid(data)) {
+          console.log("Data is incomplete, sending update request...");
+
+          // 필요한 경우, temp 객체 내의 데이터만 보냄
+          const updatedData = { ...data.temp }; // 업데이트할 데이터 가공
+          const patchResponse = await fetch(`/api/sessions/${sessionId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedData),
+          });
+
+          if (!patchResponse.ok) {
+            console.error("Error updating session:", patchResponse.statusText);
+          } else {
+            console.log("Update request successful");
+          }
+        } else {
+          console.log("Data is valid, no update needed.");
+        }
+
+        // 데이터를 상태로 설정
+        setPatientInfo(data.temp);
+      } catch (error) {
+        console.error("Error fetching or sending update request:", error);
+      }
+    };
+
+    fetchAndUpdateData();
+  }, [sessionId]);
+
+  const isDataInvalid = (data: any) => {
+    // 데이터가 없거나 temp 객체가 없으면 불완전
+    if (!data || !data.temp) {
+      console.log("Data or temp is null or undefined.");
+      return true;
+    }
+
+    const { temp } = data;
+
+    // 개인 정보 검증: temp 안에 personal_info 객체가 존재하는지 확인
+    if (
+      !temp.personal_info ||
+      !("name" in temp.personal_info) ||
+      !("date_of_birth" in temp.personal_info) ||
+      !("phone_number" in temp.personal_info)
+    ) {
+      console.log(
+        "Personal info is incomplete or undefined:",
+        temp.personal_info
+      );
+      return true;
+    }
+
+    // 상담 정보 검증: temp 안에 consultation_info 객체가 존재하는지 확인
+    if (
+      !temp.consultation_info ||
+      !("insurance_type" in temp.consultation_info) ||
+      !("initial_consult_date" in temp.consultation_info) ||
+      !("current_consult_date" in temp.consultation_info)
+    ) {
+      console.log(
+        "Consultation info is incomplete or undefined:",
+        temp.consultation_info
+      );
+      return true;
+    }
+
+    // 만성 질환 정보 검증: temp 안에 medical_conditions 객체가 존재하는지 확인
+    if (
+      !temp.medical_conditions ||
+      !temp.medical_conditions.chronic_diseases ||
+      !("disease_names" in temp.medical_conditions.chronic_diseases)
+    ) {
+      console.log(
+        "Medical conditions are incomplete or undefined:",
+        temp.medical_conditions.chronic_diseases
+      );
+      return true;
+    }
+
+    // 라이프스타일 정보 검증: temp 안에 lifestyle 객체가 존재하는지 확인
+    if (
+      !temp.lifestyle ||
+      !("smoking" in temp.lifestyle) ||
+      !("alcohol" in temp.lifestyle) ||
+      !("exercise" in temp.lifestyle)
+    ) {
+      console.log("Lifestyle info is incomplete or undefined:", temp.lifestyle);
+      return true;
+    }
+
+    // 약물 관리 정보 검증: temp 안에 medication_management 객체가 존재하는지 확인
+    if (
+      !temp.medication_management ||
+      !("living_condition" in temp.medication_management) ||
+      !("medication_storage" in temp.medication_management) ||
+      !("prescription_storage" in temp.medication_management)
+    ) {
+      console.log(
+        "Medication management info is incomplete or undefined:",
+        temp.medication_management
+      );
+      return true;
+    }
+
+    // 기타 검증: temp 안에 필요한 필드가 존재하는지 확인
+    if (!("pharmacist_comments" in temp) || !("care_note" in temp)) {
+      console.log(
+        "Pharmacist comments or care note is missing or undefined:",
+        temp.pharmacist_comments,
+        temp.care_note
+      );
+      return true;
+    }
+
+    // 모든 검증을 통과하면 데이터가 유효함
+    return false;
+  };
+
+  const patchFormattedData = async (data: any) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("PATCH 요청이 실패했습니다.");
+      }
+
+      console.log("데이터가 성공적으로 업데이트되었습니다.");
+    } catch (error) {
+      console.error("PATCH 요청 중 오류 발생:", error);
+    }
+  };
 
   const handleRecordingStatusChange = (recordingStatus: boolean) => {
     setIsRecording(recordingStatus);
