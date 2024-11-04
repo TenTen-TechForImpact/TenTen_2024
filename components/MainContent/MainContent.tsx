@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
 import React from "react";
 import PersonalInfoSection from "./PersonalInfoSection";
 import PreQuestionsSection from "./PreQuestionsSection";
 import PrescriptionDrugsSection from "./PrescriptionDrugsSection";
-import OTCAndSupplementsSection from "./OTCAndSupplementsSection";
+import SupplementsSection from "./supplementsSection";
+import OTCSection from "./OTCSection";
 import CareNotesSection from "./CareNotesSection";
 import PharmacistInterventionSection from "./PharmacistInterventionSection";
 import RecordingSection from "./RecordingSection";
@@ -19,6 +20,8 @@ interface MainContentProps {
   preQuestions: string[];
   setPreQuestions: React.Dispatch<React.SetStateAction<string[]>>;
   sessionId: string | null;
+  medicationList: any; // 나중에 타입 제대로 지정
+  setMedicationList: React.Dispatch<React.SetStateAction<any>>; // 나중에 타입 제대로 지정
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -30,6 +33,8 @@ const MainContent: React.FC<MainContentProps> = ({
   preQuestions,
   setPreQuestions,
   sessionId,
+  medicationList,
+  setMedicationList,
 }) => {
   const handleAddContent = (content: string) => {
     console.log("추가된 content:", content);
@@ -52,10 +57,25 @@ const MainContent: React.FC<MainContentProps> = ({
             />
           </section>
           <section id="prescriptionDrugs" className={styles.section}>
-            <PrescriptionDrugsSection />
+            <PrescriptionDrugsSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
           </section>
-          <section id="otcAndSupplements" className={styles.section}>
-            <OTCAndSupplementsSection />
+          <section id="otc" className={styles.section}>
+            <OTCSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
+          </section>
+          <section id="supplements" className={styles.section}>
+            <SupplementsSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
           </section>
           <button
             className={styles.completeButton}
@@ -75,10 +95,25 @@ const MainContent: React.FC<MainContentProps> = ({
             />
           </section>
           <section id="prescriptionDrugs" className={styles.section}>
-            <PrescriptionDrugsSection />
+            <PrescriptionDrugsSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
           </section>
-          <section id="otcAndSupplements" className={styles.section}>
-            <OTCAndSupplementsSection />
+          <section id="otc" className={styles.section}>
+            <OTCSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
+          </section>
+          <section id="supplements" className={styles.section}>
+            <SupplementsSection
+              medicationList={medicationList} // 전달된 약물 목록 상태
+              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              sessionId={sessionId}
+            />
           </section>
           <section id="pharmacistIntervention" className={styles.section}>
             <PharmacistInterventionSection onAddContent={handleAddContent} />

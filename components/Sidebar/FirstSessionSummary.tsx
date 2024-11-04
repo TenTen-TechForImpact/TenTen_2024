@@ -55,17 +55,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
           <span className={styles.label}>알러지:</span>{" "}
           <span className={styles.value}>
             {patientInfo.medical_conditions.allergies.has_allergies === "예"
-              ? `의심 항목: ${
-                  Array.isArray(
-                    patientInfo.medical_conditions.allergies.suspected_items
-                  ) &&
-                  patientInfo.medical_conditions.allergies.suspected_items
-                    .length > 0
-                    ? patientInfo.medical_conditions.allergies.suspected_items.join(
-                        ", "
-                      )
-                    : "없음"
-                }`
+              ? `의심 항목: ${patientInfo.medical_conditions.allergies.suspected_items}`
               : "없음"}
           </span>
         </p>
@@ -74,29 +64,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
           <span className={styles.value}>
             {patientInfo.medical_conditions.adverse_drug_reactions
               .has_adverse_drug_reactions === "예"
-              ? `의심 약물: ${
-                  Array.isArray(
-                    patientInfo.medical_conditions.adverse_drug_reactions
-                      .suspected_medications
-                  ) &&
-                  patientInfo.medical_conditions.adverse_drug_reactions
-                    .suspected_medications.length > 0
-                    ? patientInfo.medical_conditions.adverse_drug_reactions.suspected_medications.join(
-                        ", "
-                      )
-                    : "없음"
-                }, 증상: ${
-                  Array.isArray(
-                    patientInfo.medical_conditions.adverse_drug_reactions
-                      .reaction_details
-                  ) &&
-                  patientInfo.medical_conditions.adverse_drug_reactions
-                    .reaction_details.length > 0
-                    ? patientInfo.medical_conditions.adverse_drug_reactions.reaction_details.join(
-                        ", "
-                      )
-                    : "없음"
-                }`
+              ? `의심 약물: ${patientInfo.medical_conditions.adverse_drug_reactions.suspected_medications} 증상: ${patientInfo.medical_conditions.adverse_drug_reactions.reaction_details}`
               : "없음"}
           </span>
         </p>
@@ -141,20 +109,20 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
         <p>
           <span className={styles.label}>동거 가족 구성원:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.medication_management.living_condition.family_members
-              ? patientInfo.medication_management.living_condition
-                  .family_members
-              : "없음"}
+            {patientInfo.medication_management.living_condition.living_alone ===
+            "예"
+              ? "없음"
+              : patientInfo.medication_management.living_condition
+                  .family_members}
           </span>
         </p>
         <p>
           <span className={styles.label}>투약 보조자:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.medication_management.living_condition.living_alone ===
-            "예"
-              ? patientInfo.medication_management.living_condition
-                  .medication_assistants
-              : "없음"}
+            {
+              patientInfo.medication_management.living_condition
+                .medication_assistants
+            }
           </span>
         </p>
 

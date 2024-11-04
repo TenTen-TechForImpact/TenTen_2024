@@ -62,13 +62,6 @@ const PatientDetailPage: React.FC = () => {
       return;
     }
 
-    // Create a new session object with a temporary ID
-    const tempId = `temp-${Date.now()}`; // Temporary unique ID
-    const newSession = { id: tempId, session_datetime: formattedDate };
-
-    // Optimistically update the sessions state
-    setSessions((prevSessions) => [newSession, ...prevSessions]);
-
     const sessionData = {
       "session-datetime": formattedDate,
     };
@@ -91,11 +84,6 @@ const PatientDetailPage: React.FC = () => {
     } catch (error) {
       console.error("Error creating session:", error);
       alert("세션 생성에 실패했습니다. 다시 시도해주세요.");
-
-      // Revert the optimistic update in case of an error
-      setSessions((prevSessions) =>
-        prevSessions.filter((session) => session.id !== tempId)
-      );
     }
   };
 
