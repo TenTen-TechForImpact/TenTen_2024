@@ -99,11 +99,31 @@ const PatientDetailPage: React.FC = () => {
     }
   };
 
-  const handleDeleteSession = (id: string) => {
-    // 더미 삭제 기능
-    setSessions((prevSessions) =>
-      prevSessions.filter((session) => session.id !== id)
-    );
+  const handleDeleteSession = async (id: string) => {
+    try {
+      // Make a DELETE request to the backend
+      const response = await fetch(
+        `/api/patients/${patientId}/sessions/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the session");
+      }
+
+      // Remove the session from the state
+      setSessions((prevSessions) =>
+        prevSessions.filter((session) => session.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
