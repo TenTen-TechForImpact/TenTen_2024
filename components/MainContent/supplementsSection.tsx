@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import styles from "./PrescriptionDrugsSection.module.css";
-
-interface PrescriptionDrug {
-  name: string;
-  days: string;
-  purpose: string;
-  status: string;
-}
+import styles from "./SupplementsSection.module.css";
 
 interface Supplement {
   name: string;
   unit: string;
+  purpose: string;
+  status: string;
+}
+
+interface PrescriptionDrug {
+  name: string;
+  days: string;
   purpose: string;
   status: string;
 }
@@ -39,42 +39,48 @@ interface Props {
   sessionId: string;
 }
 
-const PrescriptionDrugsSection: React.FC<Props> = ({
+const SupplementsSection: React.FC<Props> = ({
   medicationList,
   setMedicationList,
   sessionId,
 }) => {
-  const [drugs, setDrugs] = useState<PrescriptionDrug[]>([]);
-  const [newDrug, setNewDrug] = useState<PrescriptionDrug>({
+  const [supplements, setSupplements] = useState<Supplement[]>([]);
+
+  useEffect(() => {
+    setSupplements(
+      medicationList.current_medications.health_functional_foods.list
+    );
+  }, [medicationList]);
+
+  const [newSupplement, setNewSupplement] = useState<Supplement>({
     name: "",
-    days: "",
+    unit: "",
     purpose: "",
     status: "상시 복용",
   });
 
-  // Load the ethical_the_counter_drugs list into state
-  useEffect(() => {
-    setDrugs(medicationList.current_medications.ethical_the_counter_drugs.list);
-  }, [medicationList]);
-
-  const handleAddDrug = () => {
-    if (newDrug.name && newDrug.purpose && newDrug.days !== "") {
-      const updatedDrugs = [...drugs, newDrug];
+  const handleAddSupplement = () => {
+    if (newSupplement.name && newSupplement.purpose && newSupplement.unit) {
+      const updatedSupplements = [...supplements, newSupplement];
       const updatedList = {
         ...medicationList,
         current_medications: {
           ...medicationList.current_medications,
-          ethical_the_counter_drugs: {
-            count: updatedDrugs.length,
-            list: updatedDrugs,
+          health_functional_foods: {
+            count: updatedSupplements.length,
+            list: updatedSupplements,
           },
         },
       };
 
-      // Update the state using setMedicationList
       setMedicationList(updatedList);
-      setDrugs(updatedDrugs);
-      setNewDrug({ name: "", days: "", purpose: "", status: "상시 복용" });
+      setSupplements(updatedSupplements);
+      setNewSupplement({
+        name: "",
+        unit: "",
+        purpose: "",
+        status: "상시 복용",
+      });
 
       // Make the PATCH request to update the server
       fetch(`/api/sessions/${sessionId}`, {
@@ -84,9 +90,9 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
         },
         body: JSON.stringify({
           current_medications: {
-            ethical_the_counter_drugs: {
-              count: updatedDrugs.length,
-              list: updatedDrugs,
+            health_functional_foods: {
+              count: updatedSupplements.length,
+              list: updatedSupplements,
             },
           },
         }),
@@ -106,24 +112,22 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
     }
   };
 
-  const handleDeleteDrug = (index: number) => {
-    const updatedDrugs = drugs.filter((_, i) => i !== index);
+  const handleDeleteSupplement = (index: number) => {
+    const updatedSupplements = supplements.filter((_, i) => i !== index);
     const updatedList = {
       ...medicationList,
       current_medications: {
         ...medicationList.current_medications,
-        ethical_the_counter_drugs: {
-          count: updatedDrugs.length,
-          list: updatedDrugs,
+        health_functional_foods: {
+          count: updatedSupplements.length,
+          list: updatedSupplements,
         },
       },
     };
 
-    // Update the state using setMedicationList
     setMedicationList(updatedList);
-    setDrugs(updatedDrugs);
+    setSupplements(updatedSupplements);
 
-    // Make the PATCH request to update the server
     fetch(`/api/sessions/${sessionId}`, {
       method: "PATCH",
       headers: {
@@ -131,9 +135,9 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
       },
       body: JSON.stringify({
         current_medications: {
-          ethical_the_counter_drugs: {
-            count: updatedDrugs.length,
-            list: updatedDrugs,
+          health_functional_foods: {
+            count: updatedSupplements.length,
+            list: updatedSupplements,
           },
         },
       }),
@@ -154,30 +158,30 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
 
   return (
     <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>처방 의약품</h3>
+      <h3 className={styles.sectionTitle}>건강기능식품</h3>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>#</th>
             <th>상품명</th>
-            <th>처방 일수</th>
+            <th>제품 단위</th>
             <th>약물 사용 목적</th>
             <th>사용 상태</th>
             <th>삭제</th>
           </tr>
         </thead>
         <tbody>
-          {drugs.map((drug, index) => (
+          {supplements.map((supplement, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td>{drug.name}</td>
-              <td>{drug.days}일</td>
-              <td>{drug.purpose}</td>
-              <td>{drug.status}</td>
+              <td>{supplement.name}</td>
+              <td>{supplement.unit}</td>
+              <td>{supplement.purpose}</td>
+              <td>{supplement.status}</td>
               <td>
                 <button
                   className={styles.deleteButton}
-                  onClick={() => handleDeleteDrug(index)}
+                  onClick={() => handleDeleteSupplement(index)}
                 >
                   <FaTrashAlt />
                 </button>
@@ -191,27 +195,35 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
         <input
           type="text"
           placeholder="상품명"
-          value={newDrug.name}
-          onChange={(e) => setNewDrug({ ...newDrug, name: e.target.value })}
+          value={newSupplement.name}
+          onChange={(e) =>
+            setNewSupplement({ ...newSupplement, name: e.target.value })
+          }
           className={styles.inputField}
         />
         <input
-          type="number"
-          placeholder="처방 일수"
-          value={newDrug.days}
-          onChange={(e) => setNewDrug({ ...newDrug, days: e.target.value })}
+          type="text"
+          placeholder="제품 단위"
+          value={newSupplement.unit}
+          onChange={(e) =>
+            setNewSupplement({ ...newSupplement, unit: e.target.value })
+          }
           className={styles.inputField}
         />
         <input
           type="text"
           placeholder="약물 사용 목적"
-          value={newDrug.purpose}
-          onChange={(e) => setNewDrug({ ...newDrug, purpose: e.target.value })}
+          value={newSupplement.purpose}
+          onChange={(e) =>
+            setNewSupplement({ ...newSupplement, purpose: e.target.value })
+          }
           className={styles.inputField}
         />
         <select
-          value={newDrug.status}
-          onChange={(e) => setNewDrug({ ...newDrug, status: e.target.value })}
+          value={newSupplement.status}
+          onChange={(e) =>
+            setNewSupplement({ ...newSupplement, status: e.target.value })
+          }
           className={styles.selectField}
         >
           <option value="상시 복용">상시 복용</option>
@@ -219,7 +231,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
           <option value="복용 중단">복용 중단</option>
           <option value="기타">기타</option>
         </select>
-        <button className={styles.addButton} onClick={handleAddDrug}>
+        <button className={styles.addButton} onClick={handleAddSupplement}>
           저장하기
         </button>
       </div>
@@ -227,4 +239,4 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
   );
 };
 
-export default PrescriptionDrugsSection;
+export default SupplementsSection;

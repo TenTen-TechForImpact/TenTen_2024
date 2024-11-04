@@ -6,6 +6,6 @@ import ConsultationRecordPage from "./ConsultationRecordPage";
 import MainPage from "./MainPage";
 
 export default function Page() {
-  return <ConsultationRecordPage />;
+  return <MainPage />;
   /*return <MainPage />;*/
 }

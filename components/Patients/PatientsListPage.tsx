@@ -22,6 +22,7 @@ const PatientsListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("name");
   const [showModal, setShowModal] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,6 +105,35 @@ const PatientsListPage = () => {
     }
   };
 
+  // 환자 정보 수정 함수
+  const handleUpdatePatient = async (patientData: Patient) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/patients/${patientData.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patientData),
+      });
+
+      if (!response.ok) throw new Error("Failed to update patient");
+
+      setShowModal(false);
+      setSelectedPatient(null);
+      fetchPatients();
+    } catch (err) {
+      console.error("Error:", err);
+      setError("환자 정보를 수정하는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 환자 정보 수정 핸들러
+  const handleEditPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setShowModal(true);
+  };
+
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (value: string) => {
     setSortOption(value);
@@ -138,11 +168,15 @@ const PatientsListPage = () => {
 
       {showModal && (
         <PatientAddModal
-          onClose={() => setShowModal(false)}
-          onSubmit={handleAddPatient}
+          patient={selectedPatient}
+          isEditMode={!!selectedPatient}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedPatient(null);
+          }}
+          onSubmit={selectedPatient ? handleUpdatePatient : handleAddPatient}
         />
       )}
-
       {error && <p className={styles.errorMessage}>{error}</p>}
 
       <div className={styles.patientList}>
@@ -166,6 +200,7 @@ const PatientsListPage = () => {
               phone_number={patient.phone_number}
               organization={patient.organization}
               onDelete={() => handleDeletePatient(patient.id)}
+              onEdit={() => handleEditPatient(patient)}
             />
           ))
         )}

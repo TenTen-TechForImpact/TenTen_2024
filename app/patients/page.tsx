@@ -3,9 +3,7 @@
 import React from "react";
 import MainPage from "@/app/MainPage";
 
-const PatientDetail = ({ params }: { params: { id: string } }) => {
-  const patientId = Number(params.id);
-
+const PatientDetail: React.FC = () => {
   return <MainPage />;
 };
 

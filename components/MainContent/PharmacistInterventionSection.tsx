@@ -1,109 +1,94 @@
-// src/components/MainContent/OTCAndSupplementsSection.tsx
-import React, { useState } from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
-import styles from './OTCAndSupplementsSection.module.css';
+import React from "react";
+import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar";
+import styles from "./PharmacistInterventionSection.module.css";
 
-interface OTCDrug {
-  name: string;
-  unit: string;
-  purpose: string;
-  status: string;
+interface PharmacistInterventionSectionProps {
+  pharmacistIntervention: any;
+  setPharmacistIntervention: React.Dispatch<React.SetStateAction<any>>;
+  sessionId: string;
+  onAddContent: (content: string) => void;
 }
 
-const OTCAndSupplementsSection: React.FC = () => {
-  const [drugs, setDrugs] = useState<OTCDrug[]>([]);
-  const [newDrug, setNewDrug] = useState<OTCDrug>({
-    name: "",
-    unit: "",
-    purpose: "",
-    status: "상시 복용",
-  });
+const PharmacistInterventionSection: React.FC<
+  PharmacistInterventionSectionProps
+> = ({
+  pharmacistIntervention,
+  setPharmacistIntervention,
+  sessionId,
+  onAddContent,
+}) => {
+  const handleBlur = () => {
+    const updatedField = {
+      pharmacist_comments: pharmacistIntervention.pharmacist_comments,
+    };
+    console.log("Field updated:", JSON.stringify(updatedField));
 
-  const handleAddDrug = () => {
-    if (newDrug.name && newDrug.purpose && newDrug.unit) {
-      setDrugs([...drugs, newDrug]);
-      setNewDrug({ name: "", unit: "", purpose: "", status: "상시 복용" });
-    }
+    // Server PATCH request
+    fetch(`/api/sessions/${sessionId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedField),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data updated successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
   };
-
-  const handleDeleteDrug = (index: number) => {
-    const updatedDrugs = drugs.filter((_, i) => i !== index);
-    setDrugs(updatedDrugs);
-  };
-
   return (
     <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>일반의약품 + 건강기능식품</h3>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>상품명</th>
-            <th>제품 단위</th>
-            <th>약물 사용 목적</th>
-            <th>사용 상태</th>
-            <th>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {drugs.map((drug, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{drug.name}</td>
-              <td>{drug.unit}</td>
-              <td>{drug.purpose}</td>
-              <td>{drug.status}</td>
-              <td>
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => handleDeleteDrug(index)}
-                >
-                  <FaTrashAlt />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className={styles.inputContainer}>
-        <input
-          type="text"
-          placeholder="상품명"
-          value={newDrug.name}
-          onChange={(e) => setNewDrug({ ...newDrug, name: e.target.value })}
-          className={styles.inputField}
-        />
-        <input
-          type="text"
-          placeholder="제품 단위"
-          value={newDrug.unit}
-          onChange={(e) => setNewDrug({ ...newDrug, unit: e.target.value })}
-          className={styles.inputField}
-        />
-        <input
-          type="text"
-          placeholder="약물 사용 목적"
-          value={newDrug.purpose}
-          onChange={(e) => setNewDrug({ ...newDrug, purpose: e.target.value })}
-          className={styles.inputField}
-        />
-        <select
-          value={newDrug.status}
-          onChange={(e) => setNewDrug({ ...newDrug, status: e.target.value })}
-          className={styles.selectField}
-        >
-          <option value="상시 복용">상시 복용</option>
-          <option value="필요 시 복용">필요 시 복용</option>
-          <option value="복용 중단">복용 중단</option>
-          <option value="기타">기타</option>
-        </select>
-        <button className={styles.addButton} onClick={handleAddDrug}>
-          저장하기
-        </button>
-      </div>
+      <h3 className={styles.title}>약사 중재 내용</h3>
+      <textarea
+        value={pharmacistIntervention.pharmacist_comments}
+        onChange={(e) =>
+          setPharmacistIntervention({
+            ...pharmacistIntervention,
+            pharmacist_comments: e.target.value,
+          })
+        }
+        onBlur={handleBlur} // Save notes on blur only
+        className={styles.textarea}
+        placeholder="약사 중재 내용을 입력하세요."
+      />
+      <ConsultationSummaryBar
+        sessionSummary={[
+          {
+            topic_id: 1,
+            start_time: "0분 0초",
+            end_time: "1분 50초",
+            content: "미구현 상태입니다.",
+            related_scripts: [
+              {
+                time: "1분 24초",
+                content:
+                  "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
+              },
+              {
+                time: "1분 38초",
+                content:
+                  "줄이시는 게 발생한 문제를 해소하는 데 큰 도움이 될 거거든요.",
+              },
+            ],
+          },
+        ]}
+        onAddContent={(content) => {
+          setPharmacistIntervention({
+            pharmacist_comments: `${pharmacistIntervention.pharmacist_comments}\n${content}`,
+          });
+          onAddContent(content);
+        }}
+      />
     </div>
   );
 };
 
-export default OTCAndSupplementsSection;
+export default PharmacistInterventionSection;

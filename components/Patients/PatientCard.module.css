@@ -5,7 +5,7 @@
   background-color: #e5e5ea;
   border-radius: 30px;
   padding: 38px 32px;
-  width: 436px;
+  width: 186px;
   height: 200px;
   gap: 30px;
 }
@@ -14,9 +14,13 @@
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  gap: 8px;
+  /* 삭제 버튼과 펜 아이콘 사이 간격 */
 }
 
-.deleteButton {
+.deleteButton,
+.editButton {
   background: rgb(216, 68, 68);
   color: white;
   border: none;
@@ -27,6 +31,11 @@
   font-size: 16px;
   line-height: 24px;
   text-align: center;
+  padding-left: 6px;
+}
+
+.editButton {
+  background: rgb(68, 123, 216);
 }
 
 .avatarContainer {
@@ -112,6 +121,7 @@
 .patientName,
 .patientDetails,
 .avatarContainer,
-.deleteButton {
+.deleteButton,
+.editButton {
   user-select: none;
 }

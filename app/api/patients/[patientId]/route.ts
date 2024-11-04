@@ -28,8 +28,23 @@ export async function GET(
       );
     }
 
+    // 환자와 연관된 세션 목록 조회
+    const { data: sessions, error: sessionError } = await supabase
+      .from("Session") // Session 테이블에서
+      .select("*") // 모든 필드를 선택합니다.
+      .eq("patient_id", patientId); // patient_id와 patientId가 일치하는 항목을 가져옵니다.
+
+    // 세션 반환 중 에러 처리
+    if (sessionError) {
+      console.error("Error fetching sessions:", sessionError.message);
+      return NextResponse.json(
+        { error: "Failed to fetch sessions" },
+        { status: 500 }
+      );
+    }
+
     // 성공적으로 조회된 환자 데이터 반환
-    return NextResponse.json(patient, { status: 200 });
+    return NextResponse.json({ patient, sessions }, { status: 200 });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(
@@ -76,7 +91,7 @@ export async function PUT(
     }
 
     // 업데이트된 환자 정보 반환
-    return NextResponse.json(data, { status: 200 }); // 조회, 업데이트는 200
+    return NextResponse.json(data, { status: 200 });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(

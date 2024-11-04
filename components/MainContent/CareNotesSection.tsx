@@ -1,38 +1,82 @@
-// src/components/MainContent/CareNotesSection.tsx
-import React, { useState } from 'react';
-import { FaPencilAlt, FaSave } from 'react-icons/fa';
-import styles from './CareNotesSection.module.css';
+import React from "react";
+import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar"; // Summary Bar 임포트
+import styles from "./CareNotesSection.module.css";
 
-const CareNotesSection: React.FC = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [careNotes, setCareNotes] = useState("돌봄 노트를 입력하세요.");
+interface CareNotesSectionProps {
+  careNote: any;
+  setCareNote: React.Dispatch<React.SetStateAction<any>>;
+  sessionId: string;
+  onAddContent: (content: string) => void;
+}
 
-  const handleIconClick = () => {
-    if (isEditing) {
-      console.log("저장되었습니다.");
-    }
-    setIsEditing(!isEditing);
+const CareNotesSection: React.FC<CareNotesSectionProps> = ({
+  careNote,
+  setCareNote,
+  sessionId,
+  onAddContent,
+}) => {
+  const handleBlur = () => {
+    const updatedField = { care_note: careNote.care_note };
+    console.log("Care Note 저장됨:", JSON.stringify(updatedField));
+
+    // Server PATCH request
+    fetch(`/api/sessions/${sessionId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedField),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data updated successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
   };
 
   return (
     <div className={styles.section}>
-      <div className={styles.titleContainer}>
-        <h3>돌봄 노트</h3>
-        <button className={styles.iconButton} onClick={handleIconClick}>
-          {isEditing ? <FaSave /> : <FaPencilAlt />}
-        </button>
-      </div>
-      <div className={styles.content}>
-        {isEditing ? (
-          <textarea
-            value={careNotes}
-            onChange={(e) => setCareNotes(e.target.value)}
-            className={styles.textarea}
-          />
-        ) : (
-          <p className={styles.text}>{careNotes}</p>
-        )}
-      </div>
+      <h3 className={styles.title}>돌봄 노트</h3>
+      <textarea
+        value={careNote.care_note}
+        onChange={(e) => setCareNote({ care_note: e.target.value })}
+        onBlur={handleBlur} // Save notes on blur
+        className={styles.textarea}
+        placeholder="돌봄 노트를 입력하세요."
+      />
+      <ConsultationSummaryBar
+        sessionSummary={[
+          {
+            topic_id: 1,
+            start_time: "0분 0초",
+            end_time: "1분 50초",
+            content: "미구현 상태입니다.",
+            related_scripts: [
+              {
+                time: "1분 24초",
+                content: "일단은 주간에 햇빛을 쐬고 운동을 많이 해주셔야 돼요",
+              },
+              {
+                time: "1분 34초",
+                content: "햇빛이 생체시계를 깨우는 역할을 하거든요.",
+              },
+            ],
+          },
+        ]}
+        onAddContent={(content) => {
+          setCareNote({
+            care_note: `${careNote.care_notes}\n${content}`,
+          });
+          onAddContent(content);
+        }}
+      />
     </div>
   );
 };
