@@ -114,6 +114,14 @@ const ConsultationRecordPage: React.FC = () => {
     },
   ]);
 
+  const [pharmacistIntervention, setPharmacistIntervention] = useState({
+    pharmacist_comments: "",
+  });
+
+  const [careNote, setCareNote] = useState({
+    care_note: "",
+  });
+
   useEffect(() => {
     const fetchAndUpdateData = async () => {
       try {
@@ -243,6 +251,8 @@ const ConsultationRecordPage: React.FC = () => {
         // 데이터를 상태로 설정
         setPatientInfo(data.temp);
         setMedicationList(data.temp);
+        setPharmacistIntervention(data.temp);
+        setCareNote(data.temp);
         console.log(medicationList);
       } catch (error) {
         console.error("Error fetching or sending update request:", error);
@@ -549,6 +559,10 @@ const ConsultationRecordPage: React.FC = () => {
             setPreQuestions={setPreQuestions}
             medicationList={medicationList}
             setMedicationList={setMedicationList}
+            careNote={careNote}
+            setCareNote={setCareNote}
+            pharmacistIntervention={pharmacistIntervention}
+            setPharmacistIntervention={setPharmacistIntervention}
             sessionId={sessionId}
           />
         </main>

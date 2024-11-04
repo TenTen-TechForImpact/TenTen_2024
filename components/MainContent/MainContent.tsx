@@ -22,6 +22,10 @@ interface MainContentProps {
   sessionId: string | null;
   medicationList: any; // 나중에 타입 제대로 지정
   setMedicationList: React.Dispatch<React.SetStateAction<any>>; // 나중에 타입 제대로 지정
+  careNote: any;
+  setCareNote: React.Dispatch<React.SetStateAction<any>>;
+  pharmacistIntervention: any;
+  setPharmacistIntervention: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -35,6 +39,10 @@ const MainContent: React.FC<MainContentProps> = ({
   sessionId,
   medicationList,
   setMedicationList,
+  careNote,
+  setCareNote,
+  pharmacistIntervention,
+  setPharmacistIntervention,
 }) => {
   const handleAddContent = (content: string) => {
     console.log("추가된 content:", content);
@@ -116,10 +124,20 @@ const MainContent: React.FC<MainContentProps> = ({
             />
           </section>
           <section id="pharmacistIntervention" className={styles.section}>
-            <PharmacistInterventionSection onAddContent={handleAddContent} />
+            <PharmacistInterventionSection
+              pharmacistIntervention={pharmacistIntervention}
+              setPharmacistIntervention={setPharmacistIntervention}
+              sessionId={sessionId}
+              onAddContent={handleAddContent}
+            />
           </section>
           <section id="careNotes" className={styles.section}>
-            <CareNotesSection onAddContent={handleAddContent} />
+            <CareNotesSection
+              careNote={careNote}
+              setCareNote={setCareNote}
+              sessionId={sessionId}
+              onAddContent={handleAddContent}
+            />
           </section>
         </>
       )}

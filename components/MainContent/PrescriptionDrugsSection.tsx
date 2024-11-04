@@ -154,7 +154,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
 
   return (
     <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>처방 의약품 (Ethical)</h3>
+      <h3 className={styles.sectionTitle}>처방 의약품</h3>
       <table className={styles.table}>
         <thead>
           <tr>
