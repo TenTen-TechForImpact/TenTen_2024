@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
@@ -17,6 +17,7 @@ const ConsultationRecordPage: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const pathname = usePathname();
   const sessionId = pathname.split("/").pop();
+  const router = useRouter();
 
   const [patientInfo, setPatientInfo] = useState({
     personal_info: {
@@ -528,8 +529,7 @@ const ConsultationRecordPage: React.FC = () => {
   };
 
   const handleCompleteFirstSession = () => {
-    setIsFirstSessionCompleted(true);
-    setActiveTab("followUp"); // 자동으로 2차 상담으로 전환. 나중에는 그냥 patient 페이지로 나가는 식으로?
+    router.push(`../../patients`);
   };
 
   const handleTabChange = (tab: "firstSession" | "followUp") => {
@@ -566,15 +566,13 @@ const ConsultationRecordPage: React.FC = () => {
             sessionId={sessionId}
           />
         </main>
-        {isFirstSessionCompleted && (
-          <aside className={styles.rightSidebar}>
-            <FirstSessionSummary
-              patientInfo={patientInfo}
-              preQuestions={preQuestions}
-              sessionSummaryData={sessionSummaryData}
-            />
-          </aside>
-        )}
+        <aside className={styles.rightSidebar}>
+          <FirstSessionSummary
+            patientInfo={patientInfo}
+            preQuestions={preQuestions}
+            sessionSummaryData={sessionSummaryData}
+          />
+        </aside>
       </div>
     </div>
   );

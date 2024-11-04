@@ -89,7 +89,7 @@ const MainContent: React.FC<MainContentProps> = ({
             className={styles.completeButton}
             onClick={onCompleteFirstSession}
           >
-            1차 상담 완료
+            사전 접수 완료
           </button>
         </>
       )}
@@ -139,6 +139,12 @@ const MainContent: React.FC<MainContentProps> = ({
               onAddContent={handleAddContent}
             />
           </section>
+          <button
+            className={styles.completeButton}
+            onClick={onCompleteFirstSession}
+          >
+            상담 완료
+          </button>
         </>
       )}
     </div>
