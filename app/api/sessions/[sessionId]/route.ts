@@ -10,59 +10,65 @@ export async function GET(
 ) {
   const { sessionId } = params;
 
-  // 세션 정보 조회
-  console.log("Fetching session with ID:", sessionId);
-  const { data: session, error } = await supabase
-    .from("Session") // Session 테이블에서
-    .select("*") // 필요한 모든 필드를 선택합니다.
-    .eq("id", sessionId) // sessionId와 일치하는 항목을 가져옵니다.
-    .single(); // 단일 레코드를 가져옵니다.
+  // temp 필드만 조회
+  console.log("Fetching temp field for session with ID:", sessionId);
+  const { data, error } = await supabase
+    .from("Session")
+    .select("temp")
+    .eq("id", sessionId)
+    .single();
 
-  // 에러 처리
   if (error) {
     console.error("Error fetching session:", error.message);
-    if (error.message.includes("multiple rows")) {
-      console.log("Multiple sessions found for this ID");
-      return NextResponse.json(
-        { error: "Multiple sessions found for this ID" },
-        { status: 500 }
-      );
-    } else {
-      console.log("Session not found");
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
-    }
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  // 조회된 세션 데이터를 JSON 형식으로 반환
-  return NextResponse.json(session);
+  return NextResponse.json(data);
 }
 
-export async function PUT(
+export async function PATCH(
   req: NextRequest,
   { params }: { params: { sessionId: string } }
 ) {
   const { sessionId } = params;
 
-  // 요청에서 수정할 데이터 가져오기
+  // 요청에서 업데이트할 데이터를 가져오기
   const updatedData = await req.json();
 
-  // 세션 정보 수정
-  console.log("Updating session with ID:", sessionId);
-  const { data: session, error } = await supabase
-    .from("Session") // Session 테이블에서
-    .update(updatedData) // 업데이트할 데이터
-    .eq("id", sessionId) // sessionId와 일치하는 항목을 업데이트합니다.
-    .single(); // 단일 레코드를 반환합니다.
+  // 기존 temp 데이터 가져오기
+  const { data: currentData, error: fetchError } = await supabase
+    .from("Session")
+    .select("temp")
+    .eq("id", sessionId)
+    .single();
 
-  // 에러 처리
-  if (error) {
-    console.error("Error updating session:", error.message);
+  if (fetchError) {
+    console.error("Error fetching current temp data:", fetchError.message);
     return NextResponse.json(
-      { error: "Error updating session"},
+      { error: "Error fetching current temp data" },
       { status: 500 }
     );
   }
 
-  // 수정된 세션 데이터를 JSON 형식으로 반환
-  return NextResponse.json(session);
+  // 기존 데이터와 새 데이터를 병합
+  const newTempData = { ...currentData?.temp, ...updatedData };
+
+  // temp 필드 업데이트
+  console.log("Updating temp field for session with ID:", sessionId);
+  const { data, error } = await supabase
+    .from("Session")
+    .update({ temp: newTempData }) // 병합된 temp 데이터 업데이트
+    .eq("id", sessionId)
+    .single();
+
+  if (error) {
+    console.error("Error updating session:", error.message);
+    return NextResponse.json(
+      { error: "Error updating session" },
+      { status: 500 }
+    );
+  }
+
+  // 수정된 temp 데이터를 JSON 형식으로 반환
+  return NextResponse.json(data);
 }

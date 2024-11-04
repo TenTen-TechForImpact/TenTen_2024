@@ -9,26 +9,99 @@ interface PersonalInfoSectionProps {
 type QuestionType =
   | "text"
   | "yesNo"
+  | "radio"
   | "multiCheckbox"
   | "multiCheckboxWithOther"
   | "yesNoWithText"
   | "yesNoWithSingleCheckbox"
-  | "yesNoWithConditionalText";
+  | "multipleText";
 
 interface Question {
   label: string;
   field: string;
   type: QuestionType;
-  options?: string[]; // For multiCheckbox and yesNoWithSingleCheckbox
+  optionsField?: { option: string[]; field: string };
+  options?: string[];
   subFields?: { label: string; field: string }[];
+  count?: number;
+  reverse?: boolean;
 }
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   patientInfo,
   setPatientInfo,
 }) => {
+  // 경로를 올바르게 생성하는 함수
+  const constructFieldPath = (baseField: string, subField?: string) => {
+    return subField ? `${baseField}.${subField}` : baseField;
+  };
+
+  // 중첩된 필드 값을 안전하게 업데이트하는 함수
+  const updateNestedField = (obj: any, path: string, value: any) => {
+    const keys = path.split(".");
+    const lastKey = keys.pop();
+
+    const nestedObj = keys.reduce((acc, key) => {
+      if (!acc[key]) acc[key] = {}; // 객체가 없으면 새 객체 생성
+      return acc[key];
+    }, obj);
+
+    if (lastKey) {
+      nestedObj[lastKey] = value;
+    }
+
+    return { ...obj }; // 변경된 객체를 반환
+  };
+
+  // 상태를 업데이트하는 함수
   const handleInputChange = (field: string, value: any) => {
-    setPatientInfo((prev: any) => ({ ...prev, [field]: value }));
+    // Convert "예" to true and "아니오" to false for boolean fields
+
+    const updatedPatientInfo = updateNestedField(
+      { ...patientInfo },
+      field,
+      value
+    );
+    setPatientInfo(updatedPatientInfo);
+  };
+
+  // 중첩된 필드 값을 가져오는 함수
+  const getNestedValue = (obj: any, path: string) => {
+    return path
+      .split(".")
+      .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+  };
+
+  // 필드 값이 변경된 후 서버에 전송하는 함수
+  const handleBlur = (baseField: string, subField?: string) => {
+    const fieldPath = constructFieldPath(baseField, subField);
+    const updatedField = {
+      [fieldPath]: getNestedValue(patientInfo, fieldPath),
+    };
+    console.log("Field updated:", updatedField);
+
+    // 여기에 서버에 PATCH 요청을 보낼 수 있습니다.
+    /*
+    fetch(`/api/sessions/${sessionId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedField),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data updated successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
+    */
   };
 
   const renderInputField = (question: Question) => {
@@ -40,13 +113,40 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <input
               type="text"
-              value={patientInfo[field] || ""}
+              value={getNestedValue(patientInfo, field) || ""}
               onChange={(e) => handleInputChange(field, e.target.value)}
+              onBlur={() => handleBlur(field)}
               className={styles.inputField}
               placeholder="내용을 입력하세요"
             />
           </div>
         );
+
+      case "radio":
+        return (
+          <div className={styles.infoItem}>
+            <label className={styles.label}>{label}</label>
+            <div className={styles.radioContainer}>
+              {options?.map((option, index) => (
+                <label key={index} className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name={field}
+                    value={option}
+                    checked={getNestedValue(patientInfo, field) === option}
+                    onChange={() => {
+                      handleInputChange(field, option);
+                      handleBlur(field);
+                    }}
+                    className={styles.radioInput}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          </div>
+        );
+
       case "multiCheckbox":
         return (
           <div className={styles.infoItem}>
@@ -56,20 +156,24 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 <label key={index} className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
-                    checked={patientInfo[field]?.includes(option) || false}
+                    checked={
+                      getNestedValue(patientInfo, field)?.includes(option) ||
+                      false
+                    }
                     onChange={(e) => {
-                      const selectedOptions = patientInfo[field] || [];
+                      const selectedOptions =
+                        getNestedValue(patientInfo, field) || [];
                       if (e.target.checked) {
-                        console.log(`Adding option: ${option}`); // 디버깅용 로그
                         handleInputChange(field, [...selectedOptions, option]);
+                        handleBlur(field);
                       } else {
-                        console.log(`Removing option: ${option}`); // 디버깅용 로그
                         handleInputChange(
                           field,
                           selectedOptions.filter(
                             (item: string) => item !== option
                           )
                         );
+                        handleBlur(field);
                       }
                     }}
                   />
@@ -90,31 +194,33 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   <input
                     type="radio"
                     name={field}
-                    checked={patientInfo[field]?.selectedOption === option}
-                    onChange={() =>
-                      handleInputChange(field, { selectedOption: option })
-                    }
+                    checked={getNestedValue(patientInfo, field) === option}
+                    onChange={() => {
+                      handleInputChange(field, option);
+                      handleBlur(field);
+                    }}
                   />
                   {option}
                 </label>
               ))}
-              {patientInfo[field]?.selectedOption === "기타" && (
-                <div className={styles.subField}>
-                  <label className={styles.subFieldLabel}>기타</label>
-                  <input
-                    type="text"
-                    value={patientInfo[field]?.otherText || ""}
-                    onChange={(e) =>
-                      handleInputChange(field, {
-                        selectedOption: "기타",
-                        otherText: e.target.value,
-                      })
-                    }
-                    className={styles.inputField}
-                    placeholder="기타 내용을 입력하세요"
-                  />
-                </div>
-              )}
+              {/* Inputbox for "기타" */}
+              <input
+                type="text"
+                placeholder="기타"
+                value={
+                  getNestedValue(patientInfo, field) !==
+                  options.find(
+                    (opt) => opt === getNestedValue(patientInfo, field)
+                  )
+                    ? getNestedValue(patientInfo, field)
+                    : ""
+                }
+                onChange={(e) => {
+                  handleInputChange(field, e.target.value);
+                }}
+                onBlur={() => handleBlur(field)}
+                className={styles.inputField}
+              />
             </div>
           </div>
         );
@@ -126,26 +232,46 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <div className={styles.yesNoContainer}>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field] === "예" ? styles.active : ""
+                  getNestedValue(patientInfo, field) === "예"
+                    ? styles.active
+                    : ""
                 }`}
-                onClick={() => handleInputChange(field, "예")}
+                onClick={() => {
+                  handleInputChange(field, "예");
+                  handleBlur(field);
+                }}
                 style={{
                   backgroundColor:
-                    patientInfo[field] === "예" ? "#4caf50" : "#f1f1f1",
-                  color: patientInfo[field] === "예" ? "white" : "black",
+                    getNestedValue(patientInfo, field) === "예"
+                      ? "#4caf50"
+                      : "#f1f1f1",
+                  color:
+                    getNestedValue(patientInfo, field) === "예"
+                      ? "white"
+                      : "black",
                 }}
               >
                 예
               </button>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field] === "아니오" ? styles.active : ""
+                  getNestedValue(patientInfo, field) === "아니오"
+                    ? styles.active
+                    : ""
                 }`}
-                onClick={() => handleInputChange(field, "아니오")}
+                onClick={() => {
+                  handleInputChange(field, "아니오");
+                  handleBlur(field);
+                }}
                 style={{
                   backgroundColor:
-                    patientInfo[field] === "아니오" ? "#f44336" : "#f1f1f1",
-                  color: patientInfo[field] === "아니오" ? "white" : "black",
+                    getNestedValue(patientInfo, field) === "아니오"
+                      ? "#f44336"
+                      : "#f1f1f1",
+                  color:
+                    getNestedValue(patientInfo, field) === "아니오"
+                      ? "white"
+                      : "black",
                 }}
               >
                 아니오
@@ -155,42 +281,48 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         );
 
       case "yesNoWithText":
+        // Ensure `reverse` has a default value of `false` if not provided
+        const isYesSelected = getNestedValue(patientInfo, field) === "예";
+        const isNoSelected = getNestedValue(patientInfo, field) === "아니오";
+        const showSubFields =
+          question.reverse ?? false ? isNoSelected : isYesSelected;
+
         return (
           <div className={styles.infoItem}>
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "예" ? styles.active : ""
+                  isYesSelected ? styles.active : ""
                 }`}
-                onClick={() => handleInputChange(field, { status: "예" })}
+                onClick={() => {
+                  handleInputChange(field, "예");
+                  handleBlur(field);
+                }}
                 style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "예" ? "#4caf50" : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "예" ? "white" : "black",
+                  backgroundColor: isYesSelected ? "#4caf50" : "#f1f1f1",
+                  color: isYesSelected ? "white" : "black",
                 }}
               >
                 예
               </button>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "아니오" ? styles.active : ""
+                  isNoSelected ? styles.active : ""
                 }`}
-                onClick={() => handleInputChange(field, { status: "아니오" })}
+                onClick={() => {
+                  handleInputChange(field, "아니오");
+                  handleBlur(field);
+                }}
                 style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "아니오"
-                      ? "#f44336"
-                      : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "아니오" ? "white" : "black",
+                  backgroundColor: isNoSelected ? "#f44336" : "#f1f1f1",
+                  color: isNoSelected ? "white" : "black",
                 }}
               >
                 아니오
               </button>
             </div>
-            {patientInfo[field]?.status === "예" &&
+            {showSubFields &&
               subFields?.map((subField, index) => (
                 <div key={index} className={styles.subField}>
                   <label className={styles.subFieldLabel}>
@@ -198,13 +330,11 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   </label>
                   <input
                     type="text"
-                    value={patientInfo[field]?.[subField.field] || ""}
-                    onChange={(e) =>
-                      handleInputChange(field, {
-                        ...patientInfo[field],
-                        [subField.field]: e.target.value,
-                      })
-                    }
+                    value={getNestedValue(patientInfo, subField.field) || ""}
+                    onChange={(e) => {
+                      handleInputChange(subField.field, e.target.value);
+                    }}
+                    onBlur={() => handleBlur(subField.field)}
                     className={styles.inputField}
                     placeholder="내용을 입력하세요"
                   />
@@ -214,120 +344,123 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         );
 
       case "yesNoWithSingleCheckbox":
+        // Use distinct variable names for this case
+        const isYesSelectedForSingleCheckbox =
+          getNestedValue(patientInfo, field) === "예";
+        const isNoSelectedForSingleCheckbox =
+          getNestedValue(patientInfo, field) === "아니오";
+        const shouldShowOptions = isYesSelectedForSingleCheckbox;
+        const shouldShowTextInput =
+          isYesSelectedForSingleCheckbox && !question.reverse; // 텍스트 필드는 reverse가 false일 때만 보임
+
         return (
           <div className={styles.infoItem}>
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "예" ? styles.active : ""
+                  isYesSelectedForSingleCheckbox ? styles.active : ""
                 }`}
-                onClick={() => handleInputChange(field, { status: "예" })}
+                onClick={() => {
+                  handleInputChange(field, "예");
+                  handleBlur(field);
+                }}
                 style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "예" ? "#4caf50" : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "예" ? "white" : "black",
+                  backgroundColor: isYesSelectedForSingleCheckbox
+                    ? "#4caf50"
+                    : "#f1f1f1",
+                  color: isYesSelectedForSingleCheckbox ? "white" : "black",
                 }}
               >
                 예
               </button>
               <button
                 className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "아니오" ? styles.active : ""
+                  isNoSelectedForSingleCheckbox ? styles.active : ""
                 }`}
-                onClick={() => handleInputChange(field, { status: "아니오" })}
+                onClick={() => {
+                  handleInputChange(field, "아니오");
+                  handleBlur(field);
+                }}
                 style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "아니오"
-                      ? "#f44336"
-                      : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "아니오" ? "white" : "black",
+                  backgroundColor: isNoSelectedForSingleCheckbox
+                    ? "#f44336"
+                    : "#f1f1f1",
+                  color: isNoSelectedForSingleCheckbox ? "white" : "black",
                 }}
               >
                 아니오
               </button>
             </div>
-            {patientInfo[field]?.status === "예" && (
+            {shouldShowOptions && question.optionsField && (
               <div className={styles.checkboxContainer}>
-                {options?.map((option, index) => (
+                {question.optionsField.option.map((option, index) => (
                   <label key={index} className={styles.checkboxLabel}>
                     <input
                       type="radio"
-                      name={field}
-                      checked={patientInfo[field]?.selectedOption === option}
-                      onChange={() =>
-                        handleInputChange(field, {
-                          status: "예",
-                          selectedOption: option,
-                        })
+                      name={`${field}_frequency`}
+                      checked={
+                        getNestedValue(
+                          patientInfo,
+                          question.optionsField.field
+                        ) === option
                       }
+                      onChange={() => {
+                        handleInputChange(question.optionsField.field, option);
+                        handleBlur(question.optionsField.field);
+                      }}
                     />
                     {option}
                   </label>
                 ))}
               </div>
             )}
+            {shouldShowTextInput &&
+              subFields?.map((subField, index) => (
+                <div key={index} className={styles.subField}>
+                  <label className={styles.subFieldLabel}>
+                    {subField.label}
+                  </label>
+                  <input
+                    type="text"
+                    value={getNestedValue(patientInfo, subField.field) || ""}
+                    onChange={(e) =>
+                      handleInputChange(subField.field, e.target.value)
+                    }
+                    onBlur={() => handleBlur(subField.field)}
+                    className={styles.inputField}
+                    placeholder="내용을 입력하세요"
+                  />
+                </div>
+              ))}
           </div>
         );
 
-      case "yesNoWithConditionalText":
+      case "multipleText":
         return (
           <div className={styles.infoItem}>
             <label className={styles.label}>{label}</label>
-            <div className={styles.yesNoContainer}>
-              <button
-                className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "예" ? styles.active : ""
-                }`}
-                onClick={() => handleInputChange(field, { status: "예" })}
-                style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "예" ? "#4caf50" : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "예" ? "white" : "black",
-                }}
-              >
-                예
-              </button>
-              <button
-                className={`${styles.yesNoButton} ${
-                  patientInfo[field]?.status === "아니오" ? styles.active : ""
-                }`}
-                onClick={() => handleInputChange(field, { status: "아니오" })}
-                style={{
-                  backgroundColor:
-                    patientInfo[field]?.status === "아니오"
-                      ? "#f44336"
-                      : "#f1f1f1",
-                  color:
-                    patientInfo[field]?.status === "아니오" ? "white" : "black",
-                }}
-              >
-                아니오
-              </button>
-            </div>
-            {patientInfo[field]?.status === "아니오" && (
-              <div className={styles.subField}>
-                <label className={styles.subFieldLabel}>동거 가족구성원</label>
+            <div className={styles.multipleTextContainer}>
+              {Array.from({ length: question.count || 1 }).map((_, index) => (
                 <input
+                  key={index}
                   type="text"
-                  value={patientInfo[field]?.familyMembers || ""}
-                  onChange={(e) =>
-                    handleInputChange(field, {
-                      status: "아니오",
-                      familyMembers: e.target.value,
-                    })
-                  }
+                  value={getNestedValue(patientInfo, `${field}.${index}`) || ""}
+                  onChange={(e) => {
+                    const newValues = [
+                      ...(getNestedValue(patientInfo, field) || []),
+                    ];
+                    newValues[index] = e.target.value;
+                    handleInputChange(field, newValues);
+                  }}
+                  onBlur={() => handleBlur(field)}
                   className={styles.inputField}
-                  placeholder="가족구성원을 입력하세요"
+                  placeholder={`약사 ${index + 1}`}
                 />
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         );
-
       default:
         return null;
     }
@@ -335,15 +468,39 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
 
   // 질문 목록
   const questions: Question[] = [
-    // 기존 질문들
-    { label: "참여자 성명", field: "name", type: "text" },
-    { label: "생년월일", field: "birthDate", type: "text" },
-    { label: "연락처", field: "contact", type: "text" },
-    { label: "상담일", field: "date", type: "text" },
-    { label: "상담 약사", field: "pharmacistName", type: "text" },
+    { label: "참여자 성명", field: "personal_info.name", type: "text" },
+    { label: "생년월일", field: "personal_info.date_of_birth", type: "text" },
+    { label: "연락처", field: "personal_info.phone_number", type: "text" },
+    {
+      label: "의료보장형태",
+      field: "consultation_info.insurance_type",
+      type: "radio",
+      options: ["건강보험", "의료급여", "보훈", "비급여"],
+    },
+    {
+      label: "최초 상담일",
+      field: "consultation_info.initial_consult_date",
+      type: "text",
+    },
+    {
+      label: "상담일",
+      field: "consultation_info.current_consult_date",
+      type: "text",
+    },
+    {
+      label: "상담 차수",
+      field: "consultation_info.consult_session_number",
+      type: "text",
+    },
+    {
+      label: "상담 약사",
+      field: "consultation_info.pharmacist_names",
+      type: "multipleText",
+      count: 3,
+    },
     {
       label: "앓고 있는 질병",
-      field: "diseases",
+      field: "medical_conditions.chronic_diseases.disease_names",
       type: "multiCheckbox",
       options: [
         "고혈압",
@@ -368,66 +525,115 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         "뇌경색",
       ],
     },
-    { label: "기타 의견", field: "additionalDiseaseInfo", type: "text" },
+    {
+      label: "기타",
+      field: "medical_conditions.chronic_diseases.additional_info",
+      type: "text",
+    },
+    {
+      label: "과거 질병 및 수술 이력",
+      field: "medical_conditions.medical_history",
+      type: "text",
+    },
+    {
+      label: "주요 불편한 증상",
+      field: "medical_conditions.symptoms",
+      type: "text",
+    },
     {
       label: "알러지",
-      field: "allergies",
+      field: "medical_conditions.allergies.has_allergies",
       type: "yesNoWithText",
       subFields: [
-        { label: "알레르기 의심 식품 또는 약물", field: "suspectedItem" },
+        {
+          label: "알레르기 의심 식품 또는 약물",
+          field: "medical_conditions.allergies.suspected_items",
+        },
       ],
     },
     {
       label: "약물 부작용",
-      field: "adverseDrugReactions",
+      field:
+        "medical_conditions.adverse_drug_reactions.has_adverse_drug_reactions",
       type: "yesNoWithText",
       subFields: [
-        { label: "부작용 의심 약물", field: "suspectedMedication" },
-        { label: "부작용 증상", field: "reactionDetail" },
+        {
+          label: "부작용 의심 약물",
+          field:
+            "medical_conditions.adverse_drug_reactions.suspected_medications",
+        },
+        {
+          label: "부작용 증상",
+          field: "medical_conditions.adverse_drug_reactions.reaction_details",
+        },
       ],
     },
     {
       label: "흡연",
-      field: "smoking",
+      field: "lifestyle.smoking.is_smoking",
       type: "yesNoWithText",
       subFields: [
-        { label: "흡연 기간 (년)", field: "duration" },
-        { label: "평균 흡연량 (갑)", field: "packsPerDay" },
+        {
+          label: "흡연 기간 (년)",
+          field: "lifestyle.smoking.duration_in_years",
+        },
+        { label: "평균 흡연량 (갑)", field: "lifestyle.smoking.pack_per_day" },
       ],
     },
     {
       label: "음주",
-      field: "drinking",
+      field: "lifestyle.alcohol.is_drinking",
       type: "yesNoWithText",
       subFields: [
-        { label: "음주 횟수 (주)", field: "frequencyPerWeek" },
-        { label: "1회 음주량 (병)", field: "amountPerSession" },
+        { label: "음주 횟수 (주)", field: "lifestyle.alcohol.drinks_per_week" },
+        {
+          label: "1회 음주량 (병)",
+          field: "lifestyle.alcohol.amount_per_drink",
+        },
       ],
     },
     {
       label: "일주일에 30분 이상 운동을 하십니까?",
-      field: "exercise",
+      field: "lifestyle.exercise.is_exercising",
       type: "yesNoWithSingleCheckbox",
-      options: ["주 1회", "주 2회", "주 3회", "주 4회 이상", "아니요"],
+      optionsField: {
+        option: ["주 1회", "주 2회", "주 3회", "주 4회 이상"],
+        field: "lifestyle.exercise.exercise_frequency",
+      },
+      reverse: false,
       subFields: [
-        { label: "규칙적으로 하는 운동 종류", field: "exerciseType" },
+        {
+          label: "규칙적으로 하는 운동 종류",
+          field: "lifestyle.exercise.exercise_types",
+        },
       ],
     },
     {
       label: "매일 규칙적이고 균형 잡힌 식사를 하십니까?",
-      field: "diet",
+      field: "lifestyle.diet.is_balanced_meal",
       type: "yesNoWithSingleCheckbox",
-      options: ["하루 1회", "하루 2회", "하루 3회", "매일 불규칙함"],
+      optionsField: {
+        option: ["하루 1회", "하루 2회", "하루 3회"],
+        field: "lifestyle.diet.balanced_meals_per_day",
+      },
+      reverse: true,
     },
     {
       label: "독거 여부",
-      field: "livingCondition",
-      type: "yesNoWithConditionalText",
+      field: "medication_management.living_condition.living_alone",
+      type: "yesNoWithText",
+      reverse: true,
+      subFields: [
+        {
+          label: "동거 가족구성원",
+          field: "medication_management.living_condition.family_members",
+        },
+      ],
     },
     {
       label:
         "주로 약을 챙겨먹는 사람이 누구입니까? (투약보조자 유무 판별 질문)",
-      field: "medicationAssistants",
+      field: "medication_management.living_condition.medication_assistants",
       type: "multiCheckboxWithOther",
       options: [
         "본인",
@@ -436,18 +642,23 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         "친인척",
         "친구",
         "요양보호사 또는 돌봄종사자",
-        "기타",
       ],
     },
     {
       label: "가정 내 별도의 약 보관 장소가 있습니까?",
-      field: "medicationStorage",
+      field: "medication_management.medication_storage.has_medication_storage",
       type: "yesNoWithText",
-      subFields: [{ label: "보관 장소", field: "location" }],
+      subFields: [
+        {
+          label: "보관 장소",
+          field: "medication_management.medication_storage.location",
+        },
+      ],
     },
     {
       label: "만일을 위해 처방전/설명서를 보관합니까?",
-      field: "prescriptionStorage",
+      field:
+        "medication_management.prescription_storage.is_prescription_stored",
       type: "yesNo",
     },
   ];

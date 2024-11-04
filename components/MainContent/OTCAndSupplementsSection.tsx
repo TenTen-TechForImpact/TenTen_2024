@@ -1,7 +1,7 @@
 // src/components/MainContent/OTCAndSupplementsSection.tsx
-import React, { useState } from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
-import styles from './OTCAndSupplementsSection.module.css';
+import React, { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import styles from "./OTCAndSupplementsSection.module.css";
 
 interface OTCDrug {
   name: string;
