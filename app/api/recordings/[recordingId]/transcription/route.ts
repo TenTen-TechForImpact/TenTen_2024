@@ -5,8 +5,17 @@ import FormData from "form-data";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
 import { Readable } from "stream";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const supabase = createClient();
+
+const sqsClient = new SQSClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -59,7 +68,7 @@ export async function POST(
       keywords
     );
     await setSttStatus(recordingId, "completed");
-
+    
     // insert utterances into Utterance table
     try {
       await insertUtterances(recordingId, utterances);
@@ -70,6 +79,22 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    //--------Topic Post Method Calling---->
+    try {
+      await sendSqsMessage(recordingId);
+    } catch (sqsError) {
+      console.error("Error sending message to SQS:", sqsError);
+      return NextResponse.json(
+        { error: "Error sending message to SQS" },
+        { status: 500 }
+      );
+    }
+
+
+    console.log("Topic SQS POST method called successfully - from transcription_route.js");
+
+    //--------Topic Post Method Calling----/>
 
     return NextResponse.json({
       message: "Created transcription successfully",
@@ -104,6 +129,18 @@ async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   } else {
     throw new Error("Unexpected Body type returned from S3");
   }
+}
+// send sqs request to topic lambda function
+async function sendSqsMessage(recordingId: string) {
+  const messageBody = JSON.stringify({ recording_id: recordingId });
+
+  const command = new SendMessageCommand({
+    QueueUrl: process.env.AWS_SQS_QUEUE_URL,
+    MessageBody: messageBody,
+  });
+
+  await sqsClient.send(command);
+  console.log("Message sent to SQS:", messageBody);
 }
 
 async function getKeywords(recordingId: string): Promise<string[]> {
