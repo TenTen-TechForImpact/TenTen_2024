@@ -5,7 +5,7 @@
   background-color: #e5e5ea;
   border-radius: 30px;
   padding: 38px 32px;
-  width: 436px;
+  width: 186px;
   height: 200px;
   gap: 30px;
 }
@@ -31,11 +31,11 @@
   font-size: 16px;
   line-height: 24px;
   text-align: center;
+  padding-left: 6px;
 }
 
 .editButton {
   background: rgb(68, 123, 216);
-  /* 수정 버튼의 색상 */
 }
 
 .avatarContainer {
@@ -114,7 +114,8 @@
   height: 30px;
   margin-right: 8px;
   vertical-align: middle;
-  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(223deg) brightness(104%) contrast(103%);
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(223deg)
+    brightness(104%) contrast(103%);
 }
 
 .patientName,

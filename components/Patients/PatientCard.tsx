@@ -14,7 +14,14 @@ interface PatientProps {
   phone_number: string;
   organization: string;
   onDelete: (id: string) => void;
-  onEdit: (patient: { id: string; name: string; age: number; gender: string; phone_number: string; organization: string }) => void;
+  onEdit: (patient: {
+    id: string;
+    name: string;
+    age: number;
+    gender: string;
+    phone_number: string;
+    organization: string;
+  }) => void;
 }
 
 const PatientCard: React.FC<PatientProps> = ({
@@ -51,22 +58,23 @@ const PatientCard: React.FC<PatientProps> = ({
     onEdit({ id, name, age, gender, phone_number, organization });
   };
 
-  return (
-    <div className={styles.patientCard}>
-      <div className={styles.deleteButtonContainer}>
-        <button className={styles.deleteButton} onClick={handleDeleteClick}>
-          X
-        </button>
-        <button className={styles.editButton} onClick={handleEditClick}>
-          ✎
-        </button>
-      </div>
-      <div className={styles.avatarContainer}>
+  // 아바타 필요 시 아래 코드 사용
+  /* <div className={styles.avatarContainer}>
         <img
           src="/images/old_woman_color_light.svg"
           alt="Avatar"
           className={styles.avatar}
         />
+      </div>*/
+  return (
+    <div className={styles.patientCard}>
+      <div className={styles.deleteButtonContainer}>
+        <button className={styles.editButton} onClick={handleEditClick}>
+          🖊️
+        </button>
+        <button className={styles.deleteButton} onClick={handleDeleteClick}>
+          🗑️
+        </button>
       </div>
       <div className={styles.patientInfo}>
         <div className={styles.patientName}>

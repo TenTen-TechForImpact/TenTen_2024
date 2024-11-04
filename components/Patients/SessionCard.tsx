@@ -7,14 +7,14 @@ import styles from "./SessionCard.module.css";
 
 interface SessionCardProps {
   id: string;
-  date: string;
+  dateTime: string;
   onViewDetails: () => void;
   onDelete: (id: string) => void;
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({
   id,
-  date,
+  dateTime,
   onViewDetails,
   onDelete,
 }) => {
@@ -32,6 +32,9 @@ const SessionCard: React.FC<SessionCardProps> = ({
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
   };
+
+  // Extract the date in the format YYYY-MM-DD
+  const date = new Date(dateTime).toISOString().split("T")[0];
 
   return (
     <div className={styles.sessionCard}>
