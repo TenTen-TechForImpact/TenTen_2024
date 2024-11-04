@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
@@ -14,6 +15,9 @@ const ConsultationRecordPage: React.FC = () => {
   );
   const [isFirstSessionCompleted, setIsFirstSessionCompleted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const pathname = usePathname();
+  const sessionId = pathname.split("/").pop();
+
   const [patientInfo, setPatientInfo] = useState({
     birthDate: "",
     contact: "",
@@ -39,7 +43,6 @@ const ConsultationRecordPage: React.FC = () => {
 
   const [preQuestions, setPreQuestions] = useState<string[]>([]);
   const [sessionSummaryData, setSessionSummaryData] = useState([
-    // Sample data for 1차 상담의 음성 요약
     {
       topic_id: 1,
       content: "Q. 당뇨약을 줄이는 게 현실적인가요?",
@@ -55,9 +58,8 @@ const ConsultationRecordPage: React.FC = () => {
   };
 
   const handleCompleteFirstSession = () => {
-    // 1차 상담이 완료되었을 때 상태 업데이트
     setIsFirstSessionCompleted(true);
-    setActiveTab("followUp"); // 자동으로 2차 상담으로 전환
+    setActiveTab("followUp");
   };
 
   const handleTabChange = (tab: "firstSession" | "followUp") => {
@@ -85,6 +87,7 @@ const ConsultationRecordPage: React.FC = () => {
             setPatientInfo={setPatientInfo}
             preQuestions={preQuestions}
             setPreQuestions={setPreQuestions}
+            sessionId={sessionId}
           />
         </main>
         {isFirstSessionCompleted && (
