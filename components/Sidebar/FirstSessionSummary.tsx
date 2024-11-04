@@ -21,38 +21,110 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
         <p>
           <span className={styles.label}>질병 종류:</span>{" "}
           <span className={styles.value}>
-            {Array.isArray(patientInfo.diseases) &&
-            patientInfo.diseases.length > 0
-              ? patientInfo.diseases.join(", ")
+            {Array.isArray(
+              patientInfo.medical_conditions.chronic_diseases.disease_names
+            ) &&
+            patientInfo.medical_conditions.chronic_diseases.disease_names
+              .length > 0
+              ? patientInfo.medical_conditions.chronic_diseases.disease_names.join(
+                  ", "
+                )
+              : "없음"}
+          </span>
+        </p>
+        <p>
+          <span className={styles.label}>기타:</span>{" "}
+          <span className={styles.value}>
+            {patientInfo.medical_conditions.chronic_diseases.additional_info ||
+              "없음"}
+          </span>
+        </p>
+        <p>
+          <span className={styles.label}>과거 질병 및 수술 이력:</span>{" "}
+          <span className={styles.value}>
+            {patientInfo.medical_conditions.medical_history || "없음"}
+          </span>
+        </p>
+        <p>
+          <span className={styles.label}>주요 불편한 증상:</span>{" "}
+          <span className={styles.value}>
+            {patientInfo.medical_conditions.symptoms || "없음"}
+          </span>
+        </p>
+        <p>
+          <span className={styles.label}>알러지:</span>{" "}
+          <span className={styles.value}>
+            {patientInfo.medical_conditions.allergies.has_allergies === "예"
+              ? `의심 항목: ${
+                  Array.isArray(
+                    patientInfo.medical_conditions.allergies.suspected_items
+                  ) &&
+                  patientInfo.medical_conditions.allergies.suspected_items
+                    .length > 0
+                    ? patientInfo.medical_conditions.allergies.suspected_items.join(
+                        ", "
+                      )
+                    : "없음"
+                }`
+              : "없음"}
+          </span>
+        </p>
+        <p>
+          <span className={styles.label}>약물 부작용:</span>{" "}
+          <span className={styles.value}>
+            {patientInfo.medical_conditions.adverse_drug_reactions
+              .has_adverse_drug_reactions === "예"
+              ? `의심 약물: ${
+                  Array.isArray(
+                    patientInfo.medical_conditions.adverse_drug_reactions
+                      .suspected_medications
+                  ) &&
+                  patientInfo.medical_conditions.adverse_drug_reactions
+                    .suspected_medications.length > 0
+                    ? patientInfo.medical_conditions.adverse_drug_reactions.suspected_medications.join(
+                        ", "
+                      )
+                    : "없음"
+                }, 증상: ${
+                  Array.isArray(
+                    patientInfo.medical_conditions.adverse_drug_reactions
+                      .reaction_details
+                  ) &&
+                  patientInfo.medical_conditions.adverse_drug_reactions
+                    .reaction_details.length > 0
+                    ? patientInfo.medical_conditions.adverse_drug_reactions.reaction_details.join(
+                        ", "
+                      )
+                    : "없음"
+                }`
               : "없음"}
           </span>
         </p>
         <p>
           <span className={styles.label}>흡연:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.smoking?.status === "예"
-              ? `흡연 기간: ${patientInfo.smoking.duration}년, 평균 흡연량: ${patientInfo.smoking.packsPerDay}갑`
+            {patientInfo.lifestyle.smoking.is_smoking === "예"
+              ? `흡연 기간: ${patientInfo.lifestyle.smoking.duration_in_years}년, 평균 흡연량: ${patientInfo.lifestyle.smoking.pack_per_day}갑`
               : "비흡연"}
           </span>
         </p>
         <p>
           <span className={styles.label}>음주:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.drinking?.status === "예"
-              ? `음주 횟수: ${patientInfo.drinking.frequencyPerWeek}회/주, 1회 음주량: ${patientInfo.drinking.amountPerSession}병`
+            {patientInfo.lifestyle.alcohol.is_drinking === "예"
+              ? `주 ${patientInfo.lifestyle.alcohol.drinks_per_week}회, 음주량: ${patientInfo.lifestyle.alcohol.amount_per_drink}`
               : "비음주"}
           </span>
         </p>
         <p>
           <span className={styles.label}>운동:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.exercise?.status === "예"
-              ? `운동 횟수: ${
-                  patientInfo.exercise.selectedOption
+            {patientInfo.lifestyle.exercise.is_exercising === "예"
+              ? `${
+                  patientInfo.lifestyle.exercise.exercise_frequency
                 }, 운동 종류: ${
-                  Array.isArray(patientInfo.exercise.exerciseType) &&
-                  patientInfo.exercise.exerciseType.length > 0
-                    ? patientInfo.exercise.exerciseType.join(", ")
+                  patientInfo.lifestyle.exercise.exercise_types
+                    ? patientInfo.lifestyle.exercise.exercise_types
                     : "없음"
                 }`
               : "운동 안 함"}
@@ -61,63 +133,50 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
         <p>
           <span className={styles.label}>영양:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.diet?.status === "예"
-              ? `균형 잡힌 식사: 하루 ${patientInfo.diet.selectedOption}회`
+            {patientInfo.lifestyle.diet.is_balanced_meal === "예"
+              ? `균형 잡힌 식사 ${patientInfo.lifestyle.diet.balanced_meals_per_day}`
               : "불규칙한 식사"}
           </span>
         </p>
         <p>
-          <span className={styles.label}>독거 여부:</span>{" "}
+          <span className={styles.label}>동거 가족 구성원:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.livingCondition?.status === "아니오"
-              ? `동거 가족 구성원: ${
-                  patientInfo.livingCondition.familyMembers || "없음"
-                }`
-              : "독거"}
+            {patientInfo.medication_management.living_condition.family_members
+              ? patientInfo.medication_management.living_condition
+                  .family_members
+              : "없음"}
           </span>
         </p>
         <p>
           <span className={styles.label}>투약 보조자:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.medicationAssistants?.selectedOption === "기타"
-              ? `기타: ${patientInfo.medicationAssistants.otherText || "없음"}`
-              : patientInfo.medicationAssistants?.selectedOption}
+            {patientInfo.medication_management.living_condition.living_alone ===
+            "예"
+              ? patientInfo.medication_management.living_condition
+                  .medication_assistants
+              : "없음"}
           </span>
         </p>
+
         <p>
           <span className={styles.label}>약 보관 장소:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.medicationStorage?.status === "예"
-              ? `보관 장소: ${patientInfo.medicationStorage.location || "없음"}`
-              : "보관 장소 없음"}
+            {patientInfo.medication_management.medication_storage
+              .has_medication_storage === "예"
+              ? `${
+                  patientInfo.medication_management.medication_storage
+                    .location || "없음"
+                }`
+              : "없음"}
           </span>
         </p>
         <p>
           <span className={styles.label}>처방전 보관 여부:</span>{" "}
           <span className={styles.value}>
-            {patientInfo.prescriptionStorage === "예" ? "보관" : "미보관"}
-          </span>
-        </p>
-        <p>
-          <span className={styles.label}>알러지:</span>{" "}
-          <span className={styles.value}>
-            {patientInfo.allergies?.status === "예"
-              ? `알레르기 항목: ${
-                  patientInfo.allergies.suspectedItem || "없음"
-                }`
-              : "알러지 없음"}
-          </span>
-        </p>
-        <p>
-          <span className={styles.label}>약물 부작용:</span>{" "}
-          <span className={styles.value}>
-            {patientInfo.adverseDrugReactions?.status === "예"
-              ? `의심 약물: ${
-                  patientInfo.adverseDrugReactions.suspectedMedication || "없음"
-                }, 증상: ${
-                  patientInfo.adverseDrugReactions.reactionDetail || "없음"
-                }`
-              : "약물 부작용 없음"}
+            {patientInfo.medication_management.prescription_storage
+              .is_prescription_stored === "예"
+              ? "보관"
+              : "미보관"}
           </span>
         </p>
       </div>
