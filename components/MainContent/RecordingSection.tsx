@@ -5,12 +5,14 @@ import styles from "./RecordingSection.module.css";
 
 interface RecordingSectionProps {
   onRecordingStatusChange: (isRecording: boolean) => void;
-  sessionId: string; // API 엔드포인트에 필요한 sessionId
+  sessionId: string;
+  isFollowUp: boolean; // 상담 유형 구분 prop
 }
 
 const RecordingSection: React.FC<RecordingSectionProps> = ({
   onRecordingStatusChange,
   sessionId,
+  isFollowUp,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -19,7 +21,6 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
   const handleStartOrPauseRecording = async () => {
     if (!isRecording) {
-      // 녹음 시작
       try {
         await recorderRef.current.startRecording();
         setIsRecording(true);
@@ -29,12 +30,10 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
         console.error("녹음 시작 실패:", error);
       }
     } else if (isPaused) {
-      // 녹음 재개
       recorderRef.current.resumeRecording();
       setIsPaused(false);
       onRecordingStatusChange(true);
     } else {
-      // 녹음 일시정지
       recorderRef.current.pauseRecording();
       setIsPaused(true);
       onRecordingStatusChange(false);
@@ -45,7 +44,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     try {
       const audioBlob = await recorderRef.current.stopRecording();
       const url = URL.createObjectURL(audioBlob);
-      setAudioURL(url); // 녹음 완료 시 재생바에 사용될 URL 설정
+      setAudioURL(url);
       setIsRecording(false);
       setIsPaused(false);
       onRecordingStatusChange(false);
@@ -71,7 +70,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     formData.append(
       "wavfile",
       new Blob([audioBlob], { type: "audio/wav" }),
-      "recording.wav"
+      isFollowUp ? "followup_recording.wav" : "initial_recording.wav"
     );
 
     try {
@@ -96,7 +95,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
   return (
     <div className={styles.recordingSection}>
-      <h3 className={styles.sectionTitle}>녹음하기</h3>
+      <h3 className={styles.sectionTitle}>{isFollowUp ? "2차 상담 녹음하기" : "1차 상담 녹음하기"}</h3>
       <div className={styles.buttonContainer}>
         <button
           className={styles.startStopButton}
