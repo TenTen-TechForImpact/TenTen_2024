@@ -56,13 +56,11 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   // 상태를 업데이트하는 함수
   const handleInputChange = (field: string, value: any) => {
     // Convert "예" to true and "아니오" to false for boolean fields
-    const convertedValue =
-      value === "예" ? true : value === "아니오" ? false : value;
 
     const updatedPatientInfo = updateNestedField(
       { ...patientInfo },
       field,
-      convertedValue
+      value
     );
     setPatientInfo(updatedPatientInfo);
   };
