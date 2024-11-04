@@ -1,4 +1,5 @@
 import React from "react";
+import { usePathname } from "next/navigation";
 import styles from "./PersonalInfoSection.module.css";
 
 interface PersonalInfoSectionProps {
@@ -31,6 +32,10 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   patientInfo,
   setPatientInfo,
 }) => {
+  //sessionId 획득
+  const pathname = usePathname();
+  const sessionId = pathname.split("/").pop();
+
   // 경로를 올바르게 생성하는 함수
   const constructFieldPath = (baseField: string, subField?: string) => {
     return subField ? `${baseField}.${subField}` : baseField;
@@ -78,10 +83,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     const updatedField = {
       [fieldPath]: getNestedValue(patientInfo, fieldPath),
     };
-    console.log("Field updated:", updatedField);
+    console.log("Field updated:", JSON.stringify(updatedField));
 
-    // 여기에 서버에 PATCH 요청을 보낼 수 있습니다.
-    /*
+    // 여기에 서버에 PATCH 요청을 보낼 수 있습니다
     fetch(`/api/sessions/${sessionId}`, {
       method: "PATCH",
       headers: {
@@ -95,13 +99,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
         }
         return response.json();
       })
-      .then((data) => {
-        console.log("Data updated successfully:", data);
+      .then((updatedField) => {
+        console.log("Data updated successfully:", updatedField);
       })
       .catch((error) => {
         console.error("Error updating data:", error);
       });
-    */
   };
 
   const renderInputField = (question: Question) => {
