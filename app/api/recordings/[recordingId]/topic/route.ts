@@ -29,7 +29,10 @@ export async function POST(
       .single();
 
     if (recordingError) {
-      console.error("Supabase에서 Recording을 가져오는 중 오류:", recordingError);
+      console.error(
+        "Supabase에서 Recording을 가져오는 중 오류:",
+        recordingError
+      );
       return NextResponse.json(
         { error: "Error fetching recording" },
         { status: 500 }
@@ -49,31 +52,48 @@ export async function POST(
       .from("TopicSummary")
       .select("*") // Ensure that RLS policies allow this
       .eq("recording_id", recordingId);
-  
 
     if (topicSummaryError) {
-      console.error("Supabase에서 TopicSummary를 가져오는 중 오류:", topicSummaryError);
+      console.error(
+        "Supabase에서 TopicSummary를 가져오는 중 오류:",
+        topicSummaryError
+      );
       return NextResponse.json(
         { error: "Error fetching topic summary" },
         { status: 500 }
       );
-    }   
+    }
     // Check the recordingId being used
     console.log("Recording ID:", recordingId);
 
     // Check the data fetched from TopicSummary
     console.log("TopicSummaries:", topicSummaries);
 
-
     // TopicSummary 데이터가 없으면 오류 반환
     if (!topicSummaries || topicSummaries.length === 0) {
-        return NextResponse.json(
-          {
-            error: `No topic summaries found for the given recording ID: ${recordingId}`,
-            topicSummaries, 
-          },
-          { status: 404 }
-        );
+      return NextResponse.json(
+        {
+          error: `No topic summaries found for the given recording ID: ${recordingId}`,
+          topicSummaries,
+        },
+        { status: 404 }
+      );
+    }
+
+    // insert topics into supabase
+    const { data, error } = await supabase.from("Recording").insert([
+      {
+        topics: topicSummaries,
+      },
+    ]);
+
+    // 에러 처리
+    if (error) {
+      console.error("Error inserting topics:", error.message);
+      return NextResponse.json(
+        { error: "Failed to insert topics" },
+        { status: 500 }
+      );
     }
 
     // TopicSummary 데이터를 반환
