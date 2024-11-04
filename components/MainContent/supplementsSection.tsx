@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import styles from "./SupplementsSection.module.css";
+import styles from "./supplementsSection.module.css";
 
 interface Supplement {
   name: string;
