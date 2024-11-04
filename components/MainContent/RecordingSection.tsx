@@ -6,13 +6,11 @@ import styles from "./RecordingSection.module.css";
 interface RecordingSectionProps {
   onRecordingStatusChange: (isRecording: boolean) => void;
   sessionId: string;
-  isFollowUp: boolean; // 상담 유형 구분 prop
 }
 
 const RecordingSection: React.FC<RecordingSectionProps> = ({
   onRecordingStatusChange,
   sessionId,
-  isFollowUp,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -70,7 +68,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     formData.append(
       "wavfile",
       new Blob([audioBlob], { type: "audio/wav" }),
-      isFollowUp ? "followup_recording.wav" : "initial_recording.wav"
+      "recording.wav"
     );
 
     try {
@@ -95,7 +93,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
   return (
     <div className={styles.recordingSection}>
-      <h3 className={styles.sectionTitle}>{isFollowUp ? "2차 상담 녹음하기" : "1차 상담 녹음하기"}</h3>
+      <h3 className={styles.sectionTitle}>녹음하기</h3>
       <div className={styles.buttonContainer}>
         <button
           className={styles.startStopButton}

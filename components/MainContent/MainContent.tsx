@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import PersonalInfoSection from "./PersonalInfoSection";
 import PreQuestionsSection from "./PreQuestionsSection";
@@ -35,14 +37,6 @@ const MainContent: React.FC<MainContentProps> = ({
 
   return (
     <div className={styles.mainContent}>
-      <section id="recording" className={styles.section}>
-        <RecordingSection
-          onRecordingStatusChange={onRecordingStatusChange}
-          sessionId={sessionId ?? "임시ID"}
-          isFollowUp={isFollowUp}
-        />
-      </section>
-
       {!isFollowUp && (
         <>
           <section id="patientInfo" className={styles.section}>
@@ -74,6 +68,12 @@ const MainContent: React.FC<MainContentProps> = ({
 
       {isFollowUp && (
         <>
+          <section id="recording" className={styles.section}>
+            <RecordingSection
+              onRecordingStatusChange={onRecordingStatusChange}
+              sessionId={sessionId ?? "임시ID"}
+            />
+          </section>
           <section id="prescriptionDrugs" className={styles.section}>
             <PrescriptionDrugsSection />
           </section>

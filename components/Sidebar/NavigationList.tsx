@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { FaPencilAlt, FaMicrophone } from "react-icons/fa"; // 아이콘 추가
+import { FaPencilAlt, FaMicrophone } from "react-icons/fa";
 import PatientInfoCard from "./PatientInfoCard";
 import styles from "./NavigationList.module.css";
 
@@ -23,19 +23,18 @@ const NavigationList: React.FC<NavigationListProps> = ({
   const topics =
     activeTab === "followUp"
       ? [
-          { id: "recording", title: "녹음하기" },
-          { id: "prescriptionDrugs", title: "처방 의약품" },
-          { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
-          { id: "pharmacistIntervention", title: "약사 중재 내용" },
-          { id: "careNotes", title: "돌봄 노트" },
-        ]
+        { id: "recording", title: "녹음하기" },
+        { id: "prescriptionDrugs", title: "처방 의약품" },
+        { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
+        { id: "pharmacistIntervention", title: "약사 중재 내용" },
+        { id: "careNotes", title: "돌봄 노트" },
+      ]
       : [
-          { id: "recording", title: "녹음하기" },
-          { id: "patientInfo", title: "환자 상세 정보" },
-          { id: "preQuestions", title: "상담 전 질문" },
-          { id: "prescriptionDrugs", title: "처방 의약품" },
-          { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
-        ];
+        { id: "patientInfo", title: "환자 상세 정보" },
+        { id: "preQuestions", title: "상담 전 질문" },
+        { id: "prescriptionDrugs", title: "처방 의약품" },
+        { id: "otcAndSupplements", title: "일반의약품+건강기능식품" },
+      ];
 
   const handleNavigationClick = (id: string) => {
     setSelectedId(id);
