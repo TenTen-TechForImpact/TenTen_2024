@@ -62,13 +62,6 @@ const PatientDetailPage: React.FC = () => {
       return;
     }
 
-    // Create a new session object with a temporary ID
-    const tempId = `temp-${Date.now()}`; // Temporary unique ID
-    const newSession = { id: tempId, session_datetime: formattedDate };
-
-    // Optimistically update the sessions state
-    setSessions((prevSessions) => [newSession, ...prevSessions]);
-
     const sessionData = {
       "session-datetime": formattedDate,
     };
@@ -91,19 +84,34 @@ const PatientDetailPage: React.FC = () => {
     } catch (error) {
       console.error("Error creating session:", error);
       alert("세션 생성에 실패했습니다. 다시 시도해주세요.");
-
-      // Revert the optimistic update in case of an error
-      setSessions((prevSessions) =>
-        prevSessions.filter((session) => session.id !== tempId)
-      );
     }
   };
 
-  const handleDeleteSession = (id: string) => {
-    // 더미 삭제 기능
-    setSessions((prevSessions) =>
-      prevSessions.filter((session) => session.id !== id)
-    );
+  const handleDeleteSession = async (id: string) => {
+    try {
+      // Make a DELETE request to the backend
+      const response = await fetch(
+        `/api/patients/${patientId}/sessions/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the session");
+      }
+
+      // Remove the session from the state
+      setSessions((prevSessions) =>
+        prevSessions.filter((session) => session.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (

@@ -29,7 +29,6 @@ const NavigationList: React.FC<NavigationListProps> = ({
         { id: "careNotes", title: "돌봄 노트" },
       ]
       : [
-        { id: "recording", title: "녹음하기" },
         { id: "patientInfo", title: "환자 상세 정보" },
         { id: "preQuestions", title: "상담 전 질문" },
         { id: "prescriptionDrugs", title: "처방 의약품" },
@@ -56,36 +55,36 @@ const NavigationList: React.FC<NavigationListProps> = ({
     }
   };
 
+  /*patientinfocard나중에 다시 추가고려 */
   return (
     <div className={styles.navigationList}>
       <div className={styles.tabHeader}>
         <h2 className={styles.tabTitle}>
           {activeTab === "followUp" ? "약사 상담" : "사전 접수"}
         </h2>
-        {isFirstSessionCompleted && (
-          <div className={styles.tabButtons}>
-            <button
-              className={
-                activeTab === "firstSession"
-                  ? styles.inactiveButton
-                  : styles.activeButton
-              }
-              onClick={() => onTabChange("firstSession")}
-            >
-              &lt;
-            </button>
-            <button
-              className={
-                activeTab === "followUp"
-                  ? styles.inactiveButton
-                  : styles.activeButton
-              }
-              onClick={() => onTabChange("followUp")}
-            >
-              &gt;
-            </button>
-          </div>
-        )}
+
+        <div className={styles.tabButtons}>
+          <button
+            className={
+              activeTab === "firstSession"
+                ? styles.inactiveButton
+                : styles.activeButton
+            }
+            onClick={() => onTabChange("firstSession")}
+          >
+            &lt;
+          </button>
+          <button
+            className={
+              activeTab === "followUp"
+                ? styles.inactiveButton
+                : styles.activeButton
+            }
+            onClick={() => onTabChange("followUp")}
+          >
+            &gt;
+          </button>
+        </div>
       </div>
       <ol>
         {topics.map((t) => (

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import styles from "./PrescriptionDrugsSection.module.css";
+import styles from "./OTCSection.module.css";
 
-interface PrescriptionDrug {
+interface OTCDrug {
   name: string;
-  days: string;
+  unit: string;
   purpose: string;
   status: string;
 }
 
-interface Supplement {
+interface PrescriptionDrug {
   name: string;
-  unit: string;
+  days: string;
   purpose: string;
   status: string;
 }
@@ -24,11 +24,11 @@ interface MedicationList {
     };
     over_the_counter_drugs: {
       count: number;
-      list: Supplement[];
+      list: OTCDrug[];
     };
     health_functional_foods: {
       count: number;
-      list: Supplement[];
+      list: OTCDrug[];
     };
   };
 }
@@ -39,42 +39,41 @@ interface Props {
   sessionId: string;
 }
 
-const PrescriptionDrugsSection: React.FC<Props> = ({
+const OTCSection: React.FC<Props> = ({
   medicationList,
   setMedicationList,
   sessionId,
 }) => {
-  const [drugs, setDrugs] = useState<PrescriptionDrug[]>([]);
-  const [newDrug, setNewDrug] = useState<PrescriptionDrug>({
+  const [drugs, setDrugs] = useState<OTCDrug[]>([]);
+
+  useEffect(() => {
+    setDrugs(medicationList.current_medications.over_the_counter_drugs.list);
+  }, [medicationList]);
+
+  const [newDrug, setNewDrug] = useState<OTCDrug>({
     name: "",
-    days: "",
+    unit: "",
     purpose: "",
     status: "상시 복용",
   });
 
-  // Load the ethical_the_counter_drugs list into state
-  useEffect(() => {
-    setDrugs(medicationList.current_medications.ethical_the_counter_drugs.list);
-  }, [medicationList]);
-
   const handleAddDrug = () => {
-    if (newDrug.name && newDrug.purpose && newDrug.days !== "") {
+    if (newDrug.name && newDrug.purpose && newDrug.unit) {
       const updatedDrugs = [...drugs, newDrug];
       const updatedList = {
         ...medicationList,
         current_medications: {
           ...medicationList.current_medications,
-          ethical_the_counter_drugs: {
+          over_the_counter_drugs: {
             count: updatedDrugs.length,
             list: updatedDrugs,
           },
         },
       };
 
-      // Update the state using setMedicationList
       setMedicationList(updatedList);
       setDrugs(updatedDrugs);
-      setNewDrug({ name: "", days: "", purpose: "", status: "상시 복용" });
+      setNewDrug({ name: "", unit: "", purpose: "", status: "상시 복용" });
 
       // Make the PATCH request to update the server
       fetch(`/api/sessions/${sessionId}`, {
@@ -84,7 +83,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
         },
         body: JSON.stringify({
           current_medications: {
-            ethical_the_counter_drugs: {
+            over_the_counter_drugs: {
               count: updatedDrugs.length,
               list: updatedDrugs,
             },
@@ -112,18 +111,16 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
       ...medicationList,
       current_medications: {
         ...medicationList.current_medications,
-        ethical_the_counter_drugs: {
+        over_the_counter_drugs: {
           count: updatedDrugs.length,
           list: updatedDrugs,
         },
       },
     };
 
-    // Update the state using setMedicationList
     setMedicationList(updatedList);
     setDrugs(updatedDrugs);
 
-    // Make the PATCH request to update the server
     fetch(`/api/sessions/${sessionId}`, {
       method: "PATCH",
       headers: {
@@ -131,7 +128,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
       },
       body: JSON.stringify({
         current_medications: {
-          ethical_the_counter_drugs: {
+          over_the_counter_drugs: {
             count: updatedDrugs.length,
             list: updatedDrugs,
           },
@@ -154,13 +151,13 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
 
   return (
     <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>처방 의약품</h3>
+      <h3 className={styles.sectionTitle}>일반의약품</h3>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>#</th>
             <th>상품명</th>
-            <th>처방 일수</th>
+            <th>제품 단위</th>
             <th>약물 사용 목적</th>
             <th>사용 상태</th>
             <th>삭제</th>
@@ -171,7 +168,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
             <tr key={index}>
               <td>{index + 1}</td>
               <td>{drug.name}</td>
-              <td>{drug.days}일</td>
+              <td>{drug.unit}</td>
               <td>{drug.purpose}</td>
               <td>{drug.status}</td>
               <td>
@@ -196,10 +193,10 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
           className={styles.inputField}
         />
         <input
-          type="number"
-          placeholder="처방 일수"
-          value={newDrug.days}
-          onChange={(e) => setNewDrug({ ...newDrug, days: e.target.value })}
+          type="text"
+          placeholder="제품 단위"
+          value={newDrug.unit}
+          onChange={(e) => setNewDrug({ ...newDrug, unit: e.target.value })}
           className={styles.inputField}
         />
         <input
@@ -227,4 +224,4 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
   );
 };
 
-export default PrescriptionDrugsSection;
+export default OTCSection;
