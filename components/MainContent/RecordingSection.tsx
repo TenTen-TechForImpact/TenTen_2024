@@ -14,7 +14,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
   const recorderRef = useRef<AudioRecorder>(new AudioRecorder());
 
   const handleStartOrPauseRecording = async () => {
@@ -41,8 +41,8 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
   const handleCompleteRecording = async () => {
     try {
       const audioBlob = await recorderRef.current.stopRecording();
-      const url = URL.createObjectURL(audioBlob);
-      setAudioURL(url);
+      const audioFile = new File([audioBlob], "recording.wav", { type: "audio/wav" });
+      setAudioFile(audioFile);
       setIsRecording(false);
       setIsPaused(false);
       onRecordingStatusChange(false);
@@ -53,32 +53,23 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
   const handleResetRecording = () => {
     recorderRef.current.resetRecording();
-    setAudioURL(null);
+    setAudioFile(null);
     setIsRecording(false);
     setIsPaused(false);
     onRecordingStatusChange(false);
   };
 
   const handleUploadRecording = async () => {
-    if (!audioURL) return;
+    if (!audioFile) return;
 
-    const response = await fetch(audioURL);
-    const audioBlob = await response.blob();
     const formData = new FormData();
-    formData.append(
-      "wavfile",
-      new Blob([audioBlob], { type: "audio/wav" }),
-      "recording.wav"
-    );
+    formData.append("wavfile", audioFile);
 
     try {
-      const uploadResponse = await fetch(
-        `/api/sessions/${sessionId}/upload-s3`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const uploadResponse = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
+        method: "POST",
+        body: formData,
+      });
 
       if (uploadResponse.ok) {
         const data = await uploadResponse.json();
@@ -124,7 +115,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
         <button
           className={styles.resetButton}
           onClick={handleResetRecording}
-          disabled={!audioURL}
+          disabled={!audioFile}
         >
           <FaRedo />
           <span className={styles.buttonLabel}>초기화</span>
@@ -132,15 +123,15 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
         <button
           className={styles.uploadButton}
           onClick={handleUploadRecording}
-          disabled={!audioURL}
+          disabled={!audioFile}
         >
           <FaUpload />
           <span className={styles.buttonLabel}>업로드</span>
         </button>
       </div>
-      {audioURL && (
+      {audioFile && (
         <div className={styles.audioContainer}>
-          <audio src={audioURL} controls className={styles.audioPlayer} />
+          <audio src={URL.createObjectURL(audioFile)} controls className={styles.audioPlayer} />
         </div>
       )}
     </div>

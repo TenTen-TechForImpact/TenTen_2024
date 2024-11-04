@@ -212,9 +212,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 placeholder="기타"
                 value={
                   getNestedValue(patientInfo, field) !==
-                  options.find(
-                    (opt) => opt === getNestedValue(patientInfo, field)
-                  )
+                    options.find(
+                      (opt) => opt === getNestedValue(patientInfo, field)
+                    )
                     ? getNestedValue(patientInfo, field)
                     : ""
                 }
@@ -234,11 +234,10 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${
-                  getNestedValue(patientInfo, field) === "예"
+                className={`${styles.yesNoButton} ${getNestedValue(patientInfo, field) === "예"
                     ? styles.active
                     : ""
-                }`}
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -257,11 +256,10 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${
-                  getNestedValue(patientInfo, field) === "아니오"
+                className={`${styles.yesNoButton} ${getNestedValue(patientInfo, field) === "아니오"
                     ? styles.active
                     : ""
-                }`}
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);
@@ -295,9 +293,8 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${
-                  isYesSelected ? styles.active : ""
-                }`}
+                className={`${styles.yesNoButton} ${isYesSelected ? styles.active : ""
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -310,9 +307,8 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${
-                  isNoSelected ? styles.active : ""
-                }`}
+                className={`${styles.yesNoButton} ${isNoSelected ? styles.active : ""
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);
@@ -361,9 +357,8 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${
-                  isYesSelectedForSingleCheckbox ? styles.active : ""
-                }`}
+                className={`${styles.yesNoButton} ${isYesSelectedForSingleCheckbox ? styles.active : ""
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -378,9 +373,8 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${
-                  isNoSelectedForSingleCheckbox ? styles.active : ""
-                }`}
+                className={`${styles.yesNoButton} ${isNoSelectedForSingleCheckbox ? styles.active : ""
+                  }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);

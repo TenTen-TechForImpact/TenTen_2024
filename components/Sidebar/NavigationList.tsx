@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { FaPencilAlt, FaMicrophone } from "react-icons/fa";
-import PatientInfoCard from "./PatientInfoCard";
 import styles from "./NavigationList.module.css";
 
 interface NavigationListProps {
@@ -30,6 +29,7 @@ const NavigationList: React.FC<NavigationListProps> = ({
         { id: "careNotes", title: "돌봄 노트" },
       ]
       : [
+        { id: "recording", title: "녹음하기" },
         { id: "patientInfo", title: "환자 상세 정보" },
         { id: "preQuestions", title: "상담 전 질문" },
         { id: "prescriptionDrugs", title: "처방 의약품" },
@@ -58,15 +58,6 @@ const NavigationList: React.FC<NavigationListProps> = ({
 
   return (
     <div className={styles.navigationList}>
-      <PatientInfoCard
-        patientInfo={{
-          id: 1,
-          name: "김철수",
-          gender: "남성",
-          birthDate: "1996-05-15",
-          phoneNumber: "010-1234-5678",
-        }}
-      />
       <div className={styles.tabHeader}>
         <h2 className={styles.tabTitle}>
           {activeTab === "followUp" ? "약사 상담" : "사전 접수"}
