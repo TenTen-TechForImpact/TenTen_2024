@@ -40,6 +40,7 @@ export async function PATCH(
     .from("Session")
     .select("temp")
     .eq("id", sessionId)
+    .select()
     .single();
 
   if (fetchError) {
@@ -50,8 +51,47 @@ export async function PATCH(
     );
   }
 
-  // 기존 데이터와 새 데이터를 병합
-  const newTempData = { ...currentData?.temp, ...updatedData };
+  // 점(.)이 포함된 키를 중첩된 객체로 변환하는 함수
+  function setNestedValue(target, keyPath, value) {
+    const keys = keyPath.split(".");
+    let current = target;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      if (!(key in current)) {
+        current[key] = {};
+      }
+      current = current[key];
+    }
+    current[keys[keys.length - 1]] = value;
+  }
+
+  // 깊은 병합을 수행하는 유틸리티 함수
+  function deepMerge(target, source) {
+    for (const key in source) {
+      if (key.includes(".")) {
+        // 점(.)이 포함된 키를 중첩된 객체로 변환
+        setNestedValue(target, key, source[key]);
+      } else if (
+        source[key] instanceof Object &&
+        !Array.isArray(source[key]) &&
+        source[key] !== null
+      ) {
+        if (!(key in target)) {
+          target[key] = {};
+        }
+        // 재귀적으로 병합 수행
+        deepMerge(target[key], source[key]);
+      } else {
+        // 중첩된 객체의 필드가 아닌 경우에만 직접 병합
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+
+  // 기존 데이터와 업데이트된 데이터를 깊은 병합
+  const newTempData = deepMerge(currentData?.temp || {}, updatedData);
 
   // temp 필드 업데이트
   console.log("Updating temp field for session with ID:", sessionId);
@@ -59,6 +99,7 @@ export async function PATCH(
     .from("Session")
     .update({ temp: newTempData }) // 병합된 temp 데이터 업데이트
     .eq("id", sessionId)
+    .select() // 없으면 null로 들어옴
     .single();
 
   if (error) {
@@ -68,6 +109,8 @@ export async function PATCH(
       { status: 500 }
     );
   }
+
+  console.log("Update successful:", data); // 성공적으로 업데이트된 데이터 확인
 
   // 수정된 temp 데이터를 JSON 형식으로 반환
   return NextResponse.json(data);
