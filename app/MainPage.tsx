@@ -11,7 +11,7 @@ const MainPage: React.FC = () => {
   return (
     <div className={styles.mainPage}>
       <Header />
-      <ConsultationRecordPage />
+      <PatientsListPage />
     </div>
   );
 };
