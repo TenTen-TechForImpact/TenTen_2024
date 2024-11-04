@@ -5,7 +5,7 @@ import PrescriptionDrugsSection from "./PrescriptionDrugsSection";
 import OTCAndSupplementsSection from "./OTCAndSupplementsSection";
 import CareNotesSection from "./CareNotesSection";
 import PharmacistInterventionSection from "./PharmacistInterventionSection";
-import RecordingSection from "./RecordingSection"; // 기존 섹션 유지
+import RecordingSection from "./RecordingSection";
 import styles from "./MainContent.module.css";
 
 interface MainContentProps {
@@ -16,6 +16,7 @@ interface MainContentProps {
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
   preQuestions: string[];
   setPreQuestions: React.Dispatch<React.SetStateAction<string[]>>;
+  sessionId: string | null;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -26,6 +27,7 @@ const MainContent: React.FC<MainContentProps> = ({
   setPatientInfo,
   preQuestions,
   setPreQuestions,
+  sessionId,
 }) => {
   const handleAddContent = (content: string) => {
     console.log("추가된 content:", content);
@@ -36,7 +38,8 @@ const MainContent: React.FC<MainContentProps> = ({
       <section id="recording" className={styles.section}>
         <RecordingSection
           onRecordingStatusChange={onRecordingStatusChange}
-          sessionId={"임시ID"}
+          sessionId={sessionId ?? "임시ID"}
+          isFollowUp={isFollowUp}
         />
       </section>
 
