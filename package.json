@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "npm install --save-dev typescript @types/node",
     "dev": "next dev",
     "prebuild": "npm install",
     "build": "next build",
@@ -29,9 +30,9 @@
     "redux": "^5.0.1"
   },
   "devDependencies": {
-    "@types/node": "22.7.4",
+    "@types/node": "^22.7.4",
     "@types/react": "18.3.11",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "engines": {
     "node": "v20.18.0",
