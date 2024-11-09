@@ -97,22 +97,47 @@ export async function POST(
       );
     }
 
+    // Patient 테이블에서 환자 정보 조회 (개인 정보 저장용)
+    const { data: patient, error: patientError } = await supabase
+      .from("Patient")
+      .select("name, date_of_birth, phone_number")
+      .eq("id", patientId)
+      .single();
+
+    if (patientError) {
+      console.error("Error fetching patient:", patientError.message);
+      return NextResponse.json(
+        { error: "Failed to fetch patient data" },
+        { status: 404 }
+      );
+    }
+
+    // defaultTemp에 personal_info 업데이트
+    const updatedTemp = {
+      ...defaultTemp,
+      personal_info: {
+        name: patient.name,
+        date_of_birth: patient.date_of_birth,
+        phone_number: patient.phone_number,
+      },
+    };
+
     // Session 테이블에 데이터 삽입
-    const { data, error } = await supabase
+    const { data: session, error: sessionError } = await supabase
       .from("Session")
       .insert([
         {
           session_datetime: sessionDatetime,
           patient_id: patientId,
-          patient_summary: "", // 초기값 설정
-          temp: defaultTemp,
+          patient_summary: "",
+          temp: updatedTemp,
         },
       ])
       .single(); // 삽입 후 단일 레코드 반환
 
     // 에러 처리
-    if (error) {
-      console.error("Error inserting session:", error.message);
+    if (sessionError) {
+      console.error("Error inserting session:", sessionError.message);
       return NextResponse.json(
         { error: "Failed to insert session" },
         { status: 500 }
@@ -120,7 +145,7 @@ export async function POST(
     }
 
     // 성공적으로 삽입된 데이터 반환
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(session, { status: 201 });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(
