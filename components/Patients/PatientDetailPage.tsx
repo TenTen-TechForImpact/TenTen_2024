@@ -11,12 +11,15 @@ const PatientDetailPage: React.FC = () => {
   const pathname = usePathname();
   const patientId = pathname.split("/").pop();
 
+  const [loading, setLoading] = useState(true);
+
   const [sessions, setSessions] = useState<
     { id: string; session_datetime: string }[]
   >([]);
   const [error, setError] = useState<string | null>(null);
 
   const loadSessions = async () => {
+    setLoading(true);
     try {
       const data = await fetchSessions(patientId);
       if (data.sessions) {
@@ -28,6 +31,8 @@ const PatientDetailPage: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,7 +128,9 @@ const PatientDetailPage: React.FC = () => {
         <div className={styles.addSessionCard} onClick={handleAddSession}>
           <span className={styles.addButton}>+</span>
         </div>
-        {sessions && sessions.length > 0 ? (
+        {loading ? (
+          <p>상담 목록 로딩 중...</p>
+        ) : sessions && sessions.length > 0 ? (
           sessions.map((session) => (
             <SessionCard
               key={session.id}

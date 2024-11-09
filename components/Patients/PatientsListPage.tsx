@@ -181,7 +181,7 @@ const PatientsListPage = () => {
 
       <div className={styles.patientList}>
         {loading ? (
-          <p>Loading patients...</p>
+          <p>환자 목록 로딩 중...</p>
         ) : (
           sortPatients(
             patients.filter(

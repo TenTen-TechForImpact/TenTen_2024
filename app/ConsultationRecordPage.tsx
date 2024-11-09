@@ -9,6 +9,9 @@ import Header from "../components/Header/Header";
 import styles from "./ConsultationRecordPage.module.css";
 
 const ConsultationRecordPage: React.FC = () => {
+  // 로딩 상태 관리
+  const [loading, setLoading] = useState(true);
+
   // 상담 데이터 상태 관리
   const [activeTab, setActiveTab] = useState<"firstSession" | "followUp">(
     "firstSession"
@@ -125,6 +128,7 @@ const ConsultationRecordPage: React.FC = () => {
 
   useEffect(() => {
     const fetchAndUpdateData = async () => {
+      setLoading(true);
       try {
         // 데이터 가져오기
         const response = await fetch(`/api/sessions/${sessionId}`);
@@ -259,6 +263,8 @@ const ConsultationRecordPage: React.FC = () => {
         setPreQuestions(data.temp);
       } catch (error) {
         console.error("Error fetching or sending update request:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -561,22 +567,26 @@ const ConsultationRecordPage: React.FC = () => {
           />
         </aside>
         <main className={styles.mainContent}>
-          <MainContent
-            isFollowUp={activeTab === "followUp"}
-            onCompleteFirstSession={handleCompleteFirstSession}
-            onRecordingStatusChange={handleRecordingStatusChange}
-            patientInfo={patientInfo}
-            setPatientInfo={setPatientInfo}
-            preQuestions={preQuestions}
-            setPreQuestions={setPreQuestions}
-            medicationList={medicationList}
-            setMedicationList={setMedicationList}
-            careNote={careNote}
-            setCareNote={setCareNote}
-            pharmacistIntervention={pharmacistIntervention}
-            setPharmacistIntervention={setPharmacistIntervention}
-            sessionId={sessionId}
-          />
+          {loading ? (
+            <h2>상담 내용 로딩 중...</h2> // 로딩 메시지
+          ) : (
+            <MainContent
+              isFollowUp={activeTab === "followUp"}
+              onCompleteFirstSession={handleCompleteFirstSession}
+              onRecordingStatusChange={handleRecordingStatusChange}
+              patientInfo={patientInfo}
+              setPatientInfo={setPatientInfo}
+              preQuestions={preQuestions}
+              setPreQuestions={setPreQuestions}
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
+              careNote={careNote}
+              setCareNote={setCareNote}
+              pharmacistIntervention={pharmacistIntervention}
+              setPharmacistIntervention={setPharmacistIntervention}
+              sessionId={sessionId}
+            />
+          )}
         </main>
         <aside className={styles.rightSidebar}>
           <FirstSessionSummary
