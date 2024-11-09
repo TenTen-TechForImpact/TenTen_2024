@@ -60,7 +60,7 @@ const SupplementsSection: React.FC<Props> = ({
   });
 
   const handleAddSupplement = () => {
-    if (newSupplement.name && newSupplement.purpose && newSupplement.unit) {
+    if (newSupplement.name) {
       const updatedSupplements = [...supplements, newSupplement];
       const updatedList = {
         ...medicationList,
