@@ -4,6 +4,81 @@ import { createClient } from "@/utils/supabase/component";
 // Supabase 클라이언트 생성
 const supabase = createClient();
 
+const defaultTemp = {
+  personal_info: {
+    name: "",
+    date_of_birth: "",
+    phone_number: "",
+  },
+  consultation_info: {
+    insurance_type: "",
+    initial_consult_date: "",
+    current_consult_date: "",
+    consult_session_number: "",
+    pharmacist_names: ["", "", ""],
+  },
+  medical_conditions: {
+    chronic_diseases: {
+      disease_names: [],
+      additional_info: "",
+    },
+    medical_history: "",
+    symptoms: "",
+    allergies: {
+      has_allergies: "아니오",
+      suspected_items: [],
+    },
+    adverse_drug_reactions: {
+      has_adverse_drug_reactions: "아니오",
+      suspected_medications: [],
+      reaction_details: [],
+    },
+  },
+  lifestyle: {
+    smoking: {
+      is_smoking: "아니오",
+      duration_in_years: "",
+      pack_per_day: "",
+    },
+    alcohol: {
+      is_drinking: "아니오",
+      drinks_per_week: "",
+      amount_per_drink: "",
+    },
+    exercise: {
+      is_exercising: "아니오",
+      exercise_frequency: "",
+      exercise_types: [],
+    },
+    diet: {
+      is_balanced_meal: "아니오",
+      balanced_meals_per_day: "",
+    },
+  },
+  medication_management: {
+    living_condition: {
+      living_alone: "예",
+      family_members: [],
+      medication_assistants: [],
+    },
+    medication_storage: {
+      has_medication_storage: "아니오",
+      location: "",
+    },
+    prescription_storage: {
+      is_prescription_stored: "아니오",
+    },
+  },
+  questions: { list: [] },
+  current_medications: {
+    ethical_the_counter_drugs: { count: 0, list: [] },
+    over_the_counter_drugs: { count: 0, list: [] },
+    health_functional_foods: { count: 0, list: [] },
+  },
+  pharmacist_comments: "",
+  care_note: "",
+};
+
 // Post: create new session card for a patient
 export async function POST(
   req: NextRequest,
@@ -30,6 +105,7 @@ export async function POST(
           session_datetime: sessionDatetime,
           patient_id: patientId,
           patient_summary: "", // 초기값 설정
+          temp: defaultTemp,
         },
       ])
       .single(); // 삽입 후 단일 레코드 반환
