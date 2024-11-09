@@ -103,7 +103,7 @@ const ConsultationRecordPage: React.FC = () => {
     },
   });
 
-  const [preQuestions, setPreQuestions] = useState<string[]>([]);
+  const [preQuestions, setPreQuestions] = useState({ questions: { list: [] } });
   const [sessionSummaryData, setSessionSummaryData] = useState([
     {
       topic_id: 1,
@@ -200,6 +200,7 @@ const ConsultationRecordPage: React.FC = () => {
                 is_prescription_stored: "아니오",
               },
             },
+            questions: { list: [] },
             current_medications: {
               ethical_the_counter_drugs: { count: 0, list: [] },
               over_the_counter_drugs: { count: 0, list: [] },
@@ -247,6 +248,7 @@ const ConsultationRecordPage: React.FC = () => {
           }
         } else {
           console.log("Data is valid, no update needed.");
+          console.log(data.temp);
         }
 
         // 데이터를 상태로 설정
@@ -254,7 +256,7 @@ const ConsultationRecordPage: React.FC = () => {
         setMedicationList(data.temp);
         setPharmacistIntervention(data.temp);
         setCareNote(data.temp);
-        console.log(medicationList);
+        setPreQuestions(data.temp);
       } catch (error) {
         console.error("Error fetching or sending update request:", error);
       }
@@ -387,6 +389,10 @@ const ConsultationRecordPage: React.FC = () => {
       };
     }
 
+    if (!data.questions) {
+      filteredData.questions = data.questions || { list: [] };
+    }
+
     if (!data.pharmacist_comments) {
       filteredData.pharmacist_comments = data.pharmacist_comments || "";
     }
@@ -394,6 +400,7 @@ const ConsultationRecordPage: React.FC = () => {
     if (!data.care_note) {
       filteredData.care_note = data.care_note || "";
     }
+
     console.log(filteredData);
     return filteredData;
   };
@@ -491,11 +498,16 @@ const ConsultationRecordPage: React.FC = () => {
     }
 
     // 기타 검증: temp 안에 필요한 필드가 존재하는지 확인
-    if (!("pharmacist_comments" in temp) || !("care_note" in temp)) {
+    if (
+      !("pharmacist_comments" in temp) ||
+      !("care_note" in temp) ||
+      !("questions" in temp)
+    ) {
       console.log(
-        "Pharmacist comments or care note is missing or undefined:",
+        "Pharmacist comments or care note or questions is missing or undefined:",
         temp.pharmacist_comments,
-        temp.care_note
+        temp.care_note,
+        temp.questions
       );
       return true;
     }
