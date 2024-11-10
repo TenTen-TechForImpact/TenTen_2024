@@ -56,6 +56,7 @@ const MainContent: React.FC<MainContentProps> = ({
             <PersonalInfoSection
               patientInfo={patientInfo}
               setPatientInfo={setPatientInfo}
+              sessionId={sessionId}
             />
           </section>
           <section id="preQuestions" className={styles.section}>
