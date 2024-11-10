@@ -4,28 +4,70 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import SessionCard from "./SessionCard";
 import Header from "../Header/Header";
+import SessionAddModal from "./SessionAddModal";
 import styles from "./PatientDetailPage.module.css";
+
+interface Patient {
+  id: string;
+  name: string;
+  date_of_birth: Date;
+  gender: string;
+  phone_number: string;
+  organization: string;
+  created_at: Date;
+  modified_at: Date;
+}
+
+interface Session {
+  id: string;
+  patient_id: string;
+  session_datetime: Date;
+  title: string;
+  status: string | null;
+  pharmacist_summary: string | null;
+  patient_summary: string | null;
+  form_type: string | null;
+  form_content: string | null;
+  created_at: Date;
+  modified_at: Date;
+  former_questions: string | null;
+  prescription_drugs: string | null;
+  other_drugs: string | null;
+  pharmacist_note: string | null;
+  temp: string | null;
+}
 
 const PatientDetailPage: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const patientId = pathname.split("/").pop();
 
-  const [sessions, setSessions] = useState<
-    { id: string; session_datetime: string }[]
-  >([]);
+  const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadSessions = async () => {
+  const loadPatientInfo = async () => {
     try {
-      const data = await fetchSessions(patientId);
-      if (data.sessions) {
-        setSessions(data.sessions);
-      } else {
-        // api 미구현 시 빈 배열로
-        console.log("세션 없음");
-        setSessions([]);
-      }
+      const data = await fetchPatientInfo(patientId as string);
+      const formattedPatientInfo = {
+        ...data.patient,
+        created_at: new Date(data.patient.created_at),
+        modified_at: new Date(data.patient.modified_at),
+        date_of_birth: new Date(data.patient.date_of_birth),
+      };
+      const formattedSessions = data.sessions.map((session: Session) => ({
+        ...session,
+        created_at: new Date(session.created_at),
+        modified_at: new Date(session.modified_at),
+        session_datetime: new Date(session.session_datetime),
+      }));
+
+      setPatientInfo(formattedPatientInfo);
+      setSessions(formattedSessions);
+      console.log("Fetched patient data:", data);
     } catch (err: any) {
       setError(err.message);
     }
@@ -33,81 +75,87 @@ const PatientDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (!patientId) return;
-    loadSessions();
+    loadPatientInfo();
   }, [patientId]);
 
-  const fetchSessions = async (patientId: string) => {
+  const fetchPatientInfo = async (patientId: string): Promise<{ patient: Patient; sessions: Session[] }> => {
     const response = await fetch(`/api/patients/${patientId}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch patient sessions");
+      throw new Error("Failed to fetch patient information");
     }
     return await response.json();
   };
 
-  const handleAddSession = async () => {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString("en-CA");
+  const handleAddSession = () => {
+    setSelectedSession(null);
+    setIsEditMode(false);
+    setShowModal(true);
+  };
 
-    // Check if a session for today already exists
-    const existingSession = sessions.find((session) => {
-      // Extract the date part from session.session_datetime
-      const sessionDate = new Date(session.session_datetime)
-        .toISOString()
-        .split("T")[0];
-      return sessionDate === formattedDate;
-    });
+  const handleEditSession = (session: Session) => {
+    setSelectedSession(session);
+    setIsEditMode(true);
+    setShowModal(true);
+  };
 
-    if (existingSession) {
-      alert("이미 오늘 날짜에 생성된 상담 카드가 있습니다.");
-      return;
-    }
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedSession(null);
+    setIsEditMode(false);
+  };
 
-    const sessionData = {
-      "session-datetime": formattedDate,
-    };
-
+  const handleSubmitSession = async (sessionData: { title: string; session_datetime: Date }) => {
     try {
-      const response = await fetch(`/api/patients/${patientId}/sessions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(sessionData),
-      });
+      const formattedSessionData = {
+        title: sessionData.title,
+        session_datetime: sessionData.session_datetime.toISOString()
+      };
+      console.log(formattedSessionData);
+      if (isEditMode && selectedSession) {
+        const response = await fetch(`/api/patients/${patientId}/sessions/${selectedSession.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formattedSessionData),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to create a new session");
+        if (!response.ok) {
+          throw new Error("Failed to update session");
+        }
+        await loadPatientInfo()
+      } else {
+        const response = await fetch(`/api/patients/${patientId}/sessions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formattedSessionData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create session");
+        }
+        await loadPatientInfo();
       }
-
-      // Re-fetch the sessions to get the latest data from the server
-      await loadSessions(); // Call the function to reload sessions
+      setShowModal(false);
     } catch (error) {
-      console.error("Error creating session:", error);
-      alert("세션 생성에 실패했습니다. 다시 시도해주세요.");
+      console.error("Error submitting session:", error);
+      alert("세션 저장에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
   const handleDeleteSession = async (id: string) => {
     try {
-      // Make a DELETE request to the backend
-      const response = await fetch(
-        `/api/patients/${patientId}/sessions/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/patients/${patientId}/sessions/${id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to delete the session");
+        throw new Error("Failed to delete session");
       }
 
-      // Remove the session from the state
-      setSessions((prevSessions) =>
-        prevSessions.filter((session) => session.id !== id)
-      );
+      setSessions((prevSessions) => prevSessions.filter((session) => session.id !== id));
     } catch (error) {
       console.error("Error deleting session:", error);
       alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
@@ -123,20 +171,32 @@ const PatientDetailPage: React.FC = () => {
         <div className={styles.addSessionCard} onClick={handleAddSession}>
           <span className={styles.addButton}>+</span>
         </div>
-        {sessions && sessions.length > 0 ? (
+        {sessions.length > 0 ? (
           sessions.map((session) => (
             <SessionCard
               key={session.id}
               id={session.id}
               dateTime={session.session_datetime}
+              modifiedDateTime={session.modified_at}
+              title={session.title}
               onViewDetails={() => router.push(`../sessions/${session.id}`)}
-              onDelete={handleDeleteSession}
+              onDelete={() => handleDeleteSession(session.id)}
+              onEdit={() => handleEditSession(session)}
             />
           ))
         ) : (
-          <div />
+          <p>세션이 없습니다.</p>
         )}
       </div>
+      {showModal && (
+        <SessionAddModal
+          session={selectedSession || undefined}
+          patient={patientInfo}
+          isEditMode={isEditMode}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitSession}
+        />
+      )}
     </div>
   );
 };

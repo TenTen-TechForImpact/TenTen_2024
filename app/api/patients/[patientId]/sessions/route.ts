@@ -11,25 +11,25 @@ export async function POST(
 ) {
   try {
     // 요청 바디에서 JSON 데이터를 파싱
-    const { "session-datetime": sessionDatetime, title } = await req.json();
+    const { session_datetime, title } = await req.json();
     const patientId = params.patientId;
 
     // 필수 데이터가 있는지 확인
-    if (!sessionDatetime || !patientId) {
+    if (!session_datetime || !patientId) {
       return NextResponse.json(
         { error: "Required fields are missing or invalid patient ID" },
         { status: 400 }
       );
     }
 
-    const sessionTitle = title || "Untitled Session";    
+    const sessionTitle = title || "Untitled Session";
 
     // Session 테이블에 데이터 삽입
     const { data, error } = await supabase
       .from("Session")
       .insert([
         {
-          session_datetime: sessionDatetime,
+          session_datetime: session_datetime,
           title: sessionTitle,
           patient_id: patientId,
           patient_summary: "", // 초기값 설정

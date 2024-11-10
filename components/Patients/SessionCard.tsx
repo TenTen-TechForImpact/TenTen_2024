@@ -1,22 +1,28 @@
-"use client";
+// SessionCard.tsx
 
 import React, { useState } from "react";
 import ActionButton from "../ActionButton";
-import DeleteModal from "../DeleteModal"; // Import the DeleteModal component
+import DeleteModal from "../DeleteModal";
 import styles from "./SessionCard.module.css";
 
 interface SessionCardProps {
   id: string;
-  dateTime: string;
+  dateTime: Date;
+  modifiedDateTime: Date;
+  title: string;
   onViewDetails: () => void;
-  onDelete: (id: string) => void;
+  onDelete: () => void;
+  onEdit: () => void;
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({
   id,
   dateTime,
+  modifiedDateTime,
+  title,
   onViewDetails,
   onDelete,
+  onEdit,
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -25,7 +31,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
   };
 
   const handleConfirmDelete = () => {
-    onDelete(id);
+    onDelete();
     setShowDeleteModal(false);
   };
 
@@ -33,30 +39,43 @@ const SessionCard: React.FC<SessionCardProps> = ({
     setShowDeleteModal(false);
   };
 
-  // Extract the date in the format YYYY-MM-DD
-  const date = new Date(dateTime).toISOString().split("T")[0];
+  const formattedDateTime = dateTime.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const formattedModifiedDateTime = modifiedDateTime.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 
   return (
     <div className={styles.sessionCard}>
       <div className={styles.deleteButtonContainer}>
+        <button className={styles.editButton} onClick={onEdit}>
+          🖊️
+        </button>
         <button className={styles.deleteButton} onClick={handleDeleteClick}>
-          X
+          🗑️
         </button>
       </div>
-      <div className={styles.cardHeader}>
-        <span>상담 날짜: {date}</span>
+      <div className={styles.cardContent}>
+        <p className={styles.cardText}>상담일: {formattedDateTime}</p>
+        <p className={styles.cardText}>수정일: {formattedModifiedDateTime}</p>
+        <p className={styles.cardText}>제목: {title}</p>
       </div>
-      <div className={styles.buttonContainer}>
+      <div className={styles.actionButtonContainer}>
         <ActionButton
           text="상담 내용 보기"
           onClick={onViewDetails}
-          width={250}
-          height={50}
-          fontSize={16}
-        />
-        <ActionButton
-          text="저장하기"
-          onClick={() => {}}
           width={250}
           height={50}
           fontSize={16}

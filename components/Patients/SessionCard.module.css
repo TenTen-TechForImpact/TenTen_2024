@@ -1,36 +1,9 @@
 .sessionCard {
-  background: var(--secondary-color);
-  border-radius: var(--border-medium);
-  padding: 20px;
-  width: 270px;
-  height: 157px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
   position: relative;
-}
-
-.sessionCard {
   background: var(--secondary-color);
   border-radius: var(--border-medium);
   padding: 20px;
   width: 270px;
-  height: 157px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.cardHeader {
-  font-weight: bold;
-  text-align: center;
-  font-size: 20px;
-  user-select: none;
-}
-
-.buttonContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,10 +14,13 @@
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  gap: 8px;
+  /* 삭제 버튼과 수정 버튼 사이 간격 */
 }
 
-.deleteButton {
-  background: rgb(216, 68, 68);
+.deleteButton,
+.editButton {
   color: white;
   border: none;
   border-radius: 50%;
@@ -52,6 +28,38 @@
   width: 24px;
   height: 24px;
   font-size: 16px;
-  line-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton {
+  background: rgb(216, 68, 68);
+  /* 빨간색 배경 */
+}
+
+.editButton {
+  background: rgb(68, 123, 216);
+  /* 파란색 배경 */
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 15px;
+  /* 텍스트를 아래로 조금만 이동 */
+}
+
+.cardText {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000ee;
   text-align: center;
+}
+
+.actionButtonContainer {
+  margin-top: 5px;
+  /* 버튼과 텍스트 사이의 마진을 줄임 */
 }
