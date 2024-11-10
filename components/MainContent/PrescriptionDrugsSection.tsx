@@ -58,7 +58,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
   }, [medicationList]);
 
   const handleAddDrug = () => {
-    if (newDrug.name && newDrug.purpose && newDrug.days !== "") {
+    if (newDrug.name) {
       const updatedDrugs = [...drugs, newDrug];
       const updatedList = {
         ...medicationList,
@@ -171,7 +171,7 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
             <tr key={index}>
               <td>{index + 1}</td>
               <td>{drug.name}</td>
-              <td>{drug.days}일</td>
+              {drug.days === "" ? <td></td> : <td>{drug.days}일</td>}
               <td>{drug.purpose}</td>
               <td>{drug.status}</td>
               <td>

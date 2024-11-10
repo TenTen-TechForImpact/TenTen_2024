@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
@@ -9,16 +9,20 @@ import Header from "../components/Header/Header";
 import styles from "./ConsultationRecordPage.module.css";
 
 const ConsultationRecordPage: React.FC = () => {
+  const pathname = usePathname();
+  const sessionId = pathname.split("/").pop();
+  const router = useRouter();
+
+  // 로딩 상태 관리
+  const [loading, setLoading] = useState(true);
   // 상담 데이터 상태 관리
   const [activeTab, setActiveTab] = useState<"firstSession" | "followUp">(
     "firstSession"
   );
   const [isFirstSessionCompleted, setIsFirstSessionCompleted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const pathname = usePathname();
-  const sessionId = pathname.split("/").pop();
-  const router = useRouter();
 
+  //상담 정보 관리
   const [patientInfo, setPatientInfo] = useState({
     personal_info: {
       name: "",
@@ -85,7 +89,6 @@ const ConsultationRecordPage: React.FC = () => {
       },
     },
   });
-  // 약물 목록 상태 관리
   const [medicationList, setMedicationList] = useState({
     current_medications: {
       ethical_the_counter_drugs: {
@@ -102,8 +105,7 @@ const ConsultationRecordPage: React.FC = () => {
       },
     },
   });
-
-  const [preQuestions, setPreQuestions] = useState<string[]>([]);
+  const [preQuestions, setPreQuestions] = useState({ questions: { list: [] } });
   const [sessionSummaryData, setSessionSummaryData] = useState([
     {
       topic_id: 1,
@@ -114,17 +116,70 @@ const ConsultationRecordPage: React.FC = () => {
       content: "Q. 운동 계획을 어떻게 세우는 게 좋을까요?",
     },
   ]);
-
   const [pharmacistIntervention, setPharmacistIntervention] = useState({
     pharmacist_comments: "",
   });
-
   const [careNote, setCareNote] = useState({
     care_note: "",
   });
 
+  // 병합된 전체 상담 생성
+  const getMergedState = () => ({
+    patientInfo,
+    medicationList,
+    preQuestions,
+    sessionSummaryData,
+    pharmacistIntervention,
+    careNote,
+  });
+
+  // PUT 요청 함수
+  const sendPutRequest = useCallback(() => {
+    const mergedState = getMergedState();
+
+    console.log("Sending PUT request with:", mergedState);
+
+    fetch(`/api/sessions/${sessionId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(mergedState),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to sync data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data synced successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error syncing data:", error);
+      });
+  }, [
+    patientInfo,
+    medicationList,
+    preQuestions,
+    sessionSummaryData,
+    pharmacistIntervention,
+    careNote,
+  ]);
+
+  // 주기적 PUT 요청
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      sendPutRequest();
+    }, 15000); // 15초마다 동기화
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [sendPutRequest]);
+
+  //데이터 무결성 확인 및 상태 설정
   useEffect(() => {
     const fetchAndUpdateData = async () => {
+      setLoading(true);
       try {
         // 데이터 가져오기
         const response = await fetch(`/api/sessions/${sessionId}`);
@@ -200,6 +255,7 @@ const ConsultationRecordPage: React.FC = () => {
                 is_prescription_stored: "아니오",
               },
             },
+            questions: { list: [] },
             current_medications: {
               ethical_the_counter_drugs: { count: 0, list: [] },
               over_the_counter_drugs: { count: 0, list: [] },
@@ -247,6 +303,7 @@ const ConsultationRecordPage: React.FC = () => {
           }
         } else {
           console.log("Data is valid, no update needed.");
+          //console.log(data.temp);
         }
 
         // 데이터를 상태로 설정
@@ -254,9 +311,11 @@ const ConsultationRecordPage: React.FC = () => {
         setMedicationList(data.temp);
         setPharmacistIntervention(data.temp);
         setCareNote(data.temp);
-        console.log(medicationList);
+        setPreQuestions(data.temp);
       } catch (error) {
         console.error("Error fetching or sending update request:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -387,6 +446,10 @@ const ConsultationRecordPage: React.FC = () => {
       };
     }
 
+    if (!data.questions) {
+      filteredData.questions = data.questions || { list: [] };
+    }
+
     if (!data.pharmacist_comments) {
       filteredData.pharmacist_comments = data.pharmacist_comments || "";
     }
@@ -394,6 +457,7 @@ const ConsultationRecordPage: React.FC = () => {
     if (!data.care_note) {
       filteredData.care_note = data.care_note || "";
     }
+
     console.log(filteredData);
     return filteredData;
   };
@@ -491,11 +555,16 @@ const ConsultationRecordPage: React.FC = () => {
     }
 
     // 기타 검증: temp 안에 필요한 필드가 존재하는지 확인
-    if (!("pharmacist_comments" in temp) || !("care_note" in temp)) {
+    if (
+      !("pharmacist_comments" in temp) ||
+      !("care_note" in temp) ||
+      !("questions" in temp)
+    ) {
       console.log(
-        "Pharmacist comments or care note is missing or undefined:",
+        "Pharmacist comments or care note or questions is missing or undefined:",
         temp.pharmacist_comments,
-        temp.care_note
+        temp.care_note,
+        temp.questions
       );
       return true;
     }
@@ -549,22 +618,26 @@ const ConsultationRecordPage: React.FC = () => {
           />
         </aside>
         <main className={styles.mainContent}>
-          <MainContent
-            isFollowUp={activeTab === "followUp"}
-            onCompleteFirstSession={handleCompleteFirstSession}
-            onRecordingStatusChange={handleRecordingStatusChange}
-            patientInfo={patientInfo}
-            setPatientInfo={setPatientInfo}
-            preQuestions={preQuestions}
-            setPreQuestions={setPreQuestions}
-            medicationList={medicationList}
-            setMedicationList={setMedicationList}
-            careNote={careNote}
-            setCareNote={setCareNote}
-            pharmacistIntervention={pharmacistIntervention}
-            setPharmacistIntervention={setPharmacistIntervention}
-            sessionId={sessionId}
-          />
+          {loading ? (
+            <h2>상담 내용 로딩 중...</h2> // 로딩 메시지
+          ) : (
+            <MainContent
+              isFollowUp={activeTab === "followUp"}
+              onCompleteFirstSession={handleCompleteFirstSession}
+              onRecordingStatusChange={handleRecordingStatusChange}
+              patientInfo={patientInfo}
+              setPatientInfo={setPatientInfo}
+              preQuestions={preQuestions}
+              setPreQuestions={setPreQuestions}
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
+              careNote={careNote}
+              setCareNote={setCareNote}
+              pharmacistIntervention={pharmacistIntervention}
+              setPharmacistIntervention={setPharmacistIntervention}
+              sessionId={sessionId}
+            />
+          )}
         </main>
         <aside className={styles.rightSidebar}>
           <FirstSessionSummary

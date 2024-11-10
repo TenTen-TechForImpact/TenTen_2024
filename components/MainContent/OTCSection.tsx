@@ -58,7 +58,7 @@ const OTCSection: React.FC<Props> = ({
   });
 
   const handleAddDrug = () => {
-    if (newDrug.name && newDrug.purpose && newDrug.unit) {
+    if (newDrug.name) {
       const updatedDrugs = [...drugs, newDrug];
       const updatedList = {
         ...medicationList,

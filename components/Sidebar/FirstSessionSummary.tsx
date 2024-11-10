@@ -1,9 +1,15 @@
 import React from "react";
 import styles from "./FirstSessionSummary.module.css";
 
+interface PreQuestions {
+  questions?: {
+    list: string[];
+  };
+}
+
 interface FirstSessionSummaryProps {
   patientInfo: any;
-  preQuestions: string[];
+  preQuestions: PreQuestions;
   sessionSummaryData: { topic_id: number; content: string }[];
 }
 
@@ -151,8 +157,11 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
 
       <div className={styles.section}>
         <h4>상담 전 질문</h4>
-        {Array.isArray(preQuestions) && preQuestions.length > 0 ? (
-          preQuestions.map((question, index) => <p key={index}>{question}</p>)
+        {Array.isArray(preQuestions.questions.list) &&
+        preQuestions.questions.list.length > 0 ? (
+          preQuestions.questions.list.map((question, index) => (
+            <p key={index}>{question}</p>
+          ))
         ) : (
           <p>질문 없음</p>
         )}
