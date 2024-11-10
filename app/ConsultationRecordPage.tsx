@@ -280,6 +280,13 @@ const ConsultationRecordPage: React.FC = () => {
           }
         }
 
+        // 데이터를 상태로 설정
+        setPatientInfo(data.temp);
+        setMedicationList(data.temp);
+        setPharmacistIntervention(data.temp);
+        setCareNote(data.temp);
+        setPreQuestions(data.temp);
+
         // 데이터가 불완전할 경우에만 PATCH 요청 수행
         if (isDataInvalid(data)) {
           console.log("Data is incomplete, sending update request...");
@@ -296,6 +303,13 @@ const ConsultationRecordPage: React.FC = () => {
             body: JSON.stringify(updatedData),
           });
 
+          // 상태 업데이트
+          setPatientInfo(updatedData);
+          setMedicationList(updatedData);
+          setPharmacistIntervention(updatedData);
+          setCareNote(updatedData);
+          setPreQuestions(updatedData);
+
           if (!patchResponse.ok) {
             console.error("Error updating session:", patchResponse.statusText);
           } else {
@@ -305,13 +319,6 @@ const ConsultationRecordPage: React.FC = () => {
           console.log("Data is valid, no update needed.");
           //console.log(data.temp);
         }
-
-        // 데이터를 상태로 설정
-        setPatientInfo(data.temp);
-        setMedicationList(data.temp);
-        setPharmacistIntervention(data.temp);
-        setCareNote(data.temp);
-        setPreQuestions(data.temp);
       } catch (error) {
         console.error("Error fetching or sending update request:", error);
       } finally {
@@ -640,11 +647,15 @@ const ConsultationRecordPage: React.FC = () => {
           )}
         </main>
         <aside className={styles.rightSidebar}>
-          <FirstSessionSummary
-            patientInfo={patientInfo}
-            preQuestions={preQuestions}
-            sessionSummaryData={sessionSummaryData}
-          />
+          {loading ? (
+            <h2>상담 내용 로딩 중...</h2> // 로딩 메시지
+          ) : (
+            <FirstSessionSummary
+              patientInfo={patientInfo}
+              preQuestions={preQuestions}
+              sessionSummaryData={sessionSummaryData}
+            />
+          )}
         </aside>
       </div>
     </div>
