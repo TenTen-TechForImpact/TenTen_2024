@@ -11,7 +11,7 @@ export async function POST(
 ) {
   try {
     // 요청 바디에서 JSON 데이터를 파싱
-    const { "session-datetime": sessionDatetime } = await req.json();
+    const { "session-datetime": sessionDatetime, title } = await req.json();
     const patientId = params.patientId;
 
     // 필수 데이터가 있는지 확인
@@ -22,12 +22,15 @@ export async function POST(
       );
     }
 
+    const sessionTitle = title || "Untitled Session";    
+
     // Session 테이블에 데이터 삽입
     const { data, error } = await supabase
       .from("Session")
       .insert([
         {
           session_datetime: sessionDatetime,
+          title: sessionTitle,
           patient_id: patientId,
           patient_summary: "", // 초기값 설정
         },
