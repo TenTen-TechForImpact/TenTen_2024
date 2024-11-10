@@ -10,11 +10,12 @@ export async function GET(
 ) {
   const { sessionId } = params;
 
-  // temp 필드만 조회
+  // 상담 카드 조회
+  // title, session_datetime, created_at, modified_at, temp필드 조회
   console.log("Fetching temp field for session with ID:", sessionId);
   const { data, error } = await supabase
     .from("Session")
-    .select("temp")
+    .select("title, session_datetime, created_at, modified_at, temp")
     .eq("id", sessionId)
     .single();
 
@@ -26,6 +27,7 @@ export async function GET(
   return NextResponse.json(data);
 }
 
+// 상담 카드 수정
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { sessionId: string } }

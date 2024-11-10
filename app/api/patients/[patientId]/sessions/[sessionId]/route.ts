@@ -40,3 +40,63 @@ export async function DELETE(
     { status: 200 }
   );
 }
+
+// 상담 카드 정보 수정: PUT
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { sessionId: string } }
+) {
+  const { sessionId } = params;
+
+  if (!sessionId) {
+    return NextResponse.json(
+      { error: "Session ID is required" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // 요청 바디에서 업데이트할 데이터 가져오기
+    const { title, session_datetime } = await req.json();
+
+    // 필수 데이터 확인
+    if (!title || !session_datetime) {
+      return NextResponse.json(
+        { error: "Both title and session_datetime are required" },
+        { status: 400 }
+      );
+    }
+
+    // 업데이트할 필드 객체
+    const updatedFields = {
+      title,
+      session_datetime
+    };
+
+    // 세션 정보 업데이트
+    console.log("Updating session with ID:", sessionId);
+    const { data, error } = await supabase
+      .from("Session")
+      .update(updatedFields)
+      .eq("id", sessionId)
+      .single();
+
+    // 에러 처리
+    if (error) {
+      console.error("Error updating session:", error.message);
+      return NextResponse.json(
+        { error: "Failed to update session" },
+        { status: 500 }
+      );
+    }
+
+    // 성공적으로 업데이트된 데이터 반환
+    return NextResponse.json(data, { status: 200 });
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return NextResponse.json(
+      { error: "Invalid request data" },
+      { status: 400 }
+    );
+  }
+}
