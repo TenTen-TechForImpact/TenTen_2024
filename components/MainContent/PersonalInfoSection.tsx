@@ -1,10 +1,12 @@
 import React from "react";
-import { usePathname } from "next/navigation";
+import debounce from "lodash/debounce";
 import styles from "./PersonalInfoSection.module.css";
+import { useState, useEffect, useCallback } from "react";
 
 interface PersonalInfoSectionProps {
   patientInfo: any;
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
+  sessionId: string;
 }
 
 type QuestionType =
@@ -31,10 +33,15 @@ interface Question {
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   patientInfo,
   setPatientInfo,
+  sessionId,
 }) => {
-  //sessionId 획득
-  const pathname = usePathname();
-  const sessionId = pathname.split("/").pop();
+  const [lastBlurredValue, setLastBlurredValue] = useState({}); // 직전 값 저장 (변경 시에만 blur함수 작동할 수 있도록)
+
+  useEffect(() => {
+    if (Object.keys(lastBlurredValue).length === 0) {
+      setLastBlurredValue(patientInfo); // 초기값 한 번만 설정
+    }
+  }, []);
 
   // 경로를 올바르게 생성하는 함수
   const constructFieldPath = (baseField: string, subField?: string) => {
@@ -68,6 +75,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
       value
     );
     setPatientInfo(updatedPatientInfo);
+    //console.log("hanled input change");
   };
 
   // 중첩된 필드 값을 가져오는 함수
@@ -80,32 +88,54 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   // 필드 값이 변경된 후 서버에 전송하는 함수
   const handleBlur = (baseField: string, subField?: string) => {
     const fieldPath = constructFieldPath(baseField, subField);
+    const newValue = getNestedValue(patientInfo, fieldPath);
+    const previousValue = getNestedValue(lastBlurredValue, fieldPath); // 직전 값
+
+    // 값이 동일하면 PATCH 생략
+    if (newValue === previousValue) {
+      //console.log("No changes detected, skipping PATCH request.");
+      return;
+    }
+
     const updatedField = {
       [fieldPath]: getNestedValue(patientInfo, fieldPath),
     };
-    console.log("Field updated:", JSON.stringify(updatedField));
+    //console.log("Field updated:", JSON.stringify(updatedField));
 
-    // 여기에 서버에 PATCH 요청을 보낼 수 있습니다
-    fetch(`/api/sessions/${sessionId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedField),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update data");
-        }
-        return response.json();
-      })
-      .then((updatedField) => {
-        console.log("Data updated successfully:", updatedField);
-      })
-      .catch((error) => {
-        console.error("Error updating data:", error);
-      });
+    setLastBlurredValue((prev) =>
+      updateNestedField({ ...prev }, fieldPath, newValue)
+    );
+
+    // 변경 사항을 debounce로 전달
+    debouncedPatch(updatedField);
   };
+
+  const debouncedPatch = useCallback(
+    debounce((updates) => {
+      if (Object.keys(updates).length === 0) return;
+
+      fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates), // 직접 업데이트 값 전송
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update data");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          //console.log("Data updated successfully:", data);
+        })
+        .catch((error) => {
+          console.error("Error updating data:", error);
+        });
+    }, 1000),
+    []
+  );
 
   const renderInputField = (question: Question) => {
     const { label, field, type, options, subFields } = question;
@@ -212,9 +242,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 placeholder="기타"
                 value={
                   getNestedValue(patientInfo, field) !==
-                    options.find(
-                      (opt) => opt === getNestedValue(patientInfo, field)
-                    )
+                  options.find(
+                    (opt) => opt === getNestedValue(patientInfo, field)
+                  )
                     ? getNestedValue(patientInfo, field)
                     : ""
                 }
@@ -234,10 +264,11 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${getNestedValue(patientInfo, field) === "예"
+                className={`${styles.yesNoButton} ${
+                  getNestedValue(patientInfo, field) === "예"
                     ? styles.active
                     : ""
-                  }`}
+                }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -256,10 +287,11 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${getNestedValue(patientInfo, field) === "아니오"
+                className={`${styles.yesNoButton} ${
+                  getNestedValue(patientInfo, field) === "아니오"
                     ? styles.active
                     : ""
-                  }`}
+                }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);
@@ -293,8 +325,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${isYesSelected ? styles.active : ""
-                  }`}
+                className={`${styles.yesNoButton} ${
+                  isYesSelected ? styles.active : ""
+                }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -307,8 +340,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${isNoSelected ? styles.active : ""
-                  }`}
+                className={`${styles.yesNoButton} ${
+                  isNoSelected ? styles.active : ""
+                }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);
@@ -357,8 +391,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             <label className={styles.label}>{label}</label>
             <div className={styles.yesNoContainer}>
               <button
-                className={`${styles.yesNoButton} ${isYesSelectedForSingleCheckbox ? styles.active : ""
-                  }`}
+                className={`${styles.yesNoButton} ${
+                  isYesSelectedForSingleCheckbox ? styles.active : ""
+                }`}
                 onClick={() => {
                   handleInputChange(field, "예");
                   handleBlur(field);
@@ -373,8 +408,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${isNoSelectedForSingleCheckbox ? styles.active : ""
-                  }`}
+                className={`${styles.yesNoButton} ${
+                  isNoSelectedForSingleCheckbox ? styles.active : ""
+                }`}
                 onClick={() => {
                   handleInputChange(field, "아니오");
                   handleBlur(field);

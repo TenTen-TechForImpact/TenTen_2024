@@ -117,3 +117,45 @@ export async function PATCH(
   // 수정된 temp 데이터를 JSON 형식으로 반환
   return NextResponse.json(data);
 }
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { sessionId: string } }
+) {
+  const { sessionId } = params;
+
+  // 요청에서 전체 데이터를 가져오기
+  const updatedData = await req.json();
+
+  // 데이터가 비어 있으면 요청 취소
+  if (!updatedData || Object.keys(updatedData).length === 0) {
+    console.warn(`Empty data received for session ID: ${sessionId}`);
+    return NextResponse.json(
+      { error: "Data cannot be empty" },
+      { status: 400 }
+    );
+  }
+
+  console.log("Replacing temp field for session with ID:", sessionId);
+
+  // temp 필드 업데이트 (전체 교체)
+  const { data, error } = await supabase
+    .from("Session")
+    .update({ temp: updatedData }) // 전체 데이터로 교체
+    .eq("id", sessionId)
+    .select() // 결과 반환
+    .single();
+
+  if (error) {
+    console.error("Error replacing session data:", error.message);
+    return NextResponse.json(
+      { error: "Error replacing session data" },
+      { status: 500 }
+    );
+  }
+
+  console.log("Replace successful:", data);
+
+  // 수정된 temp 데이터를 JSON 형식으로 반환
+  return NextResponse.json(data);
+}

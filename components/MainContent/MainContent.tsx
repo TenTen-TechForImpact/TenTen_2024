@@ -17,8 +17,8 @@ interface MainContentProps {
   onRecordingStatusChange: (isRecording: boolean) => void;
   patientInfo: any;
   setPatientInfo: React.Dispatch<React.SetStateAction<any>>;
-  preQuestions: string[];
-  setPreQuestions: React.Dispatch<React.SetStateAction<string[]>>;
+  preQuestions: any;
+  setPreQuestions: React.Dispatch<React.SetStateAction<any>>;
   sessionId: string | null;
   medicationList: any; // 나중에 타입 제대로 지정
   setMedicationList: React.Dispatch<React.SetStateAction<any>>; // 나중에 타입 제대로 지정
@@ -56,12 +56,14 @@ const MainContent: React.FC<MainContentProps> = ({
             <PersonalInfoSection
               patientInfo={patientInfo}
               setPatientInfo={setPatientInfo}
+              sessionId={sessionId}
             />
           </section>
           <section id="preQuestions" className={styles.section}>
             <PreQuestionsSection
               preQuestions={preQuestions}
               setPreQuestions={setPreQuestions}
+              sessionId={sessionId}
             />
           </section>
           <section id="prescriptionDrugs" className={styles.section}>

@@ -42,6 +42,8 @@ const PatientDetailPage: React.FC = () => {
   const pathname = usePathname();
   const patientId = pathname.split("/").pop();
 
+  const [loading, setLoading] = useState(true);
+
   const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -49,7 +51,7 @@ const PatientDetailPage: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPatientInfo = async () => {
+  const loadSessions = async () => {
     try {
       const data = await fetchPatientInfo(patientId as string);
       const formattedPatientInfo = {
@@ -70,12 +72,14 @@ const PatientDetailPage: React.FC = () => {
       console.log("Fetched patient data:", data);
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!patientId) return;
-    loadPatientInfo();
+    loadSessions();
   }, [patientId]);
 
   const fetchPatientInfo = async (patientId: string): Promise<{ patient: Patient; sessions: Session[] }> => {
@@ -123,7 +127,7 @@ const PatientDetailPage: React.FC = () => {
         if (!response.ok) {
           throw new Error("Failed to update session");
         }
-        await loadPatientInfo()
+        await loadSessions()
       } else {
         const response = await fetch(`/api/patients/${patientId}/sessions`, {
           method: "POST",
@@ -136,7 +140,7 @@ const PatientDetailPage: React.FC = () => {
         if (!response.ok) {
           throw new Error("Failed to create session");
         }
-        await loadPatientInfo();
+        await loadSessions();
       }
       setShowModal(false);
     } catch (error) {
@@ -171,7 +175,7 @@ const PatientDetailPage: React.FC = () => {
         <div className={styles.addSessionCard} onClick={handleAddSession}>
           <span className={styles.addButton}>+</span>
         </div>
-        {sessions.length > 0 ? (
+        {sessions && sessions.length > 0 ? (
           sessions.map((session) => (
             <SessionCard
               key={session.id}
