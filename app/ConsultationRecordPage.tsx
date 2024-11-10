@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
@@ -9,19 +9,20 @@ import Header from "../components/Header/Header";
 import styles from "./ConsultationRecordPage.module.css";
 
 const ConsultationRecordPage: React.FC = () => {
+  const pathname = usePathname();
+  const sessionId = pathname.split("/").pop();
+  const router = useRouter();
+
   // 로딩 상태 관리
   const [loading, setLoading] = useState(true);
-
   // 상담 데이터 상태 관리
   const [activeTab, setActiveTab] = useState<"firstSession" | "followUp">(
     "firstSession"
   );
   const [isFirstSessionCompleted, setIsFirstSessionCompleted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const pathname = usePathname();
-  const sessionId = pathname.split("/").pop();
-  const router = useRouter();
 
+  //상담 정보 관리
   const [patientInfo, setPatientInfo] = useState({
     personal_info: {
       name: "",
@@ -88,7 +89,6 @@ const ConsultationRecordPage: React.FC = () => {
       },
     },
   });
-  // 약물 목록 상태 관리
   const [medicationList, setMedicationList] = useState({
     current_medications: {
       ethical_the_counter_drugs: {
@@ -105,7 +105,6 @@ const ConsultationRecordPage: React.FC = () => {
       },
     },
   });
-
   const [preQuestions, setPreQuestions] = useState({ questions: { list: [] } });
   const [sessionSummaryData, setSessionSummaryData] = useState([
     {
@@ -117,15 +116,67 @@ const ConsultationRecordPage: React.FC = () => {
       content: "Q. 운동 계획을 어떻게 세우는 게 좋을까요?",
     },
   ]);
-
   const [pharmacistIntervention, setPharmacistIntervention] = useState({
     pharmacist_comments: "",
   });
-
   const [careNote, setCareNote] = useState({
     care_note: "",
   });
 
+  // 병합된 전체 상담 생성
+  const getMergedState = () => ({
+    patientInfo,
+    medicationList,
+    preQuestions,
+    sessionSummaryData,
+    pharmacistIntervention,
+    careNote,
+  });
+
+  // PUT 요청 함수
+  const sendPutRequest = useCallback(() => {
+    const mergedState = getMergedState();
+
+    console.log("Sending PUT request with:", mergedState);
+
+    fetch(`/api/sessions/${sessionId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(mergedState),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to sync data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data synced successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error syncing data:", error);
+      });
+  }, [
+    patientInfo,
+    medicationList,
+    preQuestions,
+    sessionSummaryData,
+    pharmacistIntervention,
+    careNote,
+  ]);
+
+  // 주기적 PUT 요청
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      sendPutRequest();
+    }, 15000); // 15초마다 동기화
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
+  }, [sendPutRequest]);
+
+  //데이터 무결성 확인 및 상태 설정
   useEffect(() => {
     const fetchAndUpdateData = async () => {
       setLoading(true);
@@ -252,7 +303,7 @@ const ConsultationRecordPage: React.FC = () => {
           }
         } else {
           console.log("Data is valid, no update needed.");
-          console.log(data.temp);
+          //console.log(data.temp);
         }
 
         // 데이터를 상태로 설정
