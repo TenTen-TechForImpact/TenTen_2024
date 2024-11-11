@@ -123,14 +123,42 @@ const ConsultationRecordPage: React.FC = () => {
     care_note: "",
   });
 
+  function updateStatesFromData(updatedData) {
+    setPatientInfo({
+      personal_info: updatedData.personal_info,
+      consultation_info: updatedData.consultation_info,
+      medical_conditions: updatedData.medical_conditions,
+      lifestyle: updatedData.lifestyle,
+      medication_management: updatedData.medication_management,
+    });
+
+    setMedicationList({
+      current_medications: updatedData.current_medications,
+    });
+
+    setPharmacistIntervention({
+      pharmacist_comments: updatedData.pharmacist_comments,
+    });
+
+    setCareNote({
+      care_note: updatedData.care_note,
+    });
+    setPreQuestions({
+      questions: updatedData.questions,
+    });
+  }
+
   // 병합된 전체 상담 생성
   const getMergedState = () => ({
-    patientInfo,
-    medicationList,
-    preQuestions,
-    sessionSummaryData,
-    pharmacistIntervention,
-    careNote,
+    personal_info: patientInfo.personal_info,
+    consultation_info: patientInfo.consultation_info,
+    medical_conditions: patientInfo.medical_conditions,
+    lifestyle: patientInfo.lifestyle,
+    medication_management: patientInfo.medication_management,
+    current_medications: medicationList.current_medications,
+    questions: preQuestions.questions,
+    pharmacist_comments: pharmacistIntervention.pharmacist_comments,
+    care_note: careNote.care_note,
   });
 
   // PUT 요청 함수
@@ -171,7 +199,7 @@ const ConsultationRecordPage: React.FC = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       sendPutRequest();
-    }, 15000); // 15초마다 동기화
+    }, 10000); // 10초마다 동기화
 
     return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 정리
   }, [sendPutRequest]);
@@ -281,11 +309,7 @@ const ConsultationRecordPage: React.FC = () => {
         }
 
         // 데이터를 상태로 설정
-        setPatientInfo(data.temp);
-        setMedicationList(data.temp);
-        setPharmacistIntervention(data.temp);
-        setCareNote(data.temp);
-        setPreQuestions(data.temp);
+        updateStatesFromData(data.temp);
 
         // 데이터가 불완전할 경우에만 PATCH 요청 수행
         if (isDataInvalid(data)) {
@@ -304,11 +328,7 @@ const ConsultationRecordPage: React.FC = () => {
           });
 
           // 상태 업데이트
-          setPatientInfo(updatedData);
-          setMedicationList(updatedData);
-          setPharmacistIntervention(updatedData);
-          setCareNote(updatedData);
-          setPreQuestions(updatedData);
+          updateStatesFromData(updatedData);
 
           if (!patchResponse.ok) {
             console.error("Error updating session:", patchResponse.statusText);
@@ -578,26 +598,6 @@ const ConsultationRecordPage: React.FC = () => {
 
     // 모든 검증을 통과하면 데이터가 유효함
     return false;
-  };
-
-  const patchFormattedData = async (data: any) => {
-    try {
-      const response = await fetch(`/api/sessions/${sessionId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("PATCH 요청이 실패했습니다.");
-      }
-
-      console.log("데이터가 성공적으로 업데이트되었습니다.");
-    } catch (error) {
-      console.error("PATCH 요청 중 오류 발생:", error);
-    }
   };
 
   const handleRecordingStatusChange = (recordingStatus: boolean) => {

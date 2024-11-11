@@ -19,34 +19,6 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
   sessionId,
 }) => {
   const [newQuestion, setNewQuestion] = useState("");
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
-
-  // 서버에서 데이터 로드 후 초기화
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch questions");
-        }
-        const data = await response.json();
-
-        // questions 필드가 없을 경우 기본값 제공
-        if (!data.questions || !Array.isArray(data.questions.list)) {
-          setPreQuestions({ questions: { list: [] } });
-        } else {
-          setPreQuestions(data);
-        }
-      } catch (error) {
-        console.error("Error fetching questions:", error);
-        setPreQuestions({ questions: { list: [] } });
-      } finally {
-        setLoading(false); // 로딩 종료
-      }
-    };
-
-    fetchQuestions();
-  }, [sessionId, setPreQuestions]);
 
   const updateQuestionsOnServer = async (updatedQuestions: string[]) => {
     try {
@@ -62,6 +34,7 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
         throw new Error("Failed to update questions");
       }
       console.log("Questions updated successfully");
+      console.log(updatedQuestions);
     } catch (error) {
       console.error("Error updating questions:", error);
     }
@@ -92,23 +65,19 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
   return (
     <div className={styles.section}>
       <h3 className={styles.sectionTitle}>상담 전 질문</h3>
-      {loading ? ( // 로딩 중 메시지 표시
-        <p>데이터를 불러오는 중입니다...</p>
-      ) : (
-        <ul className={styles.questionList}>
-          {preQuestions.questions?.list.map((question, index) => (
-            <li key={question} className={styles.questionItem}>
-              {question}
-              <button
-                className={styles.deleteButton}
-                onClick={() => handleDeleteQuestion(index)}
-              >
-                삭제
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className={styles.questionList}>
+        {preQuestions.questions?.list.map((question, index) => (
+          <li key={question} className={styles.questionItem}>
+            {question}
+            <button
+              className={styles.deleteButton}
+              onClick={() => handleDeleteQuestion(index)}
+            >
+              삭제
+            </button>
+          </li>
+        ))}
+      </ul>
       <textarea
         className={styles.textarea}
         value={newQuestion}
