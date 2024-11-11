@@ -90,7 +90,9 @@ const PatientCard: React.FC<PatientProps> = ({
               alt="Phone Icon"
               className={styles.icon}
             />
-            <div className={styles.phoneTooltip}>{phone_number}</div>
+            <div className={styles.phoneTooltip}>
+              {phone_number ? phone_number : "없음"}
+            </div>
           </div>
         </div>
         <div className={styles.patientDetails}>

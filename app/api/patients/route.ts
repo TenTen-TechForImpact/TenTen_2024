@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       await req.json();
 
     // 필수 데이터가 있는지 확인
-    if (!name || !gender || !phone_number) {
+    if (!name || !gender) {
       return NextResponse.json(
         { error: "Some required fields not exist" },
         { status: 400 }
