@@ -108,7 +108,6 @@ export async function POST(
           title: sessionTitle,
           patient_id: patientId,
           patient_summary: "",
-          temp: updatedTemp,
         },
       ])
       .single(); // 삽입 후 단일 레코드 반환
