@@ -60,17 +60,17 @@ export async function PUT(
     const { title, session_datetime } = await req.json();
 
     // 필수 데이터 확인
-    if (!title || !session_datetime) {
+    if (!session_datetime) {
       return NextResponse.json(
-        { error: "Both title and session_datetime are required" },
+        { error: "session_datetime are required" },
         { status: 400 }
       );
     }
 
     // 업데이트할 필드 객체
     const updatedFields = {
-      title,
-      session_datetime
+      title: title || "제목 없음",
+      session_datetime,
     };
 
     // 세션 정보 업데이트
