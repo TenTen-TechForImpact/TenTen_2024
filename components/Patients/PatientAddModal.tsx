@@ -6,7 +6,7 @@ interface Patient {
   name: string;
   date_of_birth: Date;
   gender: string;
-  phone_number: string;
+  phone_number?: string;
   organization: string;
   created_at: Date;
   modified_at: Date;
@@ -43,7 +43,7 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
     if (isEditMode && patient) {
       setName(patient.name);
       setGender(patient.gender);
-      setPhoneNumber(patient.phone_number);
+      setPhoneNumber(patient.phone_number || "");
       setOrganization(patient.organization);
       setCreatedAt(patient.created_at);
       setModifiedAt(patient.modified_at);
@@ -77,7 +77,6 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
     if (!birthYear || !birthMonth || !birthDay)
       newErrors.date_of_birth = "생년월일을 입력하세요";
     if (!gender) newErrors.gender = "성별을 입력하세요";
-    if (!phoneNumber) newErrors.phone_number = "전화번호를 입력하세요";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -93,7 +92,7 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
       name,
       date_of_birth,
       gender,
-      phone_number: phoneNumber,
+      phone_number: phoneNumber || null,
       organization,
       created_at: createdAt,
       modified_at: modifiedAt,
@@ -162,14 +161,11 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
 
         <input
           type="text"
-          placeholder="전화번호 (01012345678) *"
+          placeholder="전화번호 (01012345678)"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           className={styles.inputField}
         />
-        {errors.phone_number && (
-          <div className={styles.errorMessage}>{errors.phone_number}</div>
-        )}
 
         <input
           type="text"
