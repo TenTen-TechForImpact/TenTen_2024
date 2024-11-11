@@ -97,7 +97,7 @@ export async function POST(
       );
     }
 
-    const sessionTitle = title || "Untitled Session";
+    const sessionTitle = title || "제목 없음";
 
     // Session 테이블에 데이터 삽입
     const { data: session, error: sessionError } = await supabase
@@ -108,7 +108,7 @@ export async function POST(
           title: sessionTitle,
           patient_id: patientId,
           patient_summary: "",
-          temp: updatedTemp,
+          temp: defaultTemp,
         },
       ])
       .single(); // 삽입 후 단일 레코드 반환
