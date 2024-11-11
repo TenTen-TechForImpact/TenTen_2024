@@ -43,7 +43,6 @@ const PatientDetailPage: React.FC = () => {
   const patientId = pathname.split("/").pop();
 
   const [loading, setLoading] = useState(true);
-
   const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -52,6 +51,7 @@ const PatientDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const loadSessions = async () => {
+    setLoading(true);
     try {
       const data = await fetchPatientInfo(patientId as string);
       const formattedPatientInfo = {
@@ -69,7 +69,6 @@ const PatientDetailPage: React.FC = () => {
 
       setPatientInfo(formattedPatientInfo);
       setSessions(formattedSessions);
-      console.log("Fetched patient data:", data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -109,12 +108,12 @@ const PatientDetailPage: React.FC = () => {
   };
 
   const handleSubmitSession = async (sessionData: { title: string; session_datetime: Date }) => {
+    setLoading(true);
     try {
       const formattedSessionData = {
         title: sessionData.title,
         session_datetime: sessionData.session_datetime.toISOString()
       };
-      console.log(formattedSessionData);
       if (isEditMode && selectedSession) {
         const response = await fetch(`/api/patients/${patientId}/sessions/${selectedSession.id}`, {
           method: "PUT",
@@ -127,7 +126,7 @@ const PatientDetailPage: React.FC = () => {
         if (!response.ok) {
           throw new Error("Failed to update session");
         }
-        await loadSessions()
+        await loadSessions();
       } else {
         const response = await fetch(`/api/patients/${patientId}/sessions`, {
           method: "POST",
@@ -146,10 +145,13 @@ const PatientDetailPage: React.FC = () => {
     } catch (error) {
       console.error("Error submitting session:", error);
       alert("세션 저장에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteSession = async (id: string) => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/patients/${patientId}/sessions/${id}`, {
         method: "DELETE",
@@ -163,6 +165,8 @@ const PatientDetailPage: React.FC = () => {
     } catch (error) {
       console.error("Error deleting session:", error);
       alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -171,27 +175,36 @@ const PatientDetailPage: React.FC = () => {
       <Header />
       <h2>환자 상세 정보</h2>
       {error && <div className={styles.errorMessage}>{error}</div>}
-      <div className={styles.sessionContainer}>
-        <div className={styles.addSessionCard} onClick={handleAddSession}>
-          <span className={styles.addButton}>+</span>
+
+      {loading ? (
+        <div className={styles.loadingMessage}>로딩 중...</div>
+      ) : (
+        <div className={styles.sessionContainer}>
+          <div className={styles.addSessionCard} onClick={handleAddSession}>
+            <span className={styles.addButton}>+</span>
+          </div>
+          {sessions.length > 0 ? (
+            sessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                id={session.id}
+                dateTime={session.session_datetime}
+                modifiedDateTime={session.modified_at}
+                title={session.title}
+                onViewDetails={() => {
+                  setLoading(true);
+                  router.push(`../sessions/${session.id}`);
+                }}
+                onDelete={() => handleDeleteSession(session.id)}
+                onEdit={() => handleEditSession(session)}
+              />
+            ))
+          ) : (
+            <p>세션이 없습니다.</p>
+          )}
         </div>
-        {sessions && sessions.length > 0 ? (
-          sessions.map((session) => (
-            <SessionCard
-              key={session.id}
-              id={session.id}
-              dateTime={session.session_datetime}
-              modifiedDateTime={session.modified_at}
-              title={session.title}
-              onViewDetails={() => router.push(`../sessions/${session.id}`)}
-              onDelete={() => handleDeleteSession(session.id)}
-              onEdit={() => handleEditSession(session)}
-            />
-          ))
-        ) : (
-          <p>세션이 없습니다.</p>
-        )}
-      </div>
+      )}
+
       {showModal && (
         <SessionAddModal
           session={selectedSession || undefined}

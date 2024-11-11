@@ -1,20 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./PatientAddModal.module.css";
 
-interface PatientData {
+interface Patient {
   id?: string;
   name: string;
-  date_of_birth: string;
+  date_of_birth: Date;
   gender: string;
-  phone_number: string;
+  phone_number?: string;
   organization: string;
+  created_at: Date;
+  modified_at: Date;
 }
 
 interface PatientAddModalProps {
-  patient?: PatientData;
+  patient?: Patient;
   isEditMode?: boolean;
   onClose: () => void;
-  onSubmit: (patientData: PatientData) => void;
+  onSubmit: (patientData: Patient) => void;
 }
 
 const PatientAddModal: React.FC<PatientAddModalProps> = ({
@@ -30,22 +32,26 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
   const [gender, setGender] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [organization, setOrganization] = useState("");
+  const [createdAt, setCreatedAt] = useState<Date>(new Date());
+  const [modifiedAt, setModifiedAt] = useState<Date>(new Date());
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
 
-  // 수정 모드일 때 초기값 설정
   useEffect(() => {
     if (isEditMode && patient) {
       setName(patient.name);
       setGender(patient.gender);
-      setPhoneNumber(patient.phone_number);
+      setPhoneNumber(patient.phone_number || "");
       setOrganization(patient.organization);
-      const [year, month, day] = patient.date_of_birth.split("-");
-      setBirthYear(year);
-      setBirthMonth(month);
-      setBirthDay(day);
+      setCreatedAt(patient.created_at);
+      setModifiedAt(patient.modified_at);
+
+      const birthDate = new Date(patient.date_of_birth);
+      setBirthYear(birthDate.getFullYear().toString());
+      setBirthMonth((birthDate.getMonth() + 1).toString().padStart(2, "0"));
+      setBirthDay(birthDate.getDate().toString().padStart(2, "0"));
     }
   }, [isEditMode, patient]);
 
@@ -71,24 +77,25 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
     if (!birthYear || !birthMonth || !birthDay)
       newErrors.date_of_birth = "생년월일을 입력하세요";
     if (!gender) newErrors.gender = "성별을 입력하세요";
-    if (!phoneNumber) newErrors.phone_number = "전화번호를 입력하세요";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    const date_of_birth = `${birthYear}-${birthMonth.padStart(
-      2,
-      "0"
-    )}-${birthDay.padStart(2, "0")}`;
+    const date_of_birth = new Date(
+      `${birthYear}-${birthMonth.padStart(2, "0")}-${birthDay.padStart(2, "0")}`
+    );
+
     onSubmit({
       id: patient?.id,
       name,
       date_of_birth,
       gender,
-      phone_number: phoneNumber,
+      phone_number: phoneNumber || null,
       organization,
+      created_at: createdAt,
+      modified_at: modifiedAt,
     });
     onClose();
   };
@@ -154,14 +161,11 @@ const PatientAddModal: React.FC<PatientAddModalProps> = ({
 
         <input
           type="text"
-          placeholder="전화번호 (01012345678) *"
+          placeholder="전화번호 (01012345678)"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           className={styles.inputField}
         />
-        {errors.phone_number && (
-          <div className={styles.errorMessage}>{errors.phone_number}</div>
-        )}
 
         <input
           type="text"

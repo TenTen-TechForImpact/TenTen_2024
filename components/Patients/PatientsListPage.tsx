@@ -11,10 +11,12 @@ import PatientAddModal from "@/components/Patients/PatientAddModal";
 interface Patient {
   id: string;
   name: string;
-  date_of_birth: string;
+  date_of_birth: Date;
   gender: string;
   phone_number: string;
   organization: string;
+  created_at: Date;
+  modified_at: Date;
 }
 
 const PatientsListPage = () => {
@@ -24,7 +26,6 @@ const PatientsListPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPatients();
@@ -33,15 +34,20 @@ const PatientsListPage = () => {
   // API를 통해 환자 목록을 가져오는 함수
   const fetchPatients = async () => {
     setLoading(true);
-    setError(null);
     try {
       const response = await fetch("/api/patients", { method: "GET" });
       if (!response.ok) throw new Error("Failed to fetch patients");
 
       const data: Patient[] = await response.json();
-      setPatients(data);
+      const formattedPatients = data.map((patient) => ({
+        ...patient,
+        date_of_birth: new Date(patient.date_of_birth),
+        created_at: new Date(patient.created_at),
+        modified_at: new Date(patient.modified_at),
+      }));
+      setPatients(formattedPatients);
     } catch (err) {
-      setError("환자 목록을 불러오는 데 문제가 발생했습니다.");
+      console.error("환자 목록을 불러오는 데 문제가 발생했습니다:", err);
     } finally {
       setLoading(false);
     }
@@ -56,6 +62,8 @@ const PatientsListPage = () => {
         const ageA = calculateAge(a.date_of_birth);
         const ageB = calculateAge(b.date_of_birth);
         return ageA - ageB;
+      } else if (sortOption === "modified") {
+        return b.modified_at.getTime() - a.modified_at.getTime()
       }
       return 0;
     });
@@ -68,7 +76,12 @@ const PatientsListPage = () => {
       const response = await fetch("/api/patients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify({
+          ...patientData,
+          date_of_birth: patientData.date_of_birth.toISOString(),
+          created_at: new Date().toISOString(),
+          modified_at: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
@@ -79,8 +92,7 @@ const PatientsListPage = () => {
       setShowModal(false);
       fetchPatients();
     } catch (err) {
-      console.error("Error:", err);
-      setError("새 환자를 추가하는 데 실패했습니다.");
+      console.error("새 환자를 추가하는 데 실패했습니다:", err);
     } finally {
       setLoading(false);
     }
@@ -94,12 +106,12 @@ const PatientsListPage = () => {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete patient");
+
       setPatients((prevPatients) =>
         prevPatients.filter((patient) => patient.id !== id)
       );
     } catch (err) {
-      console.error("Error:", err);
-      setError("환자를 삭제하는 데 실패했습니다.");
+      console.error("환자를 삭제하는 데 실패했습니다:", err);
     } finally {
       setLoading(false);
     }
@@ -112,7 +124,12 @@ const PatientsListPage = () => {
       const response = await fetch(`/api/patients/${patientData.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify({
+          ...patientData,
+          date_of_birth: patientData.date_of_birth.toISOString(),
+          created_at: patientData.created_at.toISOString(),
+          modified_at: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to update patient");
@@ -121,8 +138,7 @@ const PatientsListPage = () => {
       setSelectedPatient(null);
       fetchPatients();
     } catch (err) {
-      console.error("Error:", err);
-      setError("환자 정보를 수정하는 데 실패했습니다.");
+      console.error("환자 정보를 수정하는 데 실패했습니다:", err);
     } finally {
       setLoading(false);
     }
@@ -161,6 +177,7 @@ const PatientsListPage = () => {
           options={[
             { value: "name", label: "이름 순" },
             { value: "age", label: "나이 순" },
+            { value: "modified", label: "수정 순" },
           ]}
           onChange={(value) => setSortOption(value)}
         />
@@ -177,13 +194,12 @@ const PatientsListPage = () => {
           onSubmit={selectedPatient ? handleUpdatePatient : handleAddPatient}
         />
       )}
-      {error && <p className={styles.errorMessage}>{error}</p>}
 
-      <div className={styles.patientList}>
-        {loading ? (
-          <p>환자 목록 로딩 중...</p>
-        ) : (
-          sortPatients(
+      {loading ? (
+        <p>환자 목록 로딩 중...</p>
+      ) : (
+        <div className={styles.patientList}>
+          {sortPatients(
             patients.filter(
               (patient) =>
                 patient.name?.includes(searchTerm) ||
@@ -202,9 +218,9 @@ const PatientsListPage = () => {
               onDelete={() => handleDeletePatient(patient.id)}
               onEdit={() => handleEditPatient(patient)}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -212,13 +228,13 @@ const PatientsListPage = () => {
 export default PatientsListPage;
 
 // 생년월일을 기반으로 나이를 계산하는 함수
-function calculateAge(date_of_birth: string) {
+function calculateAge(date_of_birth: Date) {
   const today = new Date();
-  const birth = new Date(date_of_birth);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+  let age = today.getFullYear() - date_of_birth.getFullYear();
+  const monthDiff = today.getMonth() - date_of_birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date_of_birth.getDate())) {
     age--;
   }
   return age;
 }
+
