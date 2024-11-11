@@ -99,6 +99,30 @@ export async function POST(
 
     const sessionTitle = title || "제목 없음";
 
+    // Patient 테이블에서 환자 정보 조회 (개인 정보 저장용)
+    const { data: patient, error: patientError } = await supabase
+      .from("Patient")
+      .select("name, date_of_birth, phone_number")
+      .eq("id", patientId)
+      .single();
+    if (patientError) {
+      console.error("Error fetching patient:", patientError.message);
+      return NextResponse.json(
+        { error: "Failed to fetch patient data" },
+        { status: 404 }
+      );
+    }
+
+    // defaultTemp에 personal_info 업데이트
+    const updatedTemp = {
+      ...defaultTemp,
+      personal_info: {
+        name: patient.name,
+        date_of_birth: patient.date_of_birth,
+        phone_number: patient.phone_number,
+      },
+    };
+
     // Session 테이블에 데이터 삽입
     const { data: session, error: sessionError } = await supabase
       .from("Session")
@@ -108,7 +132,7 @@ export async function POST(
           title: sessionTitle,
           patient_id: patientId,
           patient_summary: "",
-          temp: defaultTemp,
+          temp: updatedTemp,
         },
       ])
       .single(); // 삽입 후 단일 레코드 반환

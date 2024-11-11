@@ -93,14 +93,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
 
     // 값이 동일하면 PATCH 생략
     if (newValue === previousValue) {
-      //console.log("No changes detected, skipping PATCH request.");
+      console.log("No changes detected, skipping PATCH request.");
       return;
     }
 
     const updatedField = {
       [fieldPath]: getNestedValue(patientInfo, fieldPath),
     };
-    //console.log("Field updated:", JSON.stringify(updatedField));
+    console.log("Field updated:", JSON.stringify(updatedField));
 
     setLastBlurredValue((prev) =>
       updateNestedField({ ...prev }, fieldPath, newValue)
@@ -128,7 +128,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           return response.json();
         })
         .then((data) => {
-          //console.log("Data updated successfully:", data);
+          console.log("Data updated successfully:", data);
         })
         .catch((error) => {
           console.error("Error updating data:", error);

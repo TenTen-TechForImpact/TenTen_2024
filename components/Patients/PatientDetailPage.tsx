@@ -81,7 +81,9 @@ const PatientDetailPage: React.FC = () => {
     loadSessions();
   }, [patientId]);
 
-  const fetchPatientInfo = async (patientId: string): Promise<{ patient: Patient; sessions: Session[] }> => {
+  const fetchPatientInfo = async (
+    patientId: string
+  ): Promise<{ patient: Patient; sessions: Session[] }> => {
     const response = await fetch(`/api/patients/${patientId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch patient information");
@@ -107,21 +109,26 @@ const PatientDetailPage: React.FC = () => {
     setIsEditMode(false);
   };
 
-  const handleSubmitSession = async (sessionData: { title: string; session_datetime: Date }) => {
-    setLoading(true);
+  const handleSubmitSession = async (sessionData: {
+    title: string;
+    session_datetime: Date;
+  }) => {
     try {
       const formattedSessionData = {
         title: sessionData.title,
-        session_datetime: sessionData.session_datetime.toISOString()
+        session_datetime: sessionData.session_datetime.toISOString(),
       };
       if (isEditMode && selectedSession) {
-        const response = await fetch(`/api/patients/${patientId}/sessions/${selectedSession.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formattedSessionData),
-        });
+        const response = await fetch(
+          `/api/patients/${patientId}/sessions/${selectedSession.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formattedSessionData),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to update session");
@@ -153,15 +160,20 @@ const PatientDetailPage: React.FC = () => {
   const handleDeleteSession = async (id: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/patients/${patientId}/sessions/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/patients/${patientId}/sessions/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete session");
       }
 
-      setSessions((prevSessions) => prevSessions.filter((session) => session.id !== id));
+      setSessions((prevSessions) =>
+        prevSessions.filter((session) => session.id !== id)
+      );
     } catch (error) {
       console.error("Error deleting session:", error);
       alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
@@ -175,36 +187,27 @@ const PatientDetailPage: React.FC = () => {
       <Header />
       <h2>환자 상세 정보</h2>
       {error && <div className={styles.errorMessage}>{error}</div>}
-
-      {loading ? (
-        <div className={styles.loadingMessage}>로딩 중...</div>
-      ) : (
-        <div className={styles.sessionContainer}>
-          <div className={styles.addSessionCard} onClick={handleAddSession}>
-            <span className={styles.addButton}>+</span>
-          </div>
-          {sessions.length > 0 ? (
-            sessions.map((session) => (
-              <SessionCard
-                key={session.id}
-                id={session.id}
-                dateTime={session.session_datetime}
-                modifiedDateTime={session.modified_at}
-                title={session.title}
-                onViewDetails={() => {
-                  setLoading(true);
-                  router.push(`../sessions/${session.id}`);
-                }}
-                onDelete={() => handleDeleteSession(session.id)}
-                onEdit={() => handleEditSession(session)}
-              />
-            ))
-          ) : (
-            <p>세션이 없습니다.</p>
-          )}
+      <div className={styles.sessionContainer}>
+        <div className={styles.addSessionCard} onClick={handleAddSession}>
+          <span className={styles.addButton}>+</span>
         </div>
-      )}
-
+        {sessions && sessions.length > 0 ? (
+          sessions.map((session) => (
+            <SessionCard
+              key={session.id}
+              id={session.id}
+              dateTime={session.session_datetime}
+              modifiedDateTime={session.modified_at}
+              title={session.title}
+              onViewDetails={() => router.push(`../sessions/${session.id}`)}
+              onDelete={() => handleDeleteSession(session.id)}
+              onEdit={() => handleEditSession(session)}
+            />
+          ))
+        ) : (
+          <p>상담 카드 로딩 중...</p>
+        )}
+      </div>
       {showModal && (
         <SessionAddModal
           session={selectedSession || undefined}
