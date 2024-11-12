@@ -112,6 +112,23 @@ export async function PATCH(
     );
   }
 
+  // Patient 테이블의 modified_at 업데이트
+  const patientId = currentData.patient_id;
+  if (patientId) {
+    const { error: patientError } = await supabase
+      .from("Patient")
+      .update({ modified_at: new Date() }) // patient의 modified_at 업데이트
+      .eq("id", patientId);
+
+    if (patientError) {
+      console.error("Error updating patient modified_at:", patientError.message);
+      return NextResponse.json(
+        { error: "Error updating patient modified_at" },
+        { status: 500 }
+      );
+    }
+  }
+
   console.log("Update successful:", data); // 성공적으로 업데이트된 데이터 확인
 
   // 수정된 temp 데이터를 JSON 형식으로 반환

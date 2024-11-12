@@ -90,6 +90,35 @@ export async function PUT(
       );
     }
 
+    // 세션과 연결된 patient_id 가져오기
+    const { data: session, error: fetchError } = await supabase
+      .from("Session")
+      .select("patient_id")
+      .eq("id", sessionId)
+      .single();
+
+    if (fetchError || !session) {
+      console.error("Error fetching session data:", fetchError);
+      return NextResponse.json(
+        { error: "Failed to fetch session data" },
+        { status: 500 }
+      );
+    }
+
+    // patient 테이블의 modified_at 업데이트
+    const { error: patientError } = await supabase
+      .from("Patient")
+      .update({ modified_at: new Date() })
+      .eq("id", session.patient_id);
+
+    if (patientError) {
+      console.error("Error updating patient modified_at:", patientError.message);
+      return NextResponse.json(
+        { error: "Failed to update patient modified_at" },
+        { status: 500 }
+      );
+    }    
+
     // 성공적으로 업데이트된 데이터 반환
     return NextResponse.json(data, { status: 200 });
   } catch (err) {
