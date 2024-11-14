@@ -5,10 +5,10 @@ import { createClient } from "@/utils/supabase/component";
 const supabase = createClient();
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.MY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -40,7 +40,7 @@ export async function POST(
     const buffer = Buffer.from(arrayBuffer);
 
     const uploadParams = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Bucket: process.env.MY_AWS_S3_BUCKET_NAME,
       Key: `recordings/${recordingId}.wav`,
       Body: buffer,
       ContentType: "audio/wav",
@@ -58,7 +58,7 @@ export async function POST(
       );
     }
 
-    const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/recordings/${recordingId}.wav`;
+    const fileUrl = `https://${process.env.MY_AWS_S3_BUCKET_NAME}.s3.${process.env.MY_AWS_REGION}.amazonaws.com/recordings/${recordingId}.wav`;
 
     try {
       await updateRecordingUrl(recordingId, fileUrl);

@@ -5,10 +5,10 @@ import { createClient } from "@/utils/supabase/component";
 const supabase = createClient();
 
 const sqsClient = new SQSClient({
-  region: process.env.AWS_REGION,
+  region: process.env.MY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -23,9 +23,12 @@ export async function POST(
   const { recordingId } = params;
 
   try {
-    // Validate 
+    // Validate
     if (!recordingId) {
-      return NextResponse.json({ error: "Recording ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Recording ID is required" },
+        { status: 400 }
+      );
     }
 
     // (optional, if needed)
@@ -37,16 +40,22 @@ export async function POST(
 
     if (error) {
       console.error("Error fetching recording from Supabase:", error);
-      return NextResponse.json({ error: "Error fetching recording" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Error fetching recording" },
+        { status: 500 }
+      );
     }
 
     if (!recording) {
-      return NextResponse.json({ error: "Recording not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Recording not found" },
+        { status: 404 }
+      );
     }
     const messageBody = JSON.stringify({ recording_id: recordingId });
 
     const command = new SendMessageCommand({
-      QueueUrl: process.env.AWS_SQS_QUEUE_URL, 
+      QueueUrl: process.env.MY_AWS_SQS_QUEUE_URL,
       MessageBody: messageBody,
     });
 
@@ -57,6 +66,9 @@ export async function POST(
     return NextResponse.json({ message: "Message sent successfully" });
   } catch (error) {
     console.error("Error sending message to SQS:", error);
-    return NextResponse.json({ error: "Error sending message to SQS" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error sending message to SQS" },
+      { status: 500 }
+    );
   }
 }

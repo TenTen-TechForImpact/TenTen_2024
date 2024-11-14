@@ -10,18 +10,18 @@ import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 const supabase = createClient();
 
 const sqsClient = new SQSClient({
-  region: process.env.AWS_REGION,
+  region: process.env.MY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
   },
 });
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.MY_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -68,7 +68,7 @@ export async function POST(
       keywords
     );
     await setSttStatus(recordingId, "completed");
-    
+
     // insert utterances into Utterance table
     try {
       await insertUtterances(recordingId, utterances);
@@ -91,8 +91,9 @@ export async function POST(
       );
     }
 
-
-    console.log("Topic SQS POST method called successfully - from transcription_route.js");
+    console.log(
+      "Topic SQS POST method called successfully - from transcription_route.js"
+    );
 
     //--------Topic Post Method Calling----/>
 
@@ -112,7 +113,7 @@ export async function POST(
 // download wav file from S3 and return buffer
 async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   const downloadParams = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Bucket: process.env.MY_AWS_S3_BUCKET_NAME,
     Key: `recordings/${recordingId}.wav`,
   };
   const command = new GetObjectCommand(downloadParams);
@@ -135,7 +136,7 @@ async function sendSqsMessage(recordingId: string) {
   const messageBody = JSON.stringify({ recording_id: recordingId });
 
   const command = new SendMessageCommand({
-    QueueUrl: process.env.AWS_SQS_QUEUE_URL,
+    QueueUrl: process.env.MY_AWS_SQS_QUEUE_URL,
     MessageBody: messageBody,
   });
 
