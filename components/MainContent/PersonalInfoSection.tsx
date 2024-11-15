@@ -103,12 +103,13 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     };
     console.log("Field updated:", JSON.stringify(updatedField));
 
+    // 변경 사항을 debounce로 전달
+    debouncedPatch(updatedField);
+
     setLastBlurredValue((prev) =>
       updateNestedField({ ...prev }, fieldPath, newValue)
     );
-
-    // 변경 사항을 debounce로 전달
-    debouncedPatch(updatedField);
+    console.log('updated lastblurred value');
   };
 
   const debouncedPatch = useCallback(
