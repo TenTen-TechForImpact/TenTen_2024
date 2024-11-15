@@ -92,6 +92,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     const previousValue = getNestedValue(lastBlurredValue, fieldPath); // 직전 값
 
     // 값이 동일하면 PATCH 생략
+    console.log(newValue, previousValue);
     if (newValue === previousValue) {
       console.log("No changes detected, skipping PATCH request.");
       return;
