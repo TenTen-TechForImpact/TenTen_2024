@@ -38,11 +38,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   const [lastBlurredValue, setLastBlurredValue] = useState({}); // 직전 값 저장 (변경 시에만 blur함수 작동할 수 있도록)
 
   useEffect(() => {
-    if (Object.keys(lastBlurredValue).length === 0) {
-      setLastBlurredValue(patientInfo); // 초기값 한 번만 설정
+    if (Object.keys(lastBlurredValue).length === 0 && Object.keys(patientInfo).length > 0) {
+      setLastBlurredValue(patientInfo); // patientInfo가 초기화된 이후에 설정
+      console.log('Initialized lastBlurredValue with patientInfo');
     }
-  }, []);
-
+  }, [patientInfo]);
+  
   // 경로를 올바르게 생성하는 함수
   const constructFieldPath = (baseField: string, subField?: string) => {
     return subField ? `${baseField}.${subField}` : baseField;
