@@ -53,17 +53,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   const updateNestedField = (obj: any, path: string, value: any) => {
     const keys = path.split(".");
     const lastKey = keys.pop();
-
-    const nestedObj = keys.reduce((acc, key) => {
-      if (!acc[key]) acc[key] = {}; // 객체가 없으면 새 객체 생성
-      return acc[key];
-    }, obj);
-
-    if (lastKey) {
-      nestedObj[lastKey] = value;
-    }
-
-    return { ...obj }; // 변경된 객체를 반환
+  
+    // 새로운 객체를 생성하면서 복사
+    const updatedObj = keys.reduceRight((acc, key) => {
+      return { [key]: { ...acc } };
+    }, { [lastKey!]: value });
+  
+    // 최상위 객체와 병합하여 새로운 객체 반환
+    return { ...obj, ...updatedObj };
   };
 
   // 상태를 업데이트하는 함수
