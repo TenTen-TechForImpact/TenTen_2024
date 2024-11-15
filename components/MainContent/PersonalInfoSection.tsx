@@ -50,18 +50,26 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   };
 
   // 중첩된 필드 값을 안전하게 업데이트하는 함수
-  const updateNestedField = (obj: any, path: string, value: any) => {
+  function updateNestedField(obj: any, path: string, value: any) {
     const keys = path.split(".");
-    const lastKey = keys.pop();
+    const newObj = { ...obj }; // 최상위 객체의 얕은 복사
   
-    // 새로운 객체를 생성하면서 복사
-    const updatedObj = keys.reduceRight((acc, key) => {
-      return { [key]: { ...acc } };
-    }, { [lastKey!]: value });
+    let current = newObj;
   
-    // 최상위 객체와 병합하여 새로운 객체 반환
-    return { ...obj, ...updatedObj };
-  };
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+  
+      // 중첩된 객체가 있으면 복사, 없으면 새 객체 생성
+      current[key] = current[key] ? { ...current[key] } : {};
+      current = current[key];
+    }
+  
+    // 마지막 키에 새 값을 설정
+    current[keys[keys.length - 1]] = value;
+  
+    return newObj; // 최상위 복사본 반환
+  }
+  
 
   // 상태를 업데이트하는 함수
   const handleInputChange = (field: string, value: any) => {
