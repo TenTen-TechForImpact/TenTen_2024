@@ -5,8 +5,8 @@ import React from "react";
 import styles from "./Header.module.css";
 
 const Header: React.FC = () => (
-  <header className={styles.header}>
-    <a href="/" className={styles.logo}>
+  <header className={`${styles.header} bg-white`}>
+    <a href="/" className={`${styles.logo} text-black`}>
       TenTen
     </a>
   </header>
