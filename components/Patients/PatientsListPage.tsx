@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./PatientsListPage.module.css";
 import SearchBar from "@/components/SearchBar";
 import ActionButton from "@/components/ActionButton";
-import SortOptions from "@/components/SortOptions";
 import PatientCard from "@/components/Patients/PatientCard";
 import PatientAddModal from "@/components/Patients/PatientAddModal";
+import DeleteModal from "@/components/DeleteModal";
 
 interface Patient {
   id: string;
@@ -22,8 +22,8 @@ interface Patient {
 const PatientsListPage = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("name");
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,23 +53,7 @@ const PatientsListPage = () => {
     }
   };
 
-  // 정렬 함수
-  const sortPatients = (patients: Patient[]) => {
-    return [...patients].sort((a, b) => {
-      if (sortOption === "name") {
-        return a.name.localeCompare(b.name);
-      } else if (sortOption === "age") {
-        const ageA = calculateAge(a.date_of_birth);
-        const ageB = calculateAge(b.date_of_birth);
-        return ageA - ageB;
-      } else if (sortOption === "modified") {
-        return b.modified_at.getTime() - a.modified_at.getTime()
-      }
-      return 0;
-    });
-  };
-
-  // API를 통해 새 환자를 추가하는 함수
+  // 환자 추가 함수
   const handleAddPatient = async (patientData: Omit<Patient, "id">) => {
     setLoading(true);
     try {
@@ -99,17 +83,21 @@ const PatientsListPage = () => {
   };
 
   // 환자 삭제 함수
-  const handleDeletePatient = async (id: string) => {
+  const handleDeletePatient = async () => {
+    if (!selectedPatient) return;
+
     setLoading(true);
     try {
-      const response = await fetch(`/api/patients/${id}`, {
+      const response = await fetch(`/api/patients/${selectedPatient.id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete patient");
 
       setPatients((prevPatients) =>
-        prevPatients.filter((patient) => patient.id !== id)
+        prevPatients.filter((patient) => patient.id !== selectedPatient.id)
       );
+      setShowDeleteModal(false);
+      setSelectedPatient(null);
     } catch (err) {
       console.error("환자를 삭제하는 데 실패했습니다:", err);
     } finally {
@@ -117,7 +105,7 @@ const PatientsListPage = () => {
     }
   };
 
-  // 환자 정보 수정 함수
+  // 환자 수정 함수
   const handleUpdatePatient = async (patientData: Patient) => {
     setLoading(true);
     try {
@@ -144,20 +132,39 @@ const PatientsListPage = () => {
     }
   };
 
+  // 환자 삭제 확인 모달 열기
+  const handleDeleteConfirm = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setShowDeleteModal(true);
+  };
+
   // 환자 정보 수정 핸들러
   const handleEditPatient = (patient: Patient) => {
     setSelectedPatient(patient);
     setShowModal(true);
   };
 
-  // 정렬 옵션 변경 핸들러
-  const handleSortChange = (value: string) => {
-    setSortOption(value);
+  // 날짜별로 그룹화하는 함수
+  const groupByModifiedDate = (patients: Patient[]) => {
+    return patients.reduce((acc: Record<string, Patient[]>, patient) => {
+      const dateKey = patient.modified_at.toISOString().split("T")[0];
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(patient);
+      return acc;
+    }, {});
+  };
+
+  // 날짜와 요일 포맷팅
+  const formatDate = (date: string) => {
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    const d = new Date(date);
+    return `${days[d.getDay()]} ${d.getDate()}`;
   };
 
   return (
     <div className={styles.patientListContainer}>
-      <div className={styles.searchAndAdd}>
+      <div className={styles.listHeader}>
+        <h2 className={"text-black text-4xl font-bold"}>전체 환자 목록</h2>
         <SearchBar
           placeholder="검색어를 입력하세요"
           onSearch={(term) => setSearchTerm(term)}
@@ -170,19 +177,6 @@ const PatientsListPage = () => {
           fontSize={64}
         />
       </div>
-
-      <div className={styles.listHeader}>
-        <h2 className={styles.title}>전체 환자 목록</h2>
-        <SortOptions
-          options={[
-            { value: "name", label: "이름 순" },
-            { value: "age", label: "나이 순" },
-            { value: "modified", label: "수정 순" },
-          ]}
-          onChange={(value) => setSortOption(value)}
-        />
-      </div>
-
       {showModal && (
         <PatientAddModal
           patient={selectedPatient}
@@ -194,31 +188,42 @@ const PatientsListPage = () => {
           onSubmit={selectedPatient ? handleUpdatePatient : handleAddPatient}
         />
       )}
-
+      {showDeleteModal && (
+        <DeleteModal
+          onConfirm={handleDeletePatient}
+          onCancel={() => setShowDeleteModal(false)}
+          deleteName={`환자 "${selectedPatient?.name}"`}
+        />
+      )}
       {loading ? (
         <p>환자 목록 로딩 중...</p>
       ) : (
         <div className={styles.patientList}>
-          {sortPatients(
-            patients.filter(
-              (patient) =>
-                patient.name?.includes(searchTerm) ||
-                patient.phone_number?.includes(searchTerm) ||
-                patient.organization?.includes(searchTerm)
+          {Object.entries(groupByModifiedDate(patients)).map(
+            ([date, patientGroup]) => (
+              <div key={date} className={styles.groupContainer}>
+                <div className={styles.groupHeader}>
+                  {formatDate(date)}
+                  <span className={styles.dateText}>{date}</span>
+                </div>
+                <div className={styles.cardList}>
+                  {patientGroup
+                    .sort(
+                      (a, b) =>
+                        b.modified_at.getTime() - a.modified_at.getTime()
+                    )
+                    .map((patient) => (
+                      <PatientCard
+                        key={patient.id}
+                        patient={patient}
+                        onDelete={handleDeleteConfirm}
+                        onEdit={handleEditPatient}
+                      />
+                    ))}
+                </div>
+              </div>
             )
-          ).map((patient) => (
-            <PatientCard
-              key={patient.id}
-              id={patient.id}
-              name={patient.name}
-              age={calculateAge(patient.date_of_birth)}
-              gender={patient.gender}
-              phone_number={patient.phone_number}
-              organization={patient.organization}
-              onDelete={() => handleDeletePatient(patient.id)}
-              onEdit={() => handleEditPatient(patient)}
-            />
-          ))}
+          )}
         </div>
       )}
     </div>
@@ -226,15 +231,3 @@ const PatientsListPage = () => {
 };
 
 export default PatientsListPage;
-
-// 생년월일을 기반으로 나이를 계산하는 함수
-function calculateAge(date_of_birth: Date) {
-  const today = new Date();
-  let age = today.getFullYear() - date_of_birth.getFullYear();
-  const monthDiff = today.getMonth() - date_of_birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date_of_birth.getDate())) {
-    age--;
-  }
-  return age;
-}
-

@@ -6,7 +6,7 @@ import styles from "./Header.module.css";
 
 const Header: React.FC = () => (
   <header className={`${styles.header} bg-white`}>
-    <a href="/" className={`${styles.logo} text-black`}>
+    <a href="/" className={"text-black text-3xl font-medium not-italic leading normal"}>
       TenTen
     </a>
   </header>

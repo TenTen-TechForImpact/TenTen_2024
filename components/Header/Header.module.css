@@ -13,11 +13,3 @@
   line-height: var(--header-height);
   box-sizing: border-box;
 }
-
-.logo {
-  font-size: 30px;
-  font-weight: 500;
-  line-height: normal;
-  font-style: normal;
-  text-decoration: none;
-}

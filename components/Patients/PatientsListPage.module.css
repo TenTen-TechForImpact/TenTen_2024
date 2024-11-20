@@ -1,38 +1,41 @@
 /* PatientListPage.module.css - 환자 리스트 스타일 */
 
-.searchAndAdd {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
 .listHeader {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
   gap: 16px;
-}
-
-.title {
-  color: #3563e9;
-  font-size: var(--font-size-large);
-  user-select: none;
+  height: var(--header-height);
 }
 
 .patientListContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  padding: 20px;
 }
 
-.patientList {
-  flex: 1;
-  overflow-y: auto;
-  max-height: calc(100vh - 300px);
-  border-radius: 20px;
+.groupContainer {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.groupHeader {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  overflow-x: hidden;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dateText {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

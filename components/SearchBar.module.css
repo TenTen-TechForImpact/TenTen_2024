@@ -1,12 +1,28 @@
 /* SearchBar.module.css - 검색 바 스타일 */
 
+.searchContainer {
+  position: relative;
+  width: 50%;
+}
+
 .searchBar {
-  flex-grow: 1;
+  width: 100%;
   font-size: var(--font-size-large);
   border-radius: var(--border-large);
   border: 1px solid #ccc;
   background-color: #d3d3d3;
   height: 57px;
-  padding-left: var(--font-size-large);
+  padding-left: 50px;
   margin: 24px 0;
+  box-sizing: border-box;
+}
+
+.searchContainer::before {
+  content: url('../public/images/Search_icon.svg');
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20x;
 }

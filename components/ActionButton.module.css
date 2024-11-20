@@ -1,15 +1,16 @@
 .actionButton {
   display: flex;
+  text-align: center;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: var(--border-large);
   cursor: pointer;
   transition: background-color 0.2s;
-  text-align: center;
-  background-color: #0511f2;
+  background-color: #000000;
   color: #ffffff;
   user-select: none;
+  line-height: 0;
 }
 
 .actionButton:hover {

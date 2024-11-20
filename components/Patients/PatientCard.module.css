@@ -1,127 +1,40 @@
-.patientCard {
-  position: relative;
+.patientRow {
   display: flex;
   align-items: center;
-  background-color: #e5e5ea;
-  border-radius: 30px;
-  padding: 38px 32px;
-  width: 186px;
-  height: 200px;
-  gap: 30px;
-}
-
-.deleteButtonContainer {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 8px;
-  /* 삭제 버튼과 펜 아이콘 사이 간격 */
-}
-
-.deleteButton,
-.editButton {
-  background: rgb(216, 68, 68);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  font-size: 16px;
-  line-height: 24px;
-  text-align: center;
-  padding-left: 6px;
-}
-
-.editButton {
-  background: rgb(68, 123, 216);
-}
-
-.avatarContainer {
-  width: 200px;
-  height: 200px;
-  background-color: #fff;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar {
-  width: 170px;
-  height: 170px;
-}
-
-.patientInfo {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
-}
-
-.patientName {
-  font-family: "Inter", sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  color: #000;
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.phoneIconContainer {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
   position: relative;
-  display: inline-block;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
   margin-left: 10px;
 }
 
-.phoneTooltip {
-  visibility: hidden;
-  background-color: #000;
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 5px;
+.dropdownMenu {
   position: absolute;
-  top: -35px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  z-index: 1;
-  font-size: 16px;
-  opacity: 0;
-  transition: opacity 0.3s;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 }
 
-.phoneIconContainer:hover .phoneTooltip {
-  visibility: visible;
-  opacity: 1;
+.dropdownItem {
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-.patientDetails {
-  font-family: "Inter", sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  color: #000;
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-}
-
-.icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 8px;
-  vertical-align: middle;
-  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(223deg)
-    brightness(104%) contrast(103%);
-}
-
-.patientName,
-.patientDetails,
-.avatarContainer,
-.deleteButton,
-.editButton {
-  user-select: none;
+.dropdownItem:hover {
+  background-color: #f0f0f0;
 }

@@ -2,131 +2,68 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import ActionButton from "../ActionButton";
-import DeleteModal from "../DeleteModal";
 import styles from "./PatientCard.module.css";
 
-interface PatientProps {
+interface Patient {
   id: string;
   name: string;
-  age: number;
+  date_of_birth: Date;
   gender: string;
   phone_number: string;
   organization: string;
-  onDelete: (id: string) => void;
-  onEdit: (patient: {
-    id: string;
-    name: string;
-    age: number;
-    gender: string;
-    phone_number: string;
-    organization: string;
-  }) => void;
+  created_at: Date;
+  modified_at: Date;
 }
 
-const PatientCard: React.FC<PatientProps> = ({
-  id,
-  name,
-  age,
-  gender,
-  organization,
-  phone_number,
-  onDelete,
-  onEdit,
-}) => {
+interface PatientCardProps {
+  patient: Patient;
+  onDelete: (patient: Patient) => void;
+  onEdit: (patient: Patient) => void;
+}
+
+const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) => {
   const router = useRouter();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleViewDetails = () => {
-    router.push(`/patients/${id}`);
+    router.push(`/patients/${patient.id}`);
   };
 
   const handleDeleteClick = () => {
-    setShowDeleteModal(true);
-  };
-
-  const handleConfirmDelete = () => {
-    onDelete(id);
-    setShowDeleteModal(false);
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeleteModal(false);
+    onDelete(patient);
+    setShowDropdown(false);
   };
 
   const handleEditClick = () => {
-    onEdit({ id, name, age, gender, phone_number, organization });
+    onEdit(patient);
+    setShowDropdown(false);
   };
 
-  // 아바타 필요 시 아래 코드 사용
-  /* <div className={styles.avatarContainer}>
-        <img
-          src="/images/old_woman_color_light.svg"
-          alt="Avatar"
-          className={styles.avatar}
-        />
-      </div>*/
-  return (
-    <div className={styles.patientCard}>
-      <div className={styles.deleteButtonContainer}>
-        <button className={styles.editButton} onClick={handleEditClick}>
-          🖊️
-        </button>
-        <button className={styles.deleteButton} onClick={handleDeleteClick}>
-          🗑️
-        </button>
-      </div>
-      <div className={styles.patientInfo}>
-        <div className={styles.patientName}>
-          <img
-            src="/images/ic_fluent_person_24_filled.svg"
-            alt=""
-            className={styles.icon}
-          />
-          <span>{name}</span>
-          <div className={styles.phoneIconContainer}>
-            <img
-              src="/images/ic_fluent_call_24_filled.svg"
-              alt="Phone Icon"
-              className={styles.icon}
-            />
-            <div className={styles.phoneTooltip}>{phone_number}</div>
-          </div>
-        </div>
-        <div className={styles.patientDetails}>
-          <img
-            src="/images/ic_fluent_info_24_regular.svg"
-            alt=""
-            className={styles.icon}
-          />
-          <span>{`${age}세 | ${gender}`}</span>
-        </div>
-        <div className={styles.patientDetails}>
-          <img
-            src="/images/ic_fluent_building_24_filled.svg"
-            alt=""
-            className={styles.icon}
-          />
-          <span>{organization}</span>
-        </div>
-        <ActionButton
-          text="상담 목록 보기"
-          onClick={handleViewDetails}
-          width={192}
-          height={50}
-          fontSize={24}
-        />
-      </div>
+  const toggleDropdown = () => {
+    setShowDropdown((prev) => !prev);
+  };
 
-      {showDeleteModal && (
-        <DeleteModal
-          onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-          deleteName="환자 카드"
-        />
+  return (
+    <div className={styles.patientRow}>
+      <span>{patient.name}</span>
+      <span>{patient.date_of_birth.toISOString().split("T")[0]}</span>
+      <span>{patient.gender}</span>
+      <span>{patient.modified_at.toISOString().split("T")[0]}</span>
+      <button className={styles.actionButton} onClick={toggleDropdown}>⋮</button>
+
+      {showDropdown && (
+        <div className={styles.dropdownMenu}>
+          <button className={styles.dropdownItem} onClick={handleEditClick}>
+            수정
+          </button>
+          <button className={styles.dropdownItem} onClick={handleDeleteClick}>
+            삭제
+          </button>
+        </div>
       )}
     </div>
   );
+
 };
 
 export default PatientCard;
