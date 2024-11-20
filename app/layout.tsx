@@ -1,6 +1,6 @@
 // layout.tsx - 모든 페이지에 전역 스타일을 적용
 
-import "../components/global.css";
+import "../dist/output.css";
 
 export const metadata = {
   title: "Next.js",
