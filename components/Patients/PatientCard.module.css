@@ -1,40 +1,68 @@
+/* 개별 환자 행 */
 .patientRow {
   display: flex;
   align-items: center;
+  /* 수직 중앙 정렬 */
+  height: 50px;
+  /* 고정된 높이 */
+  line-height: 1.5;
+  /* 텍스트가 중앙에 위치 */
   justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+  /* 데이터 아이템 간 간격 균등 분배 */
+  padding: 0 15px;
+  /* 좌우 여백 */
+  border-bottom: 1px solid #ddd;
+  /* 행 구분선 */
   position: relative;
 }
 
-.actionButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  margin-left: 10px;
+/* 데이터 필드 스타일 */
+.patientField {
+  flex: 1;
+  /* 각 데이터 아이템이 동일한 비율로 공간 차지 */
+  text-align: center;
+  /* 텍스트 중앙 정렬 */
+  margin: 0;
+  /* 여백 초기화 */
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+
 }
 
+/* 데이터 우측 액션 버튼 */
+.actionButton {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  color: #ff0000;
+  /* 버튼에 호버 시 강조 색상 */
+}
+
+/* 드롭다운 메뉴 */
 .dropdownMenu {
   position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
+  top: 50px;
+  right: 15px;
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: 10;
 }
 
 .dropdownItem {
   padding: 8px 12px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  background: none;
   cursor: pointer;
+  text-align: center;
+  font-size: 14px;
 }
 
 .dropdownItem:hover {
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
 }

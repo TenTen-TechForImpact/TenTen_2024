@@ -45,25 +45,32 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) 
 
   return (
     <div className={styles.patientRow}>
-      <span>{patient.name}</span>
-      <span>{patient.date_of_birth.toISOString().split("T")[0]}</span>
-      <span>{patient.gender}</span>
-      <span>{patient.modified_at.toISOString().split("T")[0]}</span>
-      <button className={styles.actionButton} onClick={toggleDropdown}>⋮</button>
-
+      <div className={styles.patientField}>{patient.name}</div>
+      <div className={styles.patientField}>
+        {patient.date_of_birth.toISOString().split("T")[0]}
+      </div>
+      <div className={styles.patientField}>{patient.gender}</div>
+      <div className={styles.patientField}>
+        {patient.modified_at.toISOString().split("T")[0]}
+      </div>
+      <button className={styles.actionButton} onClick={() => setShowDropdown(!showDropdown)}>
+        ⋮
+      </button>
       {showDropdown && (
         <div className={styles.dropdownMenu}>
-          <button className={styles.dropdownItem} onClick={handleEditClick}>
+          <div className={styles.dropdownItem} onClick={() => onEdit(patient)}>
             수정
-          </button>
-          <button className={styles.dropdownItem} onClick={handleDeleteClick}>
+          </div>
+          <div className={styles.dropdownItem} onClick={() => onDelete(patient)}>
             삭제
-          </button>
+          </div>
+          <div className={styles.dropdownItem} onClick={handleViewDetails}>
+            상담 보기
+          </div>
         </div>
       )}
     </div>
   );
-
 };
 
 export default PatientCard;

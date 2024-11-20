@@ -164,7 +164,7 @@ const PatientsListPage = () => {
   return (
     <div className={styles.patientListContainer}>
       <div className={styles.listHeader}>
-        <h2 className={"text-black text-4xl font-bold"}>전체 환자 목록</h2>
+        <h2 className={styles.listHeadertext}>전체 환자 목록</h2>
         <SearchBar
           placeholder="검색어를 입력하세요"
           onSearch={(term) => setSearchTerm(term)}
@@ -201,25 +201,33 @@ const PatientsListPage = () => {
         <div className={styles.patientList}>
           {Object.entries(groupByModifiedDate(patients)).map(
             ([date, patientGroup]) => (
-              <div key={date} className={styles.groupContainer}>
+              <div>
                 <div className={styles.groupHeader}>
                   {formatDate(date)}
                   <span className={styles.dateText}>{date}</span>
                 </div>
-                <div className={styles.cardList}>
-                  {patientGroup
-                    .sort(
-                      (a, b) =>
-                        b.modified_at.getTime() - a.modified_at.getTime()
-                    )
-                    .map((patient) => (
-                      <PatientCard
-                        key={patient.id}
-                        patient={patient}
-                        onDelete={handleDeleteConfirm}
-                        onEdit={handleEditPatient}
-                      />
-                    ))}
+                <div key={date} className={styles.groupContainer}>
+                  <div className={styles.tableHeader}>
+                    <div className={styles.tableHeaderItem}>이름</div>
+                    <div className={styles.tableHeaderItem}>생년월일</div>
+                    <div className={styles.tableHeaderItem}>성별</div>
+                    <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
+                  </div>
+                  <div className={styles.cardList}>
+                    {patientGroup
+                      .sort(
+                        (a, b) =>
+                          b.modified_at.getTime() - a.modified_at.getTime()
+                      )
+                      .map((patient) => (
+                        <PatientCard
+                          key={patient.id}
+                          patient={patient}
+                          onDelete={handleDeleteConfirm}
+                          onEdit={handleEditPatient}
+                        />
+                      ))}
+                  </div>
                 </div>
               </div>
             )

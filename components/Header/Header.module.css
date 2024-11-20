@@ -13,3 +13,9 @@
   line-height: var(--header-height);
   box-sizing: border-box;
 }
+
+.headertext {
+  font-size: 30px;
+  font-weight: 500;
+  color: #2B2E3B;
+}
