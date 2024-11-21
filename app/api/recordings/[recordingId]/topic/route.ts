@@ -42,10 +42,6 @@ export async function GET(
         "Supabase에서 Recording을 가져오는 중 오류:",
         recordingError
       );
-      console.error(
-        "Supabase에서 Recording을 가져오는 중 오류:",
-        recordingError
-      );
       return NextResponse.json(
         { error: "Error fetching recording" },
         { status: 500 }
