@@ -1,11 +1,41 @@
-import React, { useState, useRef } from "react";
-import { FaMicrophone, FaPause, FaPlay, FaRedo, FaUpload, FaCheck } from "react-icons/fa";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+} from "react";
+import {
+  FaMicrophone,
+  FaPause,
+  FaPlay,
+  FaRedo,
+  FaUpload,
+  FaCheck,
+} from "react-icons/fa";
 import AudioRecorder from "../../utils/Recording/audioRecorder";
 import styles from "./RecordingSection.module.css";
 
 interface RecordingSectionProps {
   onRecordingStatusChange: (isRecording: boolean) => void;
   sessionId: string;
+}
+
+// Type for handling file input
+interface FileInput {
+  file: File | null;
+}
+
+interface Props {
+  params: { sessionId: string };
+}
+
+interface RecordingItem {
+  id: string;
+  s3_url: string;
+  topic_status: string;
+  stt_status: string;
+  created_at: string;
 }
 
 const RecordingSection: React.FC<RecordingSectionProps> = ({
@@ -16,6 +46,71 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const recorderRef = useRef<AudioRecorder>(new AudioRecorder());
+
+  /*const [recentRecording, setRecentRecording] = useState<RecordingItem | null>(
+    null
+  );
+  const [topics, setTopics] = useState<any[]>([]); // Topic 데이터를 저장할 상태
+
+  useEffect(() => {
+    const fetchRecordings = async () => {
+      try {
+        const response = await fetch(
+          `/api/sessions/${sessionId}/get_recording`
+        );
+        if (response.ok) {
+          const data: RecordingItem[] = await response.json();
+          console.log("Fetched Recordings:", data);
+          // 가장 최근 녹음 파일 선택
+          if (data.length > 0) {
+            const latestRecording = data.sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )[0];
+
+            setRecentRecording(latestRecording); // 최근 녹음 ID 저장
+          }
+        } else {
+          console.error("Failed to fetch recordings:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching recordings:", error);
+      }
+    };
+
+    fetchRecordings();
+  }, [sessionId]);
+
+  // Fetch topics using the recent recordingId
+  useEffect(() => {
+    const fetchTopics = async () => {
+      if (!recentRecording) return;
+      if (recentRecording.topic_status != "completed") {
+        console.log("stt", recentRecording.stt_status, "topic", recentRecording.topic_status,);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `/api/recordings/${recentRecording.id}/topic`,
+          {
+            method: "GET",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched Topics:", data);
+          setTopics(data.topicSummaries || []); // Topic 데이터 저장
+        } else {
+          console.error("Failed to fetch topics:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, [recentRecording]);*/
 
   const handleStartOrPauseRecording = async () => {
     if (!isRecording) {
@@ -41,7 +136,9 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
   const handleCompleteRecording = async () => {
     try {
       const audioBlob = await recorderRef.current.stopRecording();
-      const audioFile = new File([audioBlob], "recording.wav", { type: "audio/wav" });
+      const audioFile = new File([audioBlob], "recording.wav", {
+        type: "audio/wav",
+      });
       setAudioFile(audioFile);
       setIsRecording(false);
       setIsPaused(false);
@@ -66,10 +163,13 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     formData.append("wavfile", audioFile);
 
     try {
-      const uploadResponse = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
-        method: "POST",
-        body: formData,
-      });
+      const uploadResponse = await fetch(
+        `/api/sessions/${sessionId}/upload-s3`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (uploadResponse.ok) {
         const data = await uploadResponse.json();
@@ -82,6 +182,57 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     }
   };
 
+  // Upload local file (should be .wav file)
+  const [fileInput, setFileInput] = useState<FileInput>({ file: null });
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
+  // Handle file input change
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFileInput({ file: files[0] });
+    }
+  };
+
+  // Handle form submit to upload the file
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const { file } = fileInput;
+    if (!file) {
+      setUploadStatus("Please select a file first.");
+      return;
+    }
+
+    // TODO: Check if it is .wav file, else convert into wav file
+    if (file.type !== "audio/wav") {
+      setUploadStatus("Please select a .wav file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("wavfile", file);
+
+    try {
+      setUploadStatus("Uploading file...");
+      const response = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        setUploadStatus(`File uploaded successfully and saved to DB`);
+        console.log("upload!");
+        // TODO: request to ai server to get summary
+      } else {
+        setUploadStatus("File upload failed.");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      setUploadStatus("An error occurred while uploading the file.");
+    }
+  };
+
   return (
     <div className={styles.recordingSection}>
       <h3 className={styles.sectionTitle}>녹음하기</h3>
@@ -90,17 +241,9 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
           className={styles.startStopButton}
           onClick={handleStartOrPauseRecording}
         >
-          {isRecording
-            ? isPaused
-              ? <FaPlay />
-              : <FaPause />
-            : <FaMicrophone />}
+          {isRecording ? isPaused ? <FaPlay /> : <FaPause /> : <FaMicrophone />}
           <span className={styles.buttonLabel}>
-            {isRecording
-              ? isPaused
-                ? "재개"
-                : "일시정지"
-              : "녹음하기"}
+            {isRecording ? (isPaused ? "재개" : "일시정지") : "녹음하기"}
           </span>
         </button>
         {isRecording && (
@@ -129,9 +272,19 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
           <span className={styles.buttonLabel}>업로드</span>
         </button>
       </div>
+
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept="audio/*" onChange={handleFileChange} />
+        <button type="submit">음성파일 업로드하기 (wav파일)</button>
+      </form>
+
       {audioFile && (
         <div className={styles.audioContainer}>
-          <audio src={URL.createObjectURL(audioFile)} controls className={styles.audioPlayer} />
+          <audio
+            src={URL.createObjectURL(audioFile)}
+            controls
+            className={styles.audioPlayer}
+          />
         </div>
       )}
     </div>

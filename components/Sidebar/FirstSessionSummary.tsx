@@ -7,10 +7,20 @@ interface PreQuestions {
   };
 }
 
+interface RecordingItem {
+  id: string;
+  s3_url: string;
+  topic_status: string;
+  stt_status: string;
+  created_at: string;
+}
+
 interface FirstSessionSummaryProps {
   patientInfo: any;
   preQuestions: PreQuestions;
   sessionSummaryData: { topic_id: number; content: string }[];
+  recentRecording: RecordingItem;
+  topics: any[];
 }
 
 const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
@@ -167,7 +177,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
         )}
       </div>
 
-      <div className={styles.section}>
+      {/* <div className={styles.section}>
         <h4>상담 전 질문 음성 요약</h4>
         {Array.isArray(sessionSummaryData) && sessionSummaryData.length > 0 ? (
           sessionSummaryData.map((item) => (
@@ -176,7 +186,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
         ) : (
           <p>요약된 질문 없음</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

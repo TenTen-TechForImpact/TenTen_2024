@@ -109,14 +109,35 @@ export async function DELETE(
   try {
     const { patientId } = params;
 
-    // Patient 테이블에서 특정 ID의 환자 정보 삭제
-    const { data, error: patientError } = await supabase
-      .from("Patient") // Patient 테이블에서
+    // 환자 ID 확인
+    if (!patientId) {
+      return NextResponse.json(
+        { error: "Patient ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // 트랜잭션 시작: 환자와 관련된 세션 삭제
+    const { error: sessionError } = await supabase
+      .from("Session")
+      .delete()
+      .eq("patient_id", patientId);
+
+    if (sessionError) {
+      console.error("Error deleting related sessions:", sessionError.message);
+      return NextResponse.json(
+        { error: "Failed to delete related sessions" },
+        { status: 500 }
+      );
+    }
+
+    // 환자 정보 삭제
+    const { data: patientData, error: patientError } = await supabase
+      .from("Patient")
       .delete()
       .eq("id", patientId)
-      .select("*"); // "id" 필드와 patientId가 일치하는 레코드 삭제
+      .select("*");
 
-    // 에러 처리
     if (patientError) {
       console.error("Error deleting patient:", patientError.message);
       return NextResponse.json(
@@ -125,12 +146,12 @@ export async function DELETE(
       );
     }
 
-    // 환자 데이터가 없는 경우 (이미 삭제된 환자)
-    if (!data || data.length === 0) {
+    // 환자 데이터가 없는 경우 처리
+    if (!patientData || patientData.length === 0) {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 
-    // 환자 데이터 삭제 성공
+    // 성공적으로 삭제된 응답 반환
     return NextResponse.json(
       { message: "Patient and related sessions deleted successfully" },
       { status: 200 }

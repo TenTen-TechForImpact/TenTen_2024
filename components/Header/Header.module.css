@@ -19,5 +19,30 @@
 .headertext {
   font-size: 30px;
   font-weight: 500;
-  color: #2B2E3B;
+  color: #2b2e3b;
+  margin-right: 16px;
+}
+
+.tabButtons {
+  display: flex;
+  gap: var(--padding-small); /* 버튼 간의 간격 */
+}
+
+.activeButton {
+  color: black; /* 활성화된 버튼은 검정색 */
+  font-weight: bold; /* 진하게 */
+  font-size: 1.1rem; /* 폰트 크기를 키움 */
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.inactiveButton {
+  color: gray; /* 비활성화된 버튼은 회색 */
+  font-weight: bold; /* 진하게 */
+  font-size: 1.1rem; /* 폰트 크기를 키움 */
+  border: none;
+  background: none;
+  cursor: pointer; /* 여전히 클릭 가능하게 */
+  opacity: 0.7; /* 살짝 연하게 */
 }

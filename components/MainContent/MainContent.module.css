@@ -1,6 +1,6 @@
 /* src/components/MainContent/MainContent.module.css */
 .mainContent {
-  padding: var(--padding-medium);
+  padding: 20px var(--padding-page);
   border: 1px solid var(--border-large);
   border-radius: var(--border-medium);
   overflow-y: auto;

@@ -5,17 +5,8 @@ import FormData from "form-data";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
 import { Readable } from "stream";
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const supabase = createClient();
-
-const sqsClient = new SQSClient({
-  region: process.env.MY_AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
-  },
-});
 
 const s3Client = new S3Client({
   region: process.env.MY_AWS_REGION,
@@ -54,10 +45,14 @@ export async function POST(
     const authToken = await getAuthToken();
     // get transcription with keywords
     const sttStatus = await getSttStatus(recordingId);
-    if (sttStatus !== "pending") {
-      console.error("Transcription already in progress or completed");
+    if (sttStatus !== "ready") {
+      console.error(
+        "Transcription not ready or already in progress or completed"
+      );
       return NextResponse.json(
-        { error: "Transcription already in progress or completed" },
+        {
+          error: "Transcription not ready or already in progress or completed",
+        },
         { status: 400 }
       );
     }
@@ -68,6 +63,7 @@ export async function POST(
       keywords
     );
     await setSttStatus(recordingId, "completed");
+    await setTopicStatus(recordingId, "ready");
 
     // insert utterances into Utterance table
     try {
@@ -79,23 +75,6 @@ export async function POST(
         { status: 500 }
       );
     }
-
-    //--------Topic Post Method Calling---->
-    try {
-      await sendSqsMessage(recordingId);
-    } catch (sqsError) {
-      console.error("Error sending message to SQS:", sqsError);
-      return NextResponse.json(
-        { error: "Error sending message to SQS" },
-        { status: 500 }
-      );
-    }
-
-    console.log(
-      "Topic SQS POST method called successfully - from transcription_route.js"
-    );
-
-    //--------Topic Post Method Calling----/>
 
     return NextResponse.json({
       message: "Created transcription successfully",
@@ -130,18 +109,6 @@ async function downloadRecordingFile(recordingId: string): Promise<Buffer> {
   } else {
     throw new Error("Unexpected Body type returned from S3");
   }
-}
-// send sqs request to topic lambda function
-async function sendSqsMessage(recordingId: string) {
-  const messageBody = JSON.stringify({ recording_id: recordingId });
-
-  const command = new SendMessageCommand({
-    QueueUrl: process.env.MY_AWS_SQS_QUEUE_URL,
-    MessageBody: messageBody,
-  });
-
-  await sqsClient.send(command);
-  console.log("Message sent to SQS:", messageBody);
 }
 
 async function getKeywords(recordingId: string): Promise<string[]> {
@@ -318,6 +285,13 @@ async function setSttStatus(recordingId: string, status: string) {
   supabase
     .from("Recording")
     .update({ stt_status: status })
+    .eq("id", recordingId);
+}
+
+async function setTopicStatus(recordingId: string, status: string) {
+  supabase
+    .from("Recording")
+    .update({ topic_status: status })
     .eq("id", recordingId);
 }
 
