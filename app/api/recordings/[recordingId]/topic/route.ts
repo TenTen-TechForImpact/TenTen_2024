@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/component";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const supabase = createClient();
 
+const sqsClient = new SQSClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
 export const runtime = "nodejs";
 
-// POST: 주어진 recordingId에 대한 TopicSummary 데이터를 가져오기
-export async function POST(
+// GET: 주어진 recordingId에 대한 TopicSummary 데이터를 가져오기
+export async function GET(
   req: NextRequest,
   { params }: { params: { recordingId: string } }
 ) {
@@ -29,7 +38,10 @@ export async function POST(
       .single();
 
     if (recordingError) {
-      console.error("Supabase에서 Recording을 가져오는 중 오류:", recordingError);
+      console.error(
+        "Supabase에서 Recording을 가져오는 중 오류:",
+        recordingError
+      );
       return NextResponse.json(
         { error: "Error fetching recording" },
         { status: 500 }
@@ -49,31 +61,32 @@ export async function POST(
       .from("TopicSummary")
       .select("*") // Ensure that RLS policies allow this
       .eq("recording_id", recordingId);
-  
 
     if (topicSummaryError) {
-      console.error("Supabase에서 TopicSummary를 가져오는 중 오류:", topicSummaryError);
+      console.error(
+        "Supabase에서 TopicSummary를 가져오는 중 오류:",
+        topicSummaryError
+      );
       return NextResponse.json(
         { error: "Error fetching topic summary" },
         { status: 500 }
       );
-    }   
+    }
     // Check the recordingId being used
     console.log("Recording ID:", recordingId);
 
     // Check the data fetched from TopicSummary
     console.log("TopicSummaries:", topicSummaries);
 
-
     // TopicSummary 데이터가 없으면 오류 반환
     if (!topicSummaries || topicSummaries.length === 0) {
-        return NextResponse.json(
-          {
-            error: `No topic summaries found for the given recording ID: ${recordingId}`,
-            topicSummaries, 
-          },
-          { status: 404 }
-        );
+      return NextResponse.json(
+        {
+          error: `No topic summaries found for the given recording ID: ${recordingId}`,
+          topicSummaries,
+        },
+        { status: 404 }
+      );
     }
 
     // TopicSummary 데이터를 반환
@@ -85,4 +98,47 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+// POST: Request to generate topic summary for a given recordingId
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { recordingId: string } }
+) {
+  const { recordingId } = params;
+
+  // Topic Post Method Calling
+  try {
+    await sendSqsMessage(recordingId);
+    await setTopicStatus(recordingId, "in_progress");
+    return NextResponse.json({
+      message: "Sent request to topic lambda function successfully",
+    });
+  } catch (sqsError) {
+    console.error("Error sending message to SQS:", sqsError);
+    return NextResponse.json(
+      { error: "Error sending message to SQS" },
+      { status: 500 }
+    );
+  }
+}
+
+// send sqs request to topic lambda function
+async function sendSqsMessage(recordingId: string) {
+  const messageBody = JSON.stringify({ recording_id: recordingId });
+
+  const command = new SendMessageCommand({
+    QueueUrl: process.env.AWS_SQS_QUEUE_URL,
+    MessageBody: messageBody,
+  });
+
+  await sqsClient.send(command);
+  console.log("Message sent to SQS:", messageBody);
+}
+
+async function setTopicStatus(recordingId: string, status: string) {
+  supabase
+    .from("Recording")
+    .update({ topic_status: status })
+    .eq("id", recordingId);
 }
