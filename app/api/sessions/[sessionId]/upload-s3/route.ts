@@ -84,7 +84,11 @@ export async function POST(
 async function createRecording(sessionId) {
   const { data, error } = await supabase
     .from("Recording")
-    .insert({ session_id: sessionId })
+    .insert({
+      session_id: sessionId,
+      stt_status: "pending",
+      topic_status: "pending",
+    })
     .select("id");
 
   if (error) {
@@ -98,7 +102,10 @@ async function createRecording(sessionId) {
 async function updateRecordingUrl(recordingId, fileUrl) {
   const { error } = await supabase
     .from("Recording")
-    .update({ s3_url: fileUrl })
+    .update({
+      s3_url: fileUrl,
+      stt_status: "ready",
+    })
     .eq("id", recordingId);
 
   if (error) {
