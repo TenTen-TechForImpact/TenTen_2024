@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import NavigationList from "../components/Sidebar/NavigationList";
 import MainContent from "../components/MainContent/MainContent";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
-import Header from "../components/Header/Header";
+import SessionHeader from "../components/Header/SessionHeader";
 import styles from "./ConsultationRecordPage.module.css";
 
 const ConsultationRecordPage: React.FC = () => {
@@ -614,16 +613,8 @@ const ConsultationRecordPage: React.FC = () => {
 
   return (
     <div className={styles.consultationRecordPage}>
-      <Header />
+      <SessionHeader activeTab={activeTab} onTabChange={handleTabChange} />
       <div className={styles.contentWrapper}>
-        <aside className={styles.sidebar}>
-          <NavigationList
-            activeTab={activeTab}
-            isRecording={isRecording}
-            isFirstSessionCompleted={isFirstSessionCompleted}
-            onTabChange={handleTabChange}
-          />
-        </aside>
         <main className={styles.mainContent}>
           {loading ? (
             <h2>상담 내용 로딩 중...</h2> // 로딩 메시지

@@ -15,7 +15,8 @@
 }
 
 .sectionTitle {
-  font-size: var(--font-size-large);
+  font-size: 24px;
+  margin-bottom: 16px;
 }
 
 .titleContainer {
@@ -55,7 +56,8 @@
 .label,
 .subFieldLabel {
   margin-top: 8px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 400;
 }
 
 .inputField {
