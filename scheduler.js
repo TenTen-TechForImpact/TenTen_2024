@@ -1,7 +1,7 @@
-import cron from "node-cron";
-import { createBrowserClient } from "@supabase/ssr";
-import axios from "axios";
-import dotenv from "dotenv";
+const cron = require("node-cron");
+const { createBrowserClient } = require("@supabase/ssr");
+const axios = require("axios");
+const dotenv = require("dotenv");
 
 // .env 파일 로드
 dotenv.config({ path: ".env.local" });

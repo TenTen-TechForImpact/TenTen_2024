@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run scheduler\"",
     "prebuild": "npm install",

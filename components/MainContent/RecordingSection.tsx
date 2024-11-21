@@ -198,7 +198,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
         <button type="submit">음성파일 업로드하기 (wav파일)</button>
       </form>
 
-      {audioURL && (
+      {audioFile && (
         <div className={styles.audioContainer}>
           <audio
             src={URL.createObjectURL(audioFile)}
