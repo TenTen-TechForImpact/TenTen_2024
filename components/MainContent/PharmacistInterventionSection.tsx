@@ -2,11 +2,27 @@ import React from "react";
 import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar";
 import styles from "./PharmacistInterventionSection.module.css";
 
+interface RelatedScript {
+  time: string;
+  content: string;
+}
+
+interface SessionSummaryItem {
+  topic_id: number;
+  start_time: string;
+  end_time: string;
+  content: string;
+  related_scripts: RelatedScript[];
+}
+
+type Topics = SessionSummaryItem[];
+
 interface PharmacistInterventionSectionProps {
   pharmacistIntervention: any;
   setPharmacistIntervention: React.Dispatch<React.SetStateAction<any>>;
   sessionId: string;
   onAddContent: (content: string) => void;
+  topics: Topics;
 }
 
 const PharmacistInterventionSection: React.FC<
@@ -16,6 +32,7 @@ const PharmacistInterventionSection: React.FC<
   setPharmacistIntervention,
   sessionId,
   onAddContent,
+  topics,
 }) => {
   const handleBlur = () => {
     const updatedField = {
@@ -60,26 +77,30 @@ const PharmacistInterventionSection: React.FC<
         placeholder="약사 중재 내용을 입력하세요."
       />
       <ConsultationSummaryBar
-        sessionSummary={[
-          {
-            topic_id: 1,
-            start_time: "0분 0초",
-            end_time: "1분 50초",
-            content: "미구현 상태입니다.",
-            related_scripts: [
-              {
-                time: "1분 24초",
-                content:
-                  "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
-              },
-              {
-                time: "1분 38초",
-                content:
-                  "줄이시는 게 발생한 문제를 해소하는 데 큰 도움이 될 거거든요.",
-              },
-            ],
-          },
-        ]}
+        sessionSummary={
+          topics
+            ? topics
+            : [
+                {
+                  topic_id: 1,
+                  start_time: "0분 0초",
+                  end_time: "1분 50초",
+                  content: "미구현 상태입니다.",
+                  related_scripts: [
+                    {
+                      time: "1분 24초",
+                      content:
+                        "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
+                    },
+                    {
+                      time: "1분 38초",
+                      content:
+                        "줄이시는 게 발생한 문제를 해소하는 데 큰 도움이 될 거거든요.",
+                    },
+                  ],
+                },
+              ]
+        }
         onAddContent={(content) => {
           setPharmacistIntervention({
             pharmacist_comments: `${pharmacistIntervention.pharmacist_comments}\n${content}`,

@@ -7,6 +7,27 @@ import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
 import SessionHeader from "../components/Header/SessionHeader";
 import styles from "./ConsultationRecordPage.module.css";
 
+interface RecordingItem {
+  id: string;
+  s3_url: string;
+  topic_status: string;
+  stt_status: string;
+  created_at: string;
+}
+
+interface RelatedScript {
+  time: string;
+  content: string;
+}
+
+interface SessionSummaryItem {
+  topic_id: number;
+  start_time: string;
+  end_time: string;
+  content: string;
+  related_scripts: RelatedScript[];
+}
+
 const ConsultationRecordPage: React.FC = () => {
   const pathname = usePathname();
   const sessionId = pathname.split("/").pop();
@@ -611,6 +632,79 @@ const ConsultationRecordPage: React.FC = () => {
     setActiveTab(tab);
   };
 
+  type Topics = SessionSummaryItem[];
+
+  //recording 정보 관리
+  const [recentRecording, setRecentRecording] = useState<RecordingItem | null>(
+    null
+  );
+  const [topics, setTopics] = useState<Topics>([]);
+
+  useEffect(() => {
+    const fetchRecordings = async () => {
+      try {
+        const response = await fetch(
+          `/api/sessions/${sessionId}/get_recording`
+        );
+        if (response.ok) {
+          const data: RecordingItem[] = await response.json();
+          console.log("Fetched Recordings:", data);
+          // 가장 최근 녹음 파일 선택
+          if (data.length > 0) {
+            const latestRecording = data.sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )[0];
+
+            setRecentRecording(latestRecording); // 최근 녹음 ID 저장
+          }
+        } else {
+          console.error("Failed to fetch recordings:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching recordings:", error);
+      }
+    };
+
+    fetchRecordings();
+  }, [sessionId]);
+
+  // Fetch topics using the recent recordingId
+  useEffect(() => {
+    const fetchTopics = async () => {
+      if (!recentRecording) return;
+      if (recentRecording.topic_status != "completed") {
+        console.log(
+          "stt",
+          recentRecording.stt_status,
+          "topic",
+          recentRecording.topic_status
+        );
+        return;
+      }
+      try {
+        const response = await fetch(
+          `/api/recordings/${recentRecording.id}/topic`,
+          {
+            method: "GET",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched Topics:", data);
+          setTopics(data.topicSummaries || []); // Topic 데이터 저장
+        } else {
+          console.error("Failed to fetch topics:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, [recentRecording]);
+
   return (
     <div className={styles.consultationRecordPage}>
       <SessionHeader activeTab={activeTab} onTabChange={handleTabChange} />
@@ -634,6 +728,7 @@ const ConsultationRecordPage: React.FC = () => {
               pharmacistIntervention={pharmacistIntervention}
               setPharmacistIntervention={setPharmacistIntervention}
               sessionId={sessionId}
+              topics={topics}
             />
           )}
         </main>
@@ -645,6 +740,8 @@ const ConsultationRecordPage: React.FC = () => {
               patientInfo={patientInfo}
               preQuestions={preQuestions}
               sessionSummaryData={sessionSummaryData}
+              recentRecording={recentRecording}
+              topics={topics}
             />
           )}
         </aside>

@@ -11,6 +11,21 @@ import PharmacistInterventionSection from "./PharmacistInterventionSection";
 import RecordingSection from "./RecordingSection";
 import styles from "./MainContent.module.css";
 
+interface RelatedScript {
+  time: string;
+  content: string;
+}
+
+interface SessionSummaryItem {
+  topic_id: number;
+  start_time: string;
+  end_time: string;
+  content: string;
+  related_scripts: RelatedScript[];
+}
+
+type Topics = SessionSummaryItem[];
+
 interface MainContentProps {
   isFollowUp: boolean;
   onCompleteFirstSession: () => void;
@@ -26,6 +41,7 @@ interface MainContentProps {
   setCareNote: React.Dispatch<React.SetStateAction<any>>;
   pharmacistIntervention: any;
   setPharmacistIntervention: React.Dispatch<React.SetStateAction<any>>;
+  topics: Topics;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -43,6 +59,7 @@ const MainContent: React.FC<MainContentProps> = ({
   setCareNote,
   pharmacistIntervention,
   setPharmacistIntervention,
+  topics,
 }) => {
   const handleAddContent = (content: string) => {
     console.log("추가된 content:", content);
@@ -131,6 +148,7 @@ const MainContent: React.FC<MainContentProps> = ({
               setPharmacistIntervention={setPharmacistIntervention}
               sessionId={sessionId}
               onAddContent={handleAddContent}
+              topics={topics}
             />
           </section>
           <section id="careNotes" className={styles.section}>
@@ -139,6 +157,7 @@ const MainContent: React.FC<MainContentProps> = ({
               setCareNote={setCareNote}
               sessionId={sessionId}
               onAddContent={handleAddContent}
+              topics={topics}
             />
           </section>
           <button

@@ -1,4 +1,10 @@
-import React, { useState, useRef, ChangeEvent, FormEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 import {
   FaMicrophone,
   FaPause,
@@ -24,6 +30,14 @@ interface Props {
   params: { sessionId: string };
 }
 
+interface RecordingItem {
+  id: string;
+  s3_url: string;
+  topic_status: string;
+  stt_status: string;
+  created_at: string;
+}
+
 const RecordingSection: React.FC<RecordingSectionProps> = ({
   onRecordingStatusChange,
   sessionId,
@@ -32,6 +46,71 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const recorderRef = useRef<AudioRecorder>(new AudioRecorder());
+
+  /*const [recentRecording, setRecentRecording] = useState<RecordingItem | null>(
+    null
+  );
+  const [topics, setTopics] = useState<any[]>([]); // Topic 데이터를 저장할 상태
+
+  useEffect(() => {
+    const fetchRecordings = async () => {
+      try {
+        const response = await fetch(
+          `/api/sessions/${sessionId}/get_recording`
+        );
+        if (response.ok) {
+          const data: RecordingItem[] = await response.json();
+          console.log("Fetched Recordings:", data);
+          // 가장 최근 녹음 파일 선택
+          if (data.length > 0) {
+            const latestRecording = data.sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )[0];
+
+            setRecentRecording(latestRecording); // 최근 녹음 ID 저장
+          }
+        } else {
+          console.error("Failed to fetch recordings:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching recordings:", error);
+      }
+    };
+
+    fetchRecordings();
+  }, [sessionId]);
+
+  // Fetch topics using the recent recordingId
+  useEffect(() => {
+    const fetchTopics = async () => {
+      if (!recentRecording) return;
+      if (recentRecording.topic_status != "completed") {
+        console.log("stt", recentRecording.stt_status, "topic", recentRecording.topic_status,);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `/api/recordings/${recentRecording.id}/topic`,
+          {
+            method: "GET",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched Topics:", data);
+          setTopics(data.topicSummaries || []); // Topic 데이터 저장
+        } else {
+          console.error("Failed to fetch topics:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, [recentRecording]);*/
 
   const handleStartOrPauseRecording = async () => {
     if (!isRecording) {
@@ -143,6 +222,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
       if (response.ok) {
         setUploadStatus(`File uploaded successfully and saved to DB`);
+        console.log("upload!");
         // TODO: request to ai server to get summary
       } else {
         setUploadStatus("File upload failed.");
