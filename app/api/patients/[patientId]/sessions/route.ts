@@ -99,7 +99,7 @@ export async function POST(
 
     const sessionTitle = title || "제목 없음";
 
-    // Patient 테이블에서 환자 정보 조회 (개인 정보 저장용)
+    // Patient 테이블에서 환자 정보 조회
     const { data: patient, error: patientError } = await supabase
       .from("Patient")
       .select("name, date_of_birth, phone_number")
@@ -113,7 +113,19 @@ export async function POST(
       );
     }
 
-    // defaultTemp에 personal_info 업데이트
+    // 이전 상담카드 가져오기
+    const { data: lastSession, error: lastSessionError } = await supabase
+      .from("Session")
+      .select("temp")
+      .eq("patient_id", patientId)
+      .order("session_datetime", { ascending: false })
+      .limit(1)
+      .single();
+
+    // 이전 상담카드가 없으면 defaultTemp 사용
+    const tempFromLastSession = lastSession ? lastSession.temp : defaultTemp;
+
+    // 새로운 상담카드의 temp 생성
     const updatedTemp = {
       ...defaultTemp,
       personal_info: {
@@ -121,6 +133,18 @@ export async function POST(
         date_of_birth: patient.date_of_birth,
         phone_number: patient.phone_number,
       },
+      consultation_info: {
+        ...tempFromLastSession.consultation_info,
+        current_consult_date: session_datetime, // 새로 입력된 값
+        consult_session_number: "", // 초기화
+      },
+      medical_conditions: tempFromLastSession.medical_conditions,
+      lifestyle: tempFromLastSession.lifestyle,
+      medication_management: tempFromLastSession.medication_management,
+      questions: tempFromLastSession.questions,
+      current_medications: tempFromLastSession.current_medications,
+      pharmacist_comments: "", // 초기화
+      care_note: "", // 초기화
     };
 
     // Session 테이블에 데이터 삽입
@@ -135,7 +159,7 @@ export async function POST(
           temp: updatedTemp,
         },
       ])
-      .single(); // 삽입 후 단일 레코드 반환
+      .single();
 
     // 에러 처리
     if (sessionError) {
