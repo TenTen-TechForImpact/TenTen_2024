@@ -49,10 +49,12 @@
 }
 
 .label {
-  font-size: 14px;
   margin-bottom: 8px;
 }
+
+.label,
 .subFieldLabel {
+  margin-top: 8px;
   font-size: 14px;
 }
 
