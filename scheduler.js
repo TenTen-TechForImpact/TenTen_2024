@@ -6,6 +6,10 @@ import dotenv from "dotenv";
 // .env 파일 로드
 dotenv.config({ path: ".env.local" });
 
+const BASE_URL =
+  // process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_BASE_URL;
+
 // Supabase 클라이언트 생성
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -24,7 +28,7 @@ async function sttScheduler() {
   const { data, error } = await supabase
     .from("Recording")
     .select("id")
-    .eq("stt_status", "pending");
+    .eq("stt_status", "ready");
 
   if (error) {
     console.error("Error fetching recording:", error.message);
@@ -33,7 +37,7 @@ async function sttScheduler() {
   data.forEach(async (recording) => {
     try {
       const response = await axios.post(
-        `/api/recordings/${recording.id}/transcription`,
+        `${BASE_URL}/api/recordings/${recording.id}/transcription`,
         null
       );
       console.log("Transcription successfully requested");
@@ -47,7 +51,7 @@ async function topicScheduler() {
   const { data, error } = await supabase
     .from("Recording")
     .select("id")
-    .eq("topic_status", "pending");
+    .eq("topic_status", "ready");
 
   if (error) {
     console.error("Error fetching recording:", error.message);
@@ -56,7 +60,7 @@ async function topicScheduler() {
   data.forEach(async (recording) => {
     try {
       const response = await axios.post(
-        `/api/recordings/${recording.id}/topic`,
+        `${BASE_URL}/api/recordings/${recording.id}/topic`,
         null
       );
       console.log("Topic successfully requested");
