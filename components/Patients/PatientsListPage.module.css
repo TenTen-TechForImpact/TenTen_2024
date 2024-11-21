@@ -1,5 +1,5 @@
 /* 환자 리스트 전체 컨테이너 */
-.patientListContainer {
+.Page {
   padding: 20px;
 }
 
@@ -20,7 +20,7 @@
 
 /* 날짜별 그룹화 컨테이너 */
 .groupContainer {
-  margin-bottom: 20px;
+  margin-bottom: 64px;
   padding: 0 16px;
   border: 1px solid #ccc;
   border-radius: 16px;
@@ -30,14 +30,43 @@
 
 /* 날짜 그룹 헤더 */
 .groupHeader {
+  flex-direction: row;
   font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 32px;
   margin-left: 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  gap: 16px;
 }
+
+.groupHeaderTime {
+  /* flex-direction: column; */
+  gap: 0px;
+}
+
+.groupHeaderDay {
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1;
+}
+
+.groupHeaderDate {
+  font-size: 49px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1;
+}
+
+.groupHeaderOrganization {
+  font-size: 30px;
+  font-weight: 700;
+  margin-left: 16px;
+  padding-bottom: 8px;
+  line-height: 1;
+}
+
 
 .dateText {
   font-size: 0.9rem;

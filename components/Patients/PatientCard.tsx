@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import styles from "./PatientCard.module.css";
 
 interface Patient {
@@ -17,17 +16,13 @@ interface Patient {
 
 interface PatientCardProps {
   patient: Patient;
+  onViewDetails: (patient: Patient) => void;
   onDelete: (patient: Patient) => void;
   onEdit: (patient: Patient) => void;
 }
 
-const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) => {
-  const router = useRouter();
+const PatientCard: React.FC<PatientCardProps> = ({ patient, onViewDetails, onDelete, onEdit }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-
-  const handleViewDetails = () => {
-    router.push(`/patients/${patient.id}`);
-  };
 
   const handleDeleteClick = () => {
     onDelete(patient);
@@ -38,6 +33,11 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) 
     onEdit(patient);
     setShowDropdown(false);
   };
+
+  const handleViewDetailsClick = () => {
+    onViewDetails(patient);
+    setShowDropdown(false);
+  }
 
   const toggleDropdown = () => {
     setShowDropdown((prev) => !prev);
@@ -54,18 +54,18 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) 
         <div className={styles.patientField}>
           {patient.modified_at.toISOString().split("T")[0]}
         </div>
-        <button className={styles.actionButton} onClick={() => setShowDropdown(!showDropdown)}>
+        <button className={styles.actionButton} onClick={toggleDropdown}>
           ⋮
         </button>
         {showDropdown && (
           <div className={styles.dropdownMenu}>
-            <div className={styles.dropdownItem} onClick={() => onEdit(patient)}>
+            <div className={styles.dropdownItem} onClick={handleEditClick}>
               수정
             </div>
-            <div className={styles.dropdownItem} onClick={() => onDelete(patient)}>
+            <div className={styles.dropdownItem} onClick={handleDeleteClick}>
               삭제
             </div>
-            <div className={styles.dropdownItem} onClick={handleViewDetails}>
+            <div className={styles.dropdownItem} onClick={handleViewDetailsClick}>
               상담 보기
             </div>
           </div>

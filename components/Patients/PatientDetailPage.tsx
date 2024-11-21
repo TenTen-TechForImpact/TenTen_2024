@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import SessionCard from "./SessionCard";
 import Header from "../Header/Header";
+import PatientProfile from "./PatientProfile";
 import SessionAddModal from "./SessionAddModal";
+import DeleteModal from "@/components/DeleteModal";
 import styles from "./PatientDetailPage.module.css";
 
 interface Patient {
@@ -46,10 +48,16 @@ const PatientDetailPage: React.FC = () => {
   const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!patientId) return;
+    loadSessions();
+  }, [patientId]);
+
+  //API를 통해 상담 목록을 가져오는 함수
   const loadSessions = async () => {
     setLoading(true);
     try {
@@ -69,17 +77,15 @@ const PatientDetailPage: React.FC = () => {
 
       setPatientInfo(formattedPatientInfo);
       setSessions(formattedSessions);
+      setSelectedSession(null);
+      setShowModal(false);
+      setShowDeleteModal(false);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!patientId) return;
-    loadSessions();
-  }, [patientId]);
 
   const fetchPatientInfo = async (
     patientId: string
@@ -91,77 +97,49 @@ const PatientDetailPage: React.FC = () => {
     return await response.json();
   };
 
-  const handleAddSession = () => {
-    setSelectedSession(null);
-    setIsEditMode(false);
-    setShowModal(true);
-  };
-
-  const handleEditSession = (session: Session) => {
-    setSelectedSession(session);
-    setIsEditMode(true);
-    setShowModal(true);
-  };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedSession(null);
-    setIsEditMode(false);
   };
 
-  const handleSubmitSession = async (sessionData: {
-    title: string;
-    session_datetime: Date;
-  }) => {
+  // 상담 추가 함수
+  const handleAddSession = async (sessionData: { title: string; session_datetime: Date }) => {
+    setLoading(true);
     try {
       const formattedSessionData = {
         title: sessionData.title,
         session_datetime: sessionData.session_datetime.toISOString(),
       };
-      if (isEditMode && selectedSession) {
-        const response = await fetch(
-          `/api/patients/${patientId}/sessions/${selectedSession.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formattedSessionData),
-          }
-        );
 
-        if (!response.ok) {
-          throw new Error("Failed to update session");
-        }
-        await loadSessions();
-      } else {
-        const response = await fetch(`/api/patients/${patientId}/sessions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formattedSessionData),
-        });
+      const response = await fetch(`/api/patients/${patientId}/sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formattedSessionData),
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to create session");
-        }
-        await loadSessions();
+      if (!response.ok) {
+        throw new Error("Failed to create session");
       }
-      setShowModal(false);
+
+      await loadSessions();
     } catch (error) {
-      console.error("Error submitting session:", error);
-      alert("세션 저장에 실패했습니다. 다시 시도해주세요.");
+      console.error("Error creating session:", error);
+      alert("세션 추가에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteSession = async (id: string) => {
+  // 상담 삭제 함수
+  const handleDeleteSession = async () => {
     setLoading(true);
     try {
+      console.log(selectedSession.id)
       const response = await fetch(
-        `/api/patients/${patientId}/sessions/${id}`,
+        `/api/patients/${patientId}/sessions/${selectedSession.id}`,
         {
           method: "DELETE",
         }
@@ -171,9 +149,7 @@ const PatientDetailPage: React.FC = () => {
         throw new Error("Failed to delete session");
       }
 
-      setSessions((prevSessions) =>
-        prevSessions.filter((session) => session.id !== id)
-      );
+      await loadSessions();
     } catch (error) {
       console.error("Error deleting session:", error);
       alert("세션 삭제에 실패했습니다. 다시 시도해주세요.");
@@ -182,40 +158,118 @@ const PatientDetailPage: React.FC = () => {
     }
   };
 
+  // 상담 수정 함수
+  const handleUpdateSession = async (sessionData: { title: string; session_datetime: Date }) => {
+    setLoading(true);
+    try {
+      if (!selectedSession) {
+        throw new Error("No session selected for update");
+      }
+
+      const formattedSessionData = {
+        title: sessionData.title,
+        session_datetime: sessionData.session_datetime.toISOString(),
+      };
+
+      const response = await fetch(
+        `/api/patients/${patientId}/sessions/${selectedSession.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formattedSessionData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update session");
+      }
+
+      await loadSessions();
+    } catch (error) {
+      console.error("Error updating session:", error);
+      alert("세션 수정에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 상담 삭제 확인 모달 열기
+  const handleDeleteConfirm = (session: Session) => {
+    setSelectedSession(session);
+    setShowDeleteModal(true);
+  };
+
+  // 상담 정보 수정 핸들러
+  const handleEditSession = (session: Session) => {
+    setSelectedSession(session);
+    setShowModal(true);
+  };
+
+  // 상담 내용 보기 핸들러
+  const handleViewDetails = (session: Session) => {
+    setSelectedSession(session);
+    router.push(`../sessions/${session.id}`)
+  };
+
+
+
   return (
-    <div className={styles.detailPage}>
+    <div className={styles.Page}>
       <Header />
-      <h2>환자 상세 정보</h2>
+      {patientInfo ? (
+        <PatientProfile patient={patientInfo}></PatientProfile>
+      ) : (
+        <p>환자 정보 로딩 중...</p>
+      )}
+
       {error && <div className={styles.errorMessage}>{error}</div>}
-      <div className={styles.sessionContainer}>
-        <div className={styles.addSessionCard} onClick={handleAddSession}>
-          <span className={styles.addButton}>+</span>
-        </div>
-        {sessions && sessions.length > 0 ? (
-          sessions.map((session) => (
-            <SessionCard
-              key={session.id}
-              id={session.id}
-              dateTime={session.session_datetime}
-              modifiedDateTime={session.modified_at}
-              title={session.title}
-              onViewDetails={() => router.push(`../sessions/${session.id}`)}
-              onDelete={() => handleDeleteSession(session.id)}
-              onEdit={() => handleEditSession(session)}
-            />
-          ))
-        ) : (
-          <p>상담 카드 로딩 중...</p>
-        )}
-      </div>
       {showModal && (
         <SessionAddModal
           session={selectedSession || undefined}
           patient={patientInfo}
-          isEditMode={isEditMode}
+          isEditMode={!!selectedSession}
           onClose={handleCloseModal}
-          onSubmit={handleSubmitSession}
+          onSubmit={selectedSession ? handleUpdateSession : handleAddSession}
         />
+      )}
+      {showDeleteModal && (
+        <DeleteModal
+          onConfirm={handleDeleteSession}
+          onCancel={() => setShowDeleteModal(false)}
+          deleteName={`상담 제목: "${selectedSession?.title}"`}
+        />
+      )}
+      {loading ? (
+        <p>상담 목록 로딩 중...</p>
+      ) : (
+        <div className={styles.sessionContainer}>
+          <div className={styles.tableHeader}>
+            <div className={styles.tableHeaderItem}>이름</div>
+            <div className={styles.tableHeaderItem}>상담 날짜</div>
+            <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
+            <button
+              className={styles.actionButton}
+              onClick={() => setShowModal(true)}
+            >
+              +
+            </button>
+          </div>
+          <div className={styles.cardList}>
+            {sessions
+              .sort((a, b) => b.modified_at.getTime() - a.modified_at.getTime())
+              .map((session) => (
+                <SessionCard
+                  key={session.id}
+                  session={session}
+                  onViewDetails={handleViewDetails}
+                  onDelete={handleDeleteConfirm}
+                  onEdit={handleEditSession}
+                />
+              ))}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,41 +1,25 @@
-/* 개별 환자 행 */
-.patientRow {
-  display: flex;
-  align-items: center;
-  /* 수직 중앙 정렬 */
-  height: 50px;
-  /* 고정된 높이 */
-  line-height: 1.5;
-  /* 텍스트가 중앙에 위치 */
-  justify-content: space-between;
-  /* 데이터 아이템 간 간격 균등 분배 */
-  padding: 0 30px;
-  margin-left: 8px;
-  /* 좌우 여백 */
-  /*border-top: 1px solid #ddd;*/
-  /* 행 구분선 */
-  position: relative;
-}
-
 .patientContainer {
   padding: 8px 0;
 }
 
-/* 데이터 필드 스타일 */
-.patientField {
-  flex: 1;
-  /* 각 데이터 아이템이 동일한 비율로 공간 차지 */
-  text-align: left;
-  /* 텍스트 중앙 정렬 */
-  margin: 0;
-  font-weight: 600;
-  /* 여백 초기화 */
-  /*border-right: 1px solid #ddd;
-  border-left: 1px solid #ddd;*/
-
+.patientRow {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  line-height: 1.5;
+  justify-content: space-between;
+  padding: 0 30px;
+  margin-left: 8px;
+  position: relative;
 }
 
-/* 데이터 우측 액션 버튼 */
+.patientField {
+  flex: 1;
+  text-align: left;
+  margin: 0;
+  font-weight: 600;
+}
+
 .actionButton {
   width: 30px;
   height: 30px;
@@ -47,10 +31,8 @@
 
 .actionButton:hover {
   color: #ff0000;
-  /* 버튼에 호버 시 강조 색상 */
 }
 
-/* 드롭다운 메뉴 */
 .dropdownMenu {
   position: absolute;
   top: 50px;
