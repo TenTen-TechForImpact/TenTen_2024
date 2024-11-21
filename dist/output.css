@@ -1848,11 +1848,6 @@ input[type="range"]::-ms-fill-lower {
   gap: 1rem;
 }
 
-.gap-x-3 {
-  -moz-column-gap: 0.75rem;
-       column-gap: 0.75rem;
-}
-
 .-space-x-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(-1rem * var(--tw-space-x-reverse));
@@ -3023,11 +3018,6 @@ input[type="range"]::-ms-fill-lower {
 
 .leading-tight {
   line-height: 1.25;
-}
-
-.text-black {
-  --tw-text-opacity: 1;
-  color: rgb(5 3 20 / var(--tw-text-opacity, 1));
 }
 
 .text-blue-500 {

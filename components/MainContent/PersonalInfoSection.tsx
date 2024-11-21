@@ -502,8 +502,8 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           {patientInfo.medical_conditions?.allergies?.has_allergies ===
             "예" && (
             <div className={styles.subField}>
-              <label className={styles.subFieldLabel}>
-                알레르기 의심 식품 또는 약물
+              <label className={styles.label}>
+                - 알레르기 의심 식품 또는 약물
               </label>
               <TextInput
                 value={
@@ -520,18 +520,19 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   handleBlur("medical_conditions.allergies.suspected_items")
                 }
                 placeholder="내용을 입력하세요"
+                className="mt-2"
               />
             </div>
           )}
           <div className={styles.infoItem}>
             <label className={styles.label}>약물 부작용 여부</label>
-            <div className={styles.yesNoContainer}>
+            <Button.Group className="gap-1">
               <button
-                className={`${styles.yesNoButton} ${
+                className={`px-4 py-2 rounded ${
                   patientInfo.medical_conditions?.adverse_drug_reactions
                     ?.has_adverse_drug_reactions === "예"
-                    ? styles.active
-                    : ""
+                    ? "bg-cyan-500 text-white"
+                    : "bg-gray-200 text-gray-700"
                 }`}
                 onClick={() => {
                   handleInputChange(
@@ -539,18 +540,18 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     "예"
                   );
                   handleBlur(
-                    "medical_conditions.adverse_drug_reactions.has_adverse_drug_reactions"
+                    "medical_conditions..adverse_drug_reactions.has_adverse_drug_reactions"
                   );
                 }}
               >
                 예
               </button>
               <button
-                className={`${styles.yesNoButton} ${
+                className={`px-4 py-2 rounded ${
                   patientInfo.medical_conditions?.adverse_drug_reactions
                     ?.has_adverse_drug_reactions === "아니오"
-                    ? styles.active
-                    : ""
+                    ? "bg-cyan-500 text-white"
+                    : "bg-gray-200 text-gray-700"
                 }`}
                 onClick={() => {
                   handleInputChange(
@@ -564,13 +565,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
               >
                 아니오
               </button>
-            </div>
+            </Button.Group>
             {patientInfo.medical_conditions?.adverse_drug_reactions
               ?.has_adverse_drug_reactions === "예" && (
               <div className={styles.subField}>
-                <label className={styles.subFieldLabel}>부작용 의심 약물</label>
-                <input
-                  type="text"
+                <label className={styles.subFieldLabel}>
+                  - 부작용 의심 약물
+                </label>
+                <TextInput
                   value={
                     patientInfo.medical_conditions?.adverse_drug_reactions
                       ?.suspected_medications || ""
@@ -586,12 +588,11 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                       "medical_conditions.adverse_drug_reactions.suspected_medications"
                     )
                   }
-                  className={inputFieldClass}
                   placeholder="내용을 입력하세요"
                 />
                 <div className={styles.subField}>
-                  <label className={styles.subFieldLabel}>부작용 증상</label>
-                  <input
+                  <label className={styles.subFieldLabel}>- 부작용 증상</label>
+                  <TextInput
                     type="text"
                     value={
                       patientInfo.medical_conditions?.adverse_drug_reactions
@@ -608,7 +609,6 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         "medical_conditions.adverse_drug_reactions.reaction_details"
                       )
                     }
-                    className={inputFieldClass}
                     placeholder="부작용 증상을 입력하세요"
                   />
                 </div>
@@ -616,80 +616,73 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
             )}
           </div>
         </div>
-
-        <div className={styles.subSection}>
-          <div className={styles.infoItem}>
-            <label className={styles.label}>흡연 여부</label>
-            <div className={styles.yesNoContainer}>
-              <button
-                className={`${styles.yesNoButton} ${
-                  patientInfo.lifestyle?.smoking?.is_smoking === "예"
-                    ? styles.active
-                    : ""
-                }`}
-                onClick={() => {
-                  handleInputChange("lifestyle.smoking.is_smoking", "예");
-                  handleBlur("lifestyle.smoking.is_smoking");
-                }}
-              >
-                예
-              </button>
-              <button
-                className={`${styles.yesNoButton} ${
-                  patientInfo.lifestyle?.smoking?.is_smoking === "아니오"
-                    ? styles.active
-                    : ""
-                }`}
-                onClick={() => {
-                  handleInputChange("lifestyle.smoking.is_smoking", "아니오");
-                  handleBlur("lifestyle.smoking.is_smoking");
-                }}
-              >
-                아니오
-              </button>
-            </div>
-            {patientInfo.lifestyle?.smoking?.is_smoking === "예" && (
+      </div>
+      <div className={styles.subSection}>
+        <div className={styles.infoItem}>
+          <label className={styles.label}>흡연 여부</label>
+          <div className={styles.yesNoContainer}>
+            <button
+              className={`${styles.yesNoButton} ${
+                patientInfo.lifestyle?.smoking?.is_smoking === "예"
+                  ? styles.active
+                  : ""
+              }`}
+              onClick={() => {
+                handleInputChange("lifestyle.smoking.is_smoking", "예");
+                handleBlur("lifestyle.smoking.is_smoking");
+              }}
+            >
+              예
+            </button>
+            <button
+              className={`${styles.yesNoButton} ${
+                patientInfo.lifestyle?.smoking?.is_smoking === "아니오"
+                  ? styles.active
+                  : ""
+              }`}
+              onClick={() => {
+                handleInputChange("lifestyle.smoking.is_smoking", "아니오");
+                handleBlur("lifestyle.smoking.is_smoking");
+              }}
+            >
+              아니오
+            </button>
+          </div>
+          {patientInfo.lifestyle?.smoking?.is_smoking === "예" && (
+            <div className={styles.subField}>
+              <label className={styles.subFieldLabel}>흡연 기간 (년)</label>
+              <input
+                type="text"
+                value={patientInfo.lifestyle?.smoking?.duration_in_years || ""}
+                onChange={(e) =>
+                  handleInputChange(
+                    "lifestyle.smoking.duration_in_years",
+                    e.target.value
+                  )
+                }
+                onBlur={() => handleBlur("lifestyle.smoking.duration_in_years")}
+                className={inputFieldClass}
+                placeholder="내용을 입력하세요"
+              />
               <div className={styles.subField}>
-                <label className={styles.subFieldLabel}>흡연 기간 (년)</label>
+                <label className={styles.subFieldLabel}>평균 흡연량 (갑)</label>
                 <input
                   type="text"
-                  value={
-                    patientInfo.lifestyle?.smoking?.duration_in_years || ""
-                  }
+                  value={patientInfo.lifestyle?.smoking?.pack_per_day || ""}
                   onChange={(e) =>
                     handleInputChange(
-                      "lifestyle.smoking.duration_in_years",
+                      "lifestyle.smoking.pack_per_day",
                       e.target.value
                     )
                   }
-                  onBlur={() =>
-                    handleBlur("lifestyle.smoking.duration_in_years")
-                  }
+                  onBlur={() => handleBlur("lifestyle.smoking.pack_per_day")}
                   className={inputFieldClass}
                   placeholder="내용을 입력하세요"
                 />
-                <div className={styles.subField}>
-                  <label className={styles.subFieldLabel}>
-                    평균 흡연량 (갑)
-                  </label>
-                  <input
-                    type="text"
-                    value={patientInfo.lifestyle?.smoking?.pack_per_day || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "lifestyle.smoking.pack_per_day",
-                        e.target.value
-                      )
-                    }
-                    onBlur={() => handleBlur("lifestyle.smoking.pack_per_day")}
-                    className={inputFieldClass}
-                    placeholder="내용을 입력하세요"
-                  />
-                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          )}
+        </div>{" "}
         <div className={styles.infoItem}>
           <label className={styles.label}>음주 여부</label>
           <div className={styles.yesNoContainer}>
