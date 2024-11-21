@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"next dev\" \"npm run scheduler\"",
     "prebuild": "npm install",
-    "build": "next build"
+    "build": "next build",
+    "scheduler": "node scheduler.js"
   },
   "keywords": [],
   "author": "",
@@ -23,12 +25,14 @@
     "@supabase/supabase-js": "^2.45.4",
     "aws-sdk": "^2.1691.0",
     "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
     "flowbite": "^2.5.2",
     "flowbite-react": "^0.10.2",
     "formidable": "^3.5.1",
     "icons": "^1.0.0",
     "lodash": "^4.17.21",
     "next": "^14.2.14",
+    "node-cron": "^3.0.3",
     "qs": "^6.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -39,6 +43,7 @@
   "devDependencies": {
     "@types/node": "22.7.4",
     "@types/react": "18.3.11",
+    "concurrently": "^9.1.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
