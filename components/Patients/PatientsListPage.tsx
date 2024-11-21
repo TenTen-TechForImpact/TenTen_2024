@@ -161,6 +161,14 @@ const PatientsListPage = () => {
     return `${days[d.getDay()]} ${d.getDate()}`;
   };
 
+  // 이름으로 필터링된 환자 목록
+  const filteredPatients =
+    searchTerm.trim() === ""
+      ? []
+      : patients.filter((patient) =>
+        patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
   return (
     <div className={styles.patientListContainer}>
       <div className={styles.listHeader}>
@@ -168,6 +176,12 @@ const PatientsListPage = () => {
         <SearchBar
           placeholder="검색어를 입력하세요"
           onSearch={(term) => setSearchTerm(term)}
+          searchTerm={searchTerm}
+          filteredPatients={patients.filter((patient) =>
+            patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )}
+          onDelete={handleDeleteConfirm}
+          onEdit={handleEditPatient}
         />
         <ActionButton
           text="+"

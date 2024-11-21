@@ -68,3 +68,46 @@
   margin: 0;
   /* 여백 초기화 */
 }
+
+
+
+.filteredResults {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.resultItem:last-child {
+  border-bottom: none;
+}
+
+.resultName,
+.resultDOB,
+.resultGender {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.resultName {
+  font-weight: bold;
+}
+
+.resultDOB {
+  color: #666;
+}
+
+.resultGender {
+  color: #444;
+}
