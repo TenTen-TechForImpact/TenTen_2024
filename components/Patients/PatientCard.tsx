@@ -44,32 +44,34 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onDelete, onEdit }) 
   };
 
   return (
-    <div className={styles.patientRow}>
-      <div className={styles.patientField}>{patient.name}</div>
-      <div className={styles.patientField}>
-        {patient.date_of_birth.toISOString().split("T")[0]}
-      </div>
-      <div className={styles.patientField}>{patient.gender}</div>
-      <div className={styles.patientField}>
-        {patient.modified_at.toISOString().split("T")[0]}
-      </div>
-      <button className={styles.actionButton} onClick={() => setShowDropdown(!showDropdown)}>
-        ⋮
-      </button>
-      {showDropdown && (
-        <div className={styles.dropdownMenu}>
-          <div className={styles.dropdownItem} onClick={() => onEdit(patient)}>
-            수정
-          </div>
-          <div className={styles.dropdownItem} onClick={() => onDelete(patient)}>
-            삭제
-          </div>
-          <div className={styles.dropdownItem} onClick={handleViewDetails}>
-            상담 보기
-          </div>
+    <div className={styles.patientContainer}>
+      <div className={styles.patientRow}>
+        <div className={styles.patientField}>{patient.name}</div>
+        <div className={styles.patientField}>
+          {patient.date_of_birth.toISOString().split("T")[0]}
         </div>
-      )}
-    </div>
+        <div className={styles.patientField}>{patient.gender}</div>
+        <div className={styles.patientField}>
+          {patient.modified_at.toISOString().split("T")[0]}
+        </div>
+        <button className={styles.actionButton} onClick={() => setShowDropdown(!showDropdown)}>
+          ⋮
+        </button>
+        {showDropdown && (
+          <div className={styles.dropdownMenu}>
+            <div className={styles.dropdownItem} onClick={() => onEdit(patient)}>
+              수정
+            </div>
+            <div className={styles.dropdownItem} onClick={() => onDelete(patient)}>
+              삭제
+            </div>
+            <div className={styles.dropdownItem} onClick={handleViewDetails}>
+              상담 보기
+            </div>
+          </div>
+        )}
+      </div>
+    </div >
   );
 };
 

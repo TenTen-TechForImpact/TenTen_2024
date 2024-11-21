@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./PatientsListPage.module.css";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/components/Patients/SearchBar";
 import ActionButton from "@/components/ActionButton";
 import PatientCard from "@/components/Patients/PatientCard";
 import PatientAddModal from "@/components/Patients/PatientAddModal";
@@ -144,14 +144,22 @@ const PatientsListPage = () => {
     setShowModal(true);
   };
 
-  // 날짜별로 그룹화하는 함수
+  // 날짜별로 그룹화하고 날짜로 정렬하는 함수
   const groupByModifiedDate = (patients: Patient[]) => {
-    return patients.reduce((acc: Record<string, Patient[]>, patient) => {
+    const grouped = patients.reduce((acc: Record<string, Patient[]>, patient) => {
       const dateKey = patient.modified_at.toISOString().split("T")[0];
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(patient);
       return acc;
     }, {});
+
+    // 날짜로 정렬
+    const sortedEntries = Object.entries(grouped).sort(
+      ([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime()
+    );
+
+    // 다시 객체 형태로 변환
+    return Object.fromEntries(sortedEntries);
   };
 
   // 날짜와 요일 포맷팅
@@ -226,6 +234,8 @@ const PatientsListPage = () => {
                     <div className={styles.tableHeaderItem}>생년월일</div>
                     <div className={styles.tableHeaderItem}>성별</div>
                     <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
+                    <button className={styles.fakeButton}>
+                    </button>
                   </div>
                   <div className={styles.cardList}>
                     {patientGroup

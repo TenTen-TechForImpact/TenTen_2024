@@ -9,23 +9,29 @@
   /* 텍스트가 중앙에 위치 */
   justify-content: space-between;
   /* 데이터 아이템 간 간격 균등 분배 */
-  padding: 0 15px;
+  padding: 0 30px;
+  margin-left: 8px;
   /* 좌우 여백 */
-  border-bottom: 1px solid #ddd;
+  /*border-top: 1px solid #ddd;*/
   /* 행 구분선 */
   position: relative;
+}
+
+.patientContainer {
+  padding: 8px 0;
 }
 
 /* 데이터 필드 스타일 */
 .patientField {
   flex: 1;
   /* 각 데이터 아이템이 동일한 비율로 공간 차지 */
-  text-align: center;
+  text-align: left;
   /* 텍스트 중앙 정렬 */
   margin: 0;
+  font-weight: 600;
   /* 여백 초기화 */
-  border-right: 1px solid #ddd;
-  border-left: 1px solid #ddd;
+  /*border-right: 1px solid #ddd;
+  border-left: 1px solid #ddd;*/
 
 }
 

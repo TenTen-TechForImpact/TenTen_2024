@@ -12,6 +12,8 @@
   padding-left: var(--padding-page);
   line-height: var(--header-height);
   box-sizing: border-box;
+  background-color: white;
+  z-index: 1000;
 }
 
 .headertext {
