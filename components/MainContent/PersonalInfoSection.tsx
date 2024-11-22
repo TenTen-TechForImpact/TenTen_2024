@@ -167,7 +167,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 handleInputChange("personal_info.name", e.target.value)
               }
               onBlur={() => handleBlur("personal_info.name")}
-              placeholder="아무개"
+              placeholder="성명"
             />
           </div>
           <div className={styles.infoItem}>

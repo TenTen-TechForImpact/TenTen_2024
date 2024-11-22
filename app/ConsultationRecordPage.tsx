@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import MainContent from "../components/MainContent/MainContent";
+import PersonalInfoLoading from "@/components/MainContent/PersonalInfoLoading";
 import FirstSessionSummary from "../components/Sidebar/FirstSessionSummary";
 import SessionHeader from "../components/Header/SessionHeader";
 import styles from "./ConsultationRecordPage.module.css";
+import { Spinner } from "flowbite-react";
 
 interface RecordingItem {
   id: string;
@@ -675,7 +677,8 @@ const ConsultationRecordPage: React.FC = () => {
         "stt",
         recentRecording.stt_status,
         "topic",
-        recentRecording.topic_status
+        recentRecording.topic_status,
+        recentRecording.created_at
       );
       if (recentRecording.topic_status != "completed") {
         return;
@@ -708,7 +711,13 @@ const ConsultationRecordPage: React.FC = () => {
       <div className={styles.contentWrapper}>
         <main className={styles.mainContent}>
           {loading ? (
-            <h2>상담 내용 로딩 중...</h2> // 로딩 메시지
+            <div className={styles.loading}>
+              <div className={styles.loadingContainer}>
+                <h3 className={styles.loadingTitle}>환자 상세 정보</h3>
+                <Spinner className={styles.loadingTitle} color="gray" />
+              </div>
+              <PersonalInfoLoading />
+            </div>
           ) : (
             <MainContent
               isFollowUp={activeTab === "followUp"}
