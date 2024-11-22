@@ -21,59 +21,101 @@ export async function POST(
 ) {
   const { sessionId } = params;
 
-  console.log("Session ID:", sessionId);
+  console.log("Session ID received:", sessionId);
 
   try {
-    const { fileUrl } = await req.json();
-    console.log("File URL received:", fileUrl);
+    // Step 1: Parse request body
+    let fileUrl: string | undefined;
+    try {
+      const body = await req.json();
+      fileUrl = body?.fileUrl;
+      console.log("File URL received:", fileUrl);
+    } catch (error) {
+      console.error("Failed to parse JSON body:", error);
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
 
+    // Step 2: Validate fileUrl
     if (!fileUrl) {
-      console.error("File URL is missing");
+      console.error("Validation failed: File URL is missing");
       return NextResponse.json(
         { error: "File URL is required" },
         { status: 400 }
       );
     }
 
-    // Insert a new recording and get the ID
-    const recordingId = await createRecording(sessionId);
-    console.log("Recording ID created:", recordingId);
-
-    // Update the recording with the file URL
-    const { error } = await supabase
-      .from("Recording")
-      .update({ s3_url: fileUrl, stt_status: "ready" })
-      .eq("id", recordingId);
-
-    if (error) {
-      console.error("Database update error:", error);
-      throw new Error(`Database update failed: ${error.message}`);
+    // Step 3: Create a new recording in the database
+    let recordingId: string;
+    try {
+      recordingId = await createRecording(sessionId);
+      console.log("Recording created successfully. ID:", recordingId);
+    } catch (error) {
+      console.error("Error during createRecording:", error.message);
+      return NextResponse.json(
+        { error: "Failed to create recording" },
+        { status: 500 }
+      );
     }
 
+    // Step 4: Update the recording with the S3 file URL
+    try {
+      const { error } = await supabase
+        .from("Recording")
+        .update({ s3_url: fileUrl, stt_status: "ready" })
+        .eq("id", recordingId);
+
+      if (error) {
+        console.error("Database update error:", error.message);
+        throw new Error("Failed to update recording in the database");
+      }
+      console.log(
+        "Database updated successfully for recording ID:",
+        recordingId
+      );
+    } catch (error) {
+      console.error("Error updating the recording:", error.message);
+      return NextResponse.json(
+        { error: "Failed to update the recording" },
+        { status: 500 }
+      );
+    }
+
+    // Step 5: Return success response
     return NextResponse.json({ message: "Database updated successfully" });
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.error("Unexpected error occurred:", error.message);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: error.message },
       { status: 500 }
     );
   }
 }
 
 async function createRecording(sessionId: string): Promise<string> {
-  const { data, error } = await supabase
-    .from("Recording")
-    .insert({
-      session_id: sessionId,
-      stt_status: "pending",
-      topic_status: "pending",
-    })
-    .select("id")
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("Recording")
+      .insert({
+        session_id: sessionId,
+        stt_status: "pending",
+        topic_status: "pending",
+      })
+      .select("id")
+      .single();
 
-  if (error) {
-    throw new Error(`Database insert failed: ${error.message}`);
+    if (error) {
+      console.error("Error inserting new recording:", error.message);
+      throw new Error("Failed to insert new recording");
+    }
+
+    if (!data?.id) {
+      console.error("Recording creation failed: Missing ID in response");
+      throw new Error("Failed to create recording: ID is missing");
+    }
+
+    return data.id;
+  } catch (error) {
+    console.error("Error in createRecording function:", error.message);
+    throw error; // Re-throw the error to propagate it to the caller
   }
-
-  return data.id;
 }
