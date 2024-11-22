@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./PatientProfile.module.css";
+import { FaPhone, FaBirthdayCake, FaVenusMars, FaBuilding } from "react-icons/fa";
 
 interface Patient {
   id: string;
@@ -19,29 +20,31 @@ interface PatientProfileProps {
 const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
   return (
     <div className={styles.profileContainer}>
-      <h2 className={styles.profileHeader}>환자 정보</h2>
-      <div className={styles.profileDetails}>
-        <div className={styles.profileRow}>
-          <span className={styles.label}>이름:</span>
-          <span className={styles.value}>{patient.name}</span>
-        </div>
-        <div className={styles.profileRow}>
-          <span className={styles.label}>생년월일:</span>
-          <span className={styles.value}>
+      <div className={styles.imageContainer}>
+        <img
+          src="/images/old_woman_color_light.svg"
+          className={styles.profileImage}
+        />
+      </div>
+      <div className={styles.profileInfo}>
+        <h2 className={styles.profileName}>{patient.name}</h2>
+        <p className={styles.profilePhone}>
+          <FaPhone className={styles.icon} />
+          {patient.phone_number}
+        </p>
+        <div className={styles.profileDetailsRow}>
+          <div className={styles.profileDetail}>
+            <FaBirthdayCake className={styles.icon} />
             {patient.date_of_birth.toISOString().split("T")[0]}
-          </span>
-        </div>
-        <div className={styles.profileRow}>
-          <span className={styles.label}>성별:</span>
-          <span className={styles.value}>{patient.gender}</span>
-        </div>
-        <div className={styles.profileRow}>
-          <span className={styles.label}>전화번호:</span>
-          <span className={styles.value}>{patient.phone_number}</span>
-        </div>
-        <div className={styles.profileRow}>
-          <span className={styles.label}>소속:</span>
-          <span className={styles.value}>{patient.organization}</span>
+          </div>
+          <div className={styles.profileDetail}>
+            <FaVenusMars className={styles.icon} />
+            {patient.gender}
+          </div>
+          <div className={styles.profileDetail}>
+            <FaBuilding className={styles.icon} />
+            {patient.organization}
+          </div>
         </div>
       </div>
     </div>
