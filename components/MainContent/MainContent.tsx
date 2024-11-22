@@ -62,7 +62,7 @@ const MainContent: React.FC<MainContentProps> = ({
   topics,
 }) => {
   const handleAddContent = (content: string) => {
-    console.log("추가된 content:", content);
+    //console.log("추가된 content:", content);
   };
 
   return (

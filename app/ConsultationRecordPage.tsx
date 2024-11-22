@@ -185,7 +185,7 @@ const ConsultationRecordPage: React.FC = () => {
   const sendPutRequest = useCallback(() => {
     const mergedState = getMergedState();
 
-    console.log("Sending PUT request with:", mergedState);
+    //console.log("Sending PUT request with:", mergedState);
 
     fetch(`/api/sessions/${sessionId}`, {
       method: "PUT",
@@ -201,7 +201,7 @@ const ConsultationRecordPage: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("Data synced successfully:", data);
+        console.log("Data synced successfully:", data.temp);
       })
       .catch((error) => {
         console.error("Error syncing data:", error);
@@ -235,9 +235,9 @@ const ConsultationRecordPage: React.FC = () => {
 
         // Guard clause: If data or data.temp is null or undefined, handle it
         if (!data || !data.temp) {
-          console.log(
-            "Data or temp is null or undefined. Creating new object..."
-          );
+          // console.log(
+          //   "Data or temp is null or undefined. Creating new object..."
+          // );
           data.temp = {
             personal_info: {
               name: "",
@@ -324,7 +324,7 @@ const ConsultationRecordPage: React.FC = () => {
           if (!patchResponse.ok) {
             console.error("Error updating session:", patchResponse.statusText);
           } else {
-            console.log("Update request successful");
+            //console.log("Update request successful");
           }
         }
 
@@ -356,7 +356,7 @@ const ConsultationRecordPage: React.FC = () => {
             console.log("Update request successful");
           }
         } else {
-          console.log("Data is valid, no update needed.");
+          //console.log("Data is valid, no update needed.");
           //console.log(data.temp);
         }
       } catch (error) {
@@ -505,14 +505,14 @@ const ConsultationRecordPage: React.FC = () => {
       filteredData.care_note = data.care_note || "";
     }
 
-    console.log(filteredData);
+    //console.log(filteredData);
     return filteredData;
   };
 
   const isDataInvalid = (data: any) => {
     // 데이터가 없거나 temp 객체가 없으면 불완전
     if (!data || !data.temp) {
-      console.log("Data or temp is null or undefined.");
+      //console.log("Data or temp is null or undefined.");
       return true;
     }
 
@@ -525,10 +525,7 @@ const ConsultationRecordPage: React.FC = () => {
       !("date_of_birth" in temp.personal_info) ||
       !("phone_number" in temp.personal_info)
     ) {
-      console.log(
-        "Personal info is incomplete or undefined:",
-        temp.personal_info
-      );
+      //console.log("Personal info is incomplete or undefined:");
       return true;
     }
 
@@ -539,10 +536,10 @@ const ConsultationRecordPage: React.FC = () => {
       !("initial_consult_date" in temp.consultation_info) ||
       !("current_consult_date" in temp.consultation_info)
     ) {
-      console.log(
-        "Consultation info is incomplete or undefined:",
-        temp.consultation_info
-      );
+      // console.log(
+      //   "Consultation info is incomplete or undefined:",
+      //   temp.consultation_info
+      // );
       return true;
     }
 
@@ -552,10 +549,10 @@ const ConsultationRecordPage: React.FC = () => {
       !temp.medical_conditions.chronic_diseases ||
       !("disease_names" in temp.medical_conditions.chronic_diseases)
     ) {
-      console.log(
-        "Medical conditions are incomplete or undefined:",
-        temp.medical_conditions.chronic_diseases
-      );
+      // console.log(
+      //   "Medical conditions are incomplete or undefined:",
+      //   temp.medical_conditions.chronic_diseases
+      // );
       return true;
     }
 
@@ -566,7 +563,7 @@ const ConsultationRecordPage: React.FC = () => {
       !("alcohol" in temp.lifestyle) ||
       !("exercise" in temp.lifestyle)
     ) {
-      console.log("Lifestyle info is incomplete or undefined:", temp.lifestyle);
+      //console.log("Lifestyle info is incomplete or undefined:", temp.lifestyle);
       return true;
     }
 
@@ -577,10 +574,10 @@ const ConsultationRecordPage: React.FC = () => {
       !("medication_storage" in temp.medication_management) ||
       !("prescription_storage" in temp.medication_management)
     ) {
-      console.log(
-        "Medication management info is incomplete or undefined:",
-        temp.medication_management
-      );
+      // console.log(
+      //   "Medication management info is incomplete or undefined:",
+      //   temp.medication_management
+      // );
       return true;
     }
 
@@ -594,10 +591,10 @@ const ConsultationRecordPage: React.FC = () => {
       !temp.current_medications.health_functional_foods ||
       !Array.isArray(temp.current_medications.health_functional_foods.list)
     ) {
-      console.log(
-        "Current medications are incomplete or undefined:",
-        temp.current_medications
-      );
+      // console.log(
+      //   "Current medications are incomplete or undefined:",
+      //   temp.current_medications
+      // );
       return true;
     }
 
@@ -607,12 +604,12 @@ const ConsultationRecordPage: React.FC = () => {
       !("care_note" in temp) ||
       !("questions" in temp)
     ) {
-      console.log(
-        "Pharmacist comments or care note or questions is missing or undefined:",
-        temp.pharmacist_comments,
-        temp.care_note,
-        temp.questions
-      );
+      // console.log(
+      //   "Pharmacist comments or care note or questions is missing or undefined:",
+      //   temp.pharmacist_comments,
+      //   temp.care_note,
+      //   temp.questions
+      // );
       return true;
     }
 
@@ -648,7 +645,7 @@ const ConsultationRecordPage: React.FC = () => {
         );
         if (response.ok) {
           const data: RecordingItem[] = await response.json();
-          console.log("Fetched Recordings:", data);
+          //console.log("Fetched Recordings:", data);
           // 가장 최근 녹음 파일 선택
           if (data.length > 0) {
             const latestRecording = data.sort(
@@ -674,13 +671,13 @@ const ConsultationRecordPage: React.FC = () => {
   useEffect(() => {
     const fetchTopics = async () => {
       if (!recentRecording) return;
+      console.log(
+        "stt",
+        recentRecording.stt_status,
+        "topic",
+        recentRecording.topic_status
+      );
       if (recentRecording.topic_status != "completed") {
-        console.log(
-          "stt",
-          recentRecording.stt_status,
-          "topic",
-          recentRecording.topic_status
-        );
         return;
       }
       try {
@@ -692,7 +689,7 @@ const ConsultationRecordPage: React.FC = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched Topics:", data);
+          //console.log("Fetched Topics");
           setTopics(data.topicSummaries || []); // Topic 데이터 저장
         } else {
           console.error("Failed to fetch topics:", response.statusText);

@@ -121,7 +121,10 @@ export async function PATCH(
       .eq("id", patientId);
 
     if (patientError) {
-      console.error("Error updating patient modified_at:", patientError.message);
+      console.error(
+        "Error updating patient modified_at:",
+        patientError.message
+      );
       return NextResponse.json(
         { error: "Error updating patient modified_at" },
         { status: 500 }
@@ -153,7 +156,7 @@ export async function PUT(
     );
   }
 
-  console.log("Replacing temp field for session with ID:", sessionId);
+  //console.log("Replacing temp field for session with ID:", sessionId);
 
   // temp 필드 업데이트 (전체 교체)
   const { data, error } = await supabase
@@ -171,7 +174,7 @@ export async function PUT(
     );
   }
 
-  console.log("Replace successful:", data);
+  //console.log("Replace successful:", data);
 
   // 수정된 temp 데이터를 JSON 형식으로 반환
   return NextResponse.json(data);

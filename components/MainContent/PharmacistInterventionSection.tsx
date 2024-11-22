@@ -55,7 +55,7 @@ const PharmacistInterventionSection: React.FC<
         return response.json();
       })
       .then((data) => {
-        console.log("Data updated successfully:", data);
+        console.log("Data updated successfully:", data.temp);
       })
       .catch((error) => {
         console.error("Error updating data:", error);

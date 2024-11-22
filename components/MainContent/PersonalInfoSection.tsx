@@ -32,7 +32,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
       Object.keys(patientInfo).length > 0
     ) {
       setLastBlurredValue(patientInfo); // patientInfo가 초기화된 이후에 설정
-      console.log("Initialized lastBlurredValue with patientInfo");
+      //console.log("Initialized lastBlurredValue with patientInfo");
     }
   }, [patientInfo]);
 
@@ -89,9 +89,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
     const previousValue = getNestedValue(lastBlurredValue, fieldPath); // 직전 값
 
     // 값이 동일하면 PATCH 생략
-    console.log(newValue, previousValue);
+    //console.log(newValue, previousValue);
     if (newValue === previousValue) {
-      console.log("No changes detected, skipping PATCH request.");
+      //console.log("No changes detected, skipping PATCH request.");
       return;
     }
 
@@ -142,7 +142,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           return response.json();
         })
         .then((data) => {
-          console.log("Data updated successfully:", data);
+          console.log("Data updated successfully:", data.temp);
         })
         .catch((error) => {
           console.error("Error updating data:", error);
@@ -210,9 +210,9 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   }
                   onChange={(event) => {
                     const selectedOption = event.target.value;
-                    console.log(
-                      `Debug (Radio Change): Selected Option: ${selectedOption}, Previous Value: ${patientInfo.consultation_info?.insurance_type}`
-                    );
+                    // console.log(
+                    //   `Debug (Radio Change): Selected Option: ${selectedOption}, Previous Value: ${patientInfo.consultation_info?.insurance_type}`
+                    // );
                     handleInputChange(
                       "consultation_info.insurance_type",
                       selectedOption
@@ -257,7 +257,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 const formattedDate = `${e.getFullYear()}-${String(
                   e.getMonth() + 1
                 ).padStart(2, "0")}-${String(e.getDate()).padStart(2, "0")}`;
-                console.log(e);
+                // console.log(e);
                 handleInputChange(
                   "consultation_info.initial_consult_date",
                   formattedDate
@@ -293,7 +293,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                 const formattedDate = `${e.getFullYear()}-${String(
                   e.getMonth() + 1
                 ).padStart(2, "0")}-${String(e.getDate()).padStart(2, "0")}`;
-                console.log(e);
+                // console.log(e);
                 handleInputChange(
                   "consultation_info.current_consult_date",
                   formattedDate
@@ -959,7 +959,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                   }
                   onChange={(event) => {
                     const selectedOption = event.target.value;
-                    console.log(selectedOption);
+                    // console.log(selectedOption);
                     handleInputChange(
                       "medication_management.living_condition.medication_assistants",
                       selectedOption

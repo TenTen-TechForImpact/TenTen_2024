@@ -222,7 +222,7 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
       if (response.ok) {
         setUploadStatus(`File uploaded successfully and saved to DB`);
-        console.log("upload!");
+        console.log("upload successful");
         // TODO: request to ai server to get summary
       } else {
         setUploadStatus("File upload failed.");

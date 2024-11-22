@@ -34,7 +34,6 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
         throw new Error("Failed to update questions");
       }
       console.log("Questions updated successfully");
-      console.log(updatedQuestions);
     } catch (error) {
       console.error("Error updating questions:", error);
     }

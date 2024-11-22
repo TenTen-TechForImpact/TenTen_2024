@@ -97,7 +97,7 @@ const OTCSection: React.FC<Props> = ({
           return response.json();
         })
         .then((data) => {
-          console.log("Data updated successfully:", data);
+          console.log("Data updated successfully:", data.temp);
         })
         .catch((error) => {
           console.error("Error updating data:", error);
