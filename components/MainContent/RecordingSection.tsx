@@ -204,32 +204,64 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       return;
     }
 
-    // TODO: Check if it is .wav file, else convert into wav file
     if (file.type !== "audio/wav") {
       setUploadStatus("Please select a .wav file.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("wavfile", file);
-
     try {
-      setUploadStatus("Uploading file...");
-      const response = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
-        method: "POST",
-        body: formData,
+      // Step 1: Request Presigned URL
+      setUploadStatus("Requesting upload URL...");
+      const presignedUrlResponse = await fetch(
+        `/api/sessions/${sessionId}/presigned-url`,
+        {
+          method: "POST",
+          body: JSON.stringify({ filename: file.name }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!presignedUrlResponse.ok) {
+        setUploadStatus("Failed to get upload URL.");
+        return;
+      }
+
+      const { url } = await presignedUrlResponse.json();
+
+      // Step 2: Upload file to S3
+      setUploadStatus("Uploading file to S3...");
+      const s3UploadResponse = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
       });
 
-      if (response.ok) {
-        setUploadStatus(`File uploaded successfully and saved to DB`);
-        console.log("upload successful");
-        // TODO: request to ai server to get summary
-      } else {
-        setUploadStatus("File upload failed.");
+      if (!s3UploadResponse.ok) {
+        setUploadStatus("File upload to S3 failed.");
+        return;
       }
+
+      // Step 3: Notify backend to update the database
+      setUploadStatus("Updating database...");
+      const dbUpdateResponse = await fetch(
+        `/api/sessions/${sessionId}/update-recording`,
+        {
+          method: "POST",
+          body: JSON.stringify({ fileUrl: url.split("?")[0] }), // S3 파일 URL에서 query string 제거
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!dbUpdateResponse.ok) {
+        setUploadStatus("Failed to update the database.");
+        return;
+      }
+
+      setUploadStatus("File uploaded successfully and saved to DB");
+      console.log("Upload and DB update successful");
     } catch (error) {
       console.error("Error uploading file:", error);
-      setUploadStatus("An error occurred while uploading the file.");
+      setUploadStatus("An error occurred during upload.");
     }
   };
 
