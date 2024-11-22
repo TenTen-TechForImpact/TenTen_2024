@@ -656,6 +656,8 @@ const ConsultationRecordPage: React.FC = () => {
                 new Date(a.created_at).getTime()
             )[0];
 
+            console.log(latestRecording);
+
             setRecentRecording(latestRecording); // 최근 녹음 ID 저장
           }
         } else {
