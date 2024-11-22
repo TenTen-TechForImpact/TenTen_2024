@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import styles from "./PatientsListPage.module.css";
+import { useRouter } from "next/navigation";
 import SearchBar from "@/components/Patients/SearchBar";
 import ActionButton from "@/components/ActionButton";
 import PatientCard from "@/components/Patients/PatientCard";
 import PatientAddModal from "@/components/Patients/PatientAddModal";
 import DeleteModal from "@/components/DeleteModal";
+import styles from "./PatientsListPage.module.css";
+
 
 interface Patient {
   id: string;
@@ -20,6 +22,7 @@ interface Patient {
 }
 
 const PatientsListPage = () => {
+  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -46,6 +49,7 @@ const PatientsListPage = () => {
         modified_at: new Date(patient.modified_at),
       }));
       setPatients(formattedPatients);
+      setSelectedPatient(null);
     } catch (err) {
       console.error("환자 목록을 불러오는 데 문제가 발생했습니다:", err);
     } finally {
@@ -74,6 +78,7 @@ const PatientsListPage = () => {
       }
 
       setShowModal(false);
+      setSelectedPatient(null);
       fetchPatients();
     } catch (err) {
       console.error("새 환자를 추가하는 데 실패했습니다:", err);
@@ -93,11 +98,9 @@ const PatientsListPage = () => {
       });
       if (!response.ok) throw new Error("Failed to delete patient");
 
-      setPatients((prevPatients) =>
-        prevPatients.filter((patient) => patient.id !== selectedPatient.id)
-      );
       setShowDeleteModal(false);
       setSelectedPatient(null);
+      fetchPatients();
     } catch (err) {
       console.error("환자를 삭제하는 데 실패했습니다:", err);
     } finally {
@@ -144,21 +147,37 @@ const PatientsListPage = () => {
     setShowModal(true);
   };
 
-  // 날짜별로 그룹화하고 날짜로 정렬하는 함수
-  const groupByModifiedDate = (patients: Patient[]) => {
-    const grouped = patients.reduce((acc: Record<string, Patient[]>, patient) => {
-      const dateKey = patient.modified_at.toISOString().split("T")[0];
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(patient);
-      return acc;
-    }, {});
+  // 환자 상담 보기 핸들러
+  const handleViewDetails = (patient: Patient) => {
+    setSelectedPatient(patient);
+    router.push(`/patients/${patient.id}`);
+  };
 
-    // 날짜로 정렬
-    const sortedEntries = Object.entries(grouped).sort(
-      ([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime()
+  // 환자 정렬
+  const groupByDateAndOrganization = (patients: Patient[]) => {
+    const grouped = patients.reduce(
+      (acc: Record<string, Patient[]>, patient) => {
+        const dateKey = patient.modified_at.toISOString().split("T")[0];
+        const orgKey = patient.organization || "미지정 소속";
+        const combinedKey = `${dateKey}_${orgKey}`;
+
+        if (!acc[combinedKey]) acc[combinedKey] = [];
+        acc[combinedKey].push(patient);
+        return acc;
+      },
+      {}
     );
+    const sortedEntries = Object.entries(grouped).sort(
+      ([keyA], [keyB]) => {
+        const [dateA, orgA] = keyA.split("_");
+        const [dateB, orgB] = keyB.split("_");
 
-    // 다시 객체 형태로 변환
+        const dateComparison = new Date(dateB).getTime() - new Date(dateA).getTime();
+        if (dateComparison !== 0) return dateComparison;
+
+        return orgA.localeCompare(orgB);
+      }
+    );
     return Object.fromEntries(sortedEntries);
   };
 
@@ -166,7 +185,7 @@ const PatientsListPage = () => {
   const formatDate = (date: string) => {
     const days = ["일", "월", "화", "수", "목", "금", "토"];
     const d = new Date(date);
-    return `${days[d.getDay()]} ${d.getDate()}`;
+    return [`${days[d.getDay()]}`, `${d.getDate()}`];
   };
 
   // 이름으로 필터링된 환자 목록
@@ -178,7 +197,7 @@ const PatientsListPage = () => {
       );
 
   return (
-    <div className={styles.patientListContainer}>
+    <div className={styles.Page}>
       <div className={styles.listHeader}>
         <h2 className={styles.listHeadertext}>전체 환자 목록</h2>
         <SearchBar
@@ -221,40 +240,43 @@ const PatientsListPage = () => {
         <p>환자 목록 로딩 중...</p>
       ) : (
         <div className={styles.patientList}>
-          {Object.entries(groupByModifiedDate(patients)).map(
-            ([date, patientGroup]) => (
-              <div>
-                <div className={styles.groupHeader}>
-                  {formatDate(date)}
-                  <span className={styles.dateText}>{date}</span>
-                </div>
-                <div key={date} className={styles.groupContainer}>
-                  <div className={styles.tableHeader}>
-                    <div className={styles.tableHeaderItem}>이름</div>
-                    <div className={styles.tableHeaderItem}>생년월일</div>
-                    <div className={styles.tableHeaderItem}>성별</div>
-                    <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
-                    <button className={styles.fakeButton}>
-                    </button>
+          {Object.entries(groupByDateAndOrganization(patients)).map(
+            ([combinedKey, patientGroup]) => {
+              const [date, organization] = combinedKey.split("_");
+              return (
+                <>
+                  <div className={styles.groupHeader}>
+                    <div className={styles.groupHeaderTime}>
+                      <div className={styles.groupHeaderDay}>{formatDate(date)[0]}</div>
+                      <div className={styles.groupHeaderDate}>{formatDate(date)[1]}</div>
+                    </div>
+                    <div className={styles.groupHeaderOrganization}>
+                      {organization}
+                    </div>
                   </div>
-                  <div className={styles.cardList}>
-                    {patientGroup
-                      .sort(
-                        (a, b) =>
-                          b.modified_at.getTime() - a.modified_at.getTime()
-                      )
-                      .map((patient) => (
+                  <div key={combinedKey} className={styles.groupContainer}>
+                    <div className={styles.tableHeader}>
+                      <div className={styles.tableHeaderItem}>이름</div>
+                      <div className={styles.tableHeaderItem}>생년월일</div>
+                      <div className={styles.tableHeaderItem}>성별</div>
+                      <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
+                      <div className={styles.fakeButton}></div>
+                    </div>
+                    <div className={styles.cardList}>
+                      {patientGroup.map((patient) => (
                         <PatientCard
                           key={patient.id}
                           patient={patient}
+                          onViewDetails={handleViewDetails}
                           onDelete={handleDeleteConfirm}
                           onEdit={handleEditPatient}
                         />
                       ))}
+                    </div>
                   </div>
-                </div>
-              </div>
-            )
+                </>
+              );
+            }
           )}
         </div>
       )}

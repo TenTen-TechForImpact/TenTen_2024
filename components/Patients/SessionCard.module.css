@@ -1,65 +1,56 @@
-.sessionCard {
+.sessionContainer {
+  padding: 8px 0;
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  line-height: 1.5;
+  justify-content: space-between;
+  padding: 0 30px;
+  margin-left: 8px;
   position: relative;
-  background: var(--secondary-color);
-  border-radius: var(--border-medium);
-  padding: 20px;
-  width: 270px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
 }
 
-.deleteButtonContainer {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 8px;
-  /* 삭제 버튼과 수정 버튼 사이 간격 */
+.sessionField {
+  flex: 1;
+  text-align: left;
+  margin: 0;
+  font-weight: 600;
 }
 
-.deleteButton,
-.editButton {
-  color: white;
+.actionButton {
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 50%;
+  background: transparent;
+  font-size: 20px;
   cursor: pointer;
-  width: 24px;
-  height: 24px;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.deleteButton {
-  background: rgb(216, 68, 68);
-  /* 빨간색 배경 */
+.actionButton:hover {
+  color: #ff0000;
 }
 
-.editButton {
-  background: rgb(68, 123, 216);
-  /* 파란색 배경 */
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 999;
 }
 
-.cardContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  margin-top: 15px;
-  /* 텍스트를 아래로 조금만 이동 */
-}
-
-.cardText {
-  font-size: 16px;
-  font-weight: bold;
-  color: #000000ee;
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
   text-align: center;
+  font-size: 14px;
 }
 
-.actionButtonContainer {
-  margin-top: 5px;
-  /* 버튼과 텍스트 사이의 마진을 줄임 */
+.dropdownItem:hover {
+  background-color: #f5f5f5;
 }
