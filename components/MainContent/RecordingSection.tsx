@@ -163,22 +163,15 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
     formData.append("wavfile", audioFile);
 
     try {
-      const uploadResponse = await fetch(
-        `/api/sessions/${sessionId}/upload-s3`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
+        method: "POST",
+        body: formData,
+      });
 
-      if (uploadResponse.ok) {
-        const data = await uploadResponse.json();
-        alert(`File uploaded successfully. URL: ${data.fileUrl}`);
-      } else {
-        console.error("파일 업로드 실패:", uploadResponse.statusText);
-      }
+      console.log("Success: upload-s3 ~ STT ~ topics");
     } catch (error) {
-      console.error("파일 업로드 오류:", error);
+      console.error("Error upload-s3 ~ STT ~ topics:", error);
+      console.log("An error occurred during upload-s3 ~ STT ~ topics.");
     }
   };
 
