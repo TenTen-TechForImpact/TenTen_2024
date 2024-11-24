@@ -121,7 +121,10 @@ export async function PATCH(
       .eq("id", patientId);
 
     if (patientError) {
-      console.error("Error updating patient modified_at:", patientError.message);
+      console.error(
+        "Error updating patient modified_at:",
+        patientError.message
+      );
       return NextResponse.json(
         { error: "Error updating patient modified_at" },
         { status: 500 }
@@ -171,7 +174,8 @@ export async function PUT(
     );
   }
 
-  console.log("Replace successful:", data);
+  // console.log("Replace successful:", data);
+  console.log("Replace successful");
 
   // 수정된 temp 데이터를 JSON 형식으로 반환
   return NextResponse.json(data);

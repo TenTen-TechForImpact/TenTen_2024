@@ -18,7 +18,7 @@ const supabase = createBrowserClient(
 
 // scheduler for 10 minutes
 // cron.schedule("*/10 * * * *", async () => {
-cron.schedule("*/30 * * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   console.log("Running STT and Topic scheduler");
   sttScheduler();
   topicScheduler();
@@ -42,7 +42,7 @@ async function sttScheduler() {
       );
       console.log("Transcription successfully requested");
     } catch (error) {
-      console.error("Error while requesting transcription:", error);
+      console.error("Error while requesting transcription:", error.message);
     }
   });
 }
@@ -65,7 +65,7 @@ async function topicScheduler() {
       );
       console.log("Topic successfully requested");
     } catch (error) {
-      console.error("Error while requesting topic:", error);
+      console.error("Error while requesting topic:", error.message);
     }
   });
 }
