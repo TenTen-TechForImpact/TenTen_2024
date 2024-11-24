@@ -101,6 +101,28 @@
   /* 여백 초기화 */
 }
 
+.actionButton {
+  width: 150px;
+  height: 57px;
+  font-size: 64px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--border-large);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #000000;
+  color: #ffffff;
+  padding-bottom: 16px;
+
+}
+
+.actionButton:hover {
+  opacity: 0.8;
+}
+
 .fakeButton {
   width: 30px;
   height: 30px;

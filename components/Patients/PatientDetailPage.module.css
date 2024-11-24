@@ -36,11 +36,16 @@
   margin: 0;
 }
 
-.fakeButton {
+.actionButton {
   width: 30px;
   height: 30px;
   border: none;
-  background: transparent;
   font-size: 20px;
-  cursor: default;
+  cursor: pointer;
+  font-weight: 700;
+  color: black;
+}
+
+.actionButton:hover {
+  color: #ff0000;
 }
