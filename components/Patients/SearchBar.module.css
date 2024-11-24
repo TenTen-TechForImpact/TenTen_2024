@@ -27,8 +27,6 @@
   border-radius: var(--border-large);
   z-index: 10;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: 200px;
-  overflow-y: auto;
 }
 
 /* 검색 결과 항목 */

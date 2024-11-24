@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchBar from "@/components/Patients/SearchBar";
-import ActionButton from "@/components/ActionButton";
 import PatientCard from "@/components/Patients/PatientCard";
 import PatientAddModal from "@/components/Patients/PatientAddModal";
 import DeleteModal from "@/components/DeleteModal";
@@ -49,6 +48,7 @@ const PatientsListPage = () => {
         modified_at: new Date(patient.modified_at),
       }));
       setPatients(formattedPatients);
+      setSearchTerm("");
       setSelectedPatient(null);
     } catch (err) {
       console.error("환자 목록을 불러오는 데 문제가 발생했습니다:", err);
@@ -210,13 +210,9 @@ const PatientsListPage = () => {
           onDelete={handleDeleteConfirm}
           onEdit={handleEditPatient}
         />
-        <ActionButton
-          text="+"
-          onClick={() => setShowModal(true)}
-          width={150}
-          height={57}
-          fontSize={64}
-        />
+        <button className={styles.actionButton} onClick={() => setShowModal(true)}>
+          +
+        </button>
       </div>
       {showModal && (
         <PatientAddModal
