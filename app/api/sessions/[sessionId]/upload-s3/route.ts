@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/utils/supabase/component";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// const BASE_URL = "http://localhost:3000";
 
 const supabase = createClient();
 
@@ -32,31 +36,9 @@ export async function POST(
   }
 
   try {
-    const formData = await req.formData();
-    const wavfile = formData.get("wavfile") as File;
-
-    // 파일 내용을 ArrayBuffer로 변환 후 Buffer로 변환
-    const arrayBuffer = await wavfile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const uploadParams = {
-      Bucket: process.env.MY_AWS_S3_BUCKET_NAME,
-      Key: `recordings/${recordingId}.wav`,
-      Body: buffer,
-      ContentType: "audio/wav",
-    };
-
-    // S3로 파일 업로드
-    const command = new PutObjectCommand(uploadParams);
-    try {
-      await s3Client.send(command);
-    } catch (s3Error) {
-      console.error("S3 upload error:", s3Error);
-      return NextResponse.json(
-        { error: "File upload to S3 failed" },
-        { status: 500 }
-      );
-    }
+    // upload wav file to s3
+    const presignedUrl = await getPresignedUrl(recordingId);
+    await uploadToS3(presignedUrl, req);
 
     const fileUrl = `https://${process.env.MY_AWS_S3_BUCKET_NAME}.s3.${process.env.MY_AWS_REGION}.amazonaws.com/recordings/${recordingId}.wav`;
 
@@ -74,24 +56,28 @@ export async function POST(
     // Request STT
     try {
       const response = await fetch(
-        `/api/recordings/${recordingId}/transcription`,
+        `${BASE_URL}/api/recordings/${recordingId}/transcription`,
         {
           method: "POST",
         }
       );
       if (!response.ok) {
-        throw new Error("Transcription request failed");
+        throw new Error("STT request failed");
       }
-      console.log("Transcription successfully requested");
+      const result = await response.json();
+      console.log("STT done.", result.transcription);
     } catch (error) {
-      console.error("Error while requesting transcription:", error);
+      console.error("Error while requesting STT:", error);
     }
 
     // Request topics
     try {
-      const response = await fetch(`/api/recordings/${recordingId}/topic`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/recordings/${recordingId}/topic`,
+        {
+          method: "POST",
+        }
+      );
       if (!response.ok) {
         throw new Error("Topic request failed");
       }
@@ -143,5 +129,48 @@ async function updateRecordingUrl(recordingId, fileUrl) {
 
   if (error) {
     throw new Error(`Error updating database record: ${error.message}`);
+  }
+}
+
+async function getPresignedUrl(recordingId) {
+  try {
+    const s3Params = {
+      Bucket: process.env.MY_AWS_S3_BUCKET_NAME,
+      Key: `recordings/${recordingId}.wav`,
+      ContentType: "audio/wav",
+    };
+
+    console.log("[DEBUG] S3 Parameters for presigned URL:", s3Params);
+
+    // Presigned URL 생성
+    const command = new PutObjectCommand(s3Params);
+    const presignedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 3600,
+    });
+
+    return presignedUrl;
+  } catch (error) {
+    console.error("[ERROR] Failed to create presigned URL:", error.message);
+    throw new Error("Failed to create presigned URL. Please try again later.");
+  }
+}
+
+async function uploadToS3(presignedUrl, req) {
+  const formData = await req.formData();
+  const wavfile = formData.get("wavfile") as File;
+
+  // 파일 내용을 ArrayBuffer로 변환 후 Buffer로 변환
+  const arrayBuffer = await wavfile.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const s3UploadResponse = await fetch(presignedUrl, {
+    method: "PUT",
+    headers: { "Content-Type": "audio/wav" },
+    body: buffer,
+  });
+
+  if (!s3UploadResponse.ok) {
+    console.log("File upload to S3 failed.");
+    return;
   }
 }

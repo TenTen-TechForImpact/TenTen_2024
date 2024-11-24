@@ -209,59 +209,19 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       return;
     }
 
+    const formData = new FormData();
+    formData.append("wavfile", file);
+
     try {
-      // Step 1: Request Presigned URL
-      console.log("Requesting upload URL...");
-      const presignedUrlResponse = await fetch(
-        `/api/sessions/${sessionId}/presigned-url`,
-        {
-          method: "POST",
-          body: JSON.stringify({ filename: file.name }),
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!presignedUrlResponse.ok) {
-        console.log("Failed to get upload URL.");
-        return;
-      }
-
-      const { url } = await presignedUrlResponse.json();
-
-      // Step 2: Upload file to S3
-      console.log("Uploading file to S3...");
-      const s3UploadResponse = await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
+      const response = await fetch(`/api/sessions/${sessionId}/upload-s3`, {
+        method: "POST",
+        body: formData,
       });
 
-      if (!s3UploadResponse.ok) {
-        console.log("File upload to S3 failed.");
-        return;
-      }
-
-      // Step 3: Notify backend to update the database
-      console.log("Updating database...");
-      const dbUpdateResponse = await fetch(
-        `/api/sessions/${sessionId}/update-recording`,
-        {
-          method: "POST",
-          body: JSON.stringify({ fileUrl: url.split("?")[0] }), // S3 파일 URL에서 query string 제거
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!dbUpdateResponse.ok) {
-        console.log("Failed to update the database.");
-        return;
-      }
-
-      console.log("File uploaded successfully and saved to DB");
-      console.log("Upload and DB update successful");
+      console.log("Success: upload-s3 ~ STT ~ topics");
     } catch (error) {
-      console.error("Error uploading file:", error);
-      console.log("An error occurred during upload.");
+      console.error("Error upload-s3 ~ STT ~ topics:", error);
+      console.log("An error occurred during upload-s3 ~ STT ~ topics.");
     }
   };
 
