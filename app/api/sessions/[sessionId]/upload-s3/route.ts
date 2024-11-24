@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/component";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-// const BASE_URL = "http://localhost:3000";
+// const BASE_URL = "http://localhost:3000"; // for local testing
 
 const supabase = createClient();
 
