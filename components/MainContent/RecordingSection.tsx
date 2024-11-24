@@ -200,18 +200,18 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
 
     const { file } = fileInput;
     if (!file) {
-      setUploadStatus("Please select a file first.");
+      console.log("Please select a file first.");
       return;
     }
 
     if (file.type !== "audio/wav") {
-      setUploadStatus("Please select a .wav file.");
+      console.log("Please select a .wav file.");
       return;
     }
 
     try {
       // Step 1: Request Presigned URL
-      setUploadStatus("Requesting upload URL...");
+      console.log("Requesting upload URL...");
       const presignedUrlResponse = await fetch(
         `/api/sessions/${sessionId}/presigned-url`,
         {
@@ -222,14 +222,14 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       );
 
       if (!presignedUrlResponse.ok) {
-        setUploadStatus("Failed to get upload URL.");
+        console.log("Failed to get upload URL.");
         return;
       }
 
       const { url } = await presignedUrlResponse.json();
 
       // Step 2: Upload file to S3
-      setUploadStatus("Uploading file to S3...");
+      console.log("Uploading file to S3...");
       const s3UploadResponse = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": file.type },
@@ -237,12 +237,12 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       });
 
       if (!s3UploadResponse.ok) {
-        setUploadStatus("File upload to S3 failed.");
+        console.log("File upload to S3 failed.");
         return;
       }
 
       // Step 3: Notify backend to update the database
-      setUploadStatus("Updating database...");
+      console.log("Updating database...");
       const dbUpdateResponse = await fetch(
         `/api/sessions/${sessionId}/update-recording`,
         {
@@ -253,15 +253,15 @@ const RecordingSection: React.FC<RecordingSectionProps> = ({
       );
 
       if (!dbUpdateResponse.ok) {
-        setUploadStatus("Failed to update the database.");
+        console.log("Failed to update the database.");
         return;
       }
 
-      setUploadStatus("File uploaded successfully and saved to DB");
+      console.log("File uploaded successfully and saved to DB");
       console.log("Upload and DB update successful");
     } catch (error) {
       console.error("Error uploading file:", error);
-      setUploadStatus("An error occurred during upload.");
+      console.log("An error occurred during upload.");
     }
   };
 
