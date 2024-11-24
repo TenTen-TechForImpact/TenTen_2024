@@ -60,6 +60,7 @@ export async function POST(
 
     const fileUrl = `https://${process.env.MY_AWS_S3_BUCKET_NAME}.s3.${process.env.MY_AWS_REGION}.amazonaws.com/recordings/${recordingId}.wav`;
 
+    // update recording url in Recording table
     try {
       await updateRecordingUrl(recordingId, fileUrl);
     } catch (dbError) {
@@ -70,13 +71,45 @@ export async function POST(
       );
     }
 
+    // Request STT
+    try {
+      const response = await fetch(
+        `/api/recordings/${recordingId}/transcription`,
+        {
+          method: "POST",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Transcription request failed");
+      }
+      console.log("Transcription successfully requested");
+    } catch (error) {
+      console.error("Error while requesting transcription:", error);
+    }
+
+    // Request topics
+    try {
+      const response = await fetch(`/api/recordings/${recordingId}/topic`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error("Topic request failed");
+      }
+      console.log("Topic successfully requested");
+    } catch (error) {
+      console.error("Error while requesting topic:", error);
+    }
+
     return NextResponse.json({
-      message: "File uploaded and DB updated successfully",
+      message: "Recording file upload, STT, and topic request successful.",
       fileUrl: fileUrl,
     });
   } catch (error) {
     console.error("Unexpected error:", error);
-    return NextResponse.json({ error: "File upload failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed among file upload, STT, and topic request." },
+      { status: 500 }
+    );
   }
 }
 
