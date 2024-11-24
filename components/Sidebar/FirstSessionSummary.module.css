@@ -2,7 +2,63 @@
   background-color: #fff;
   border: 1px solid var(--secondary-color);
   border-radius: 8px;
-  padding: var(--padding-medium);
+  padding: 16px;
+  width: 360px;
+}
+
+.listItem {
+  border-bottom: 1px solid #e5e7eb; /* Equivalent to border-gray-200 */
+  padding-bottom: 0.5rem; /* Tailwind's pb-2 */
+  margin-bottom: 0.5rem; /* Tailwind's mb-2 */
+  display: flex;
+  flex-direction: column; /* Makes the children stack vertically */
+  gap: 0.4rem; /* Adds spacing between title and content */
+}
+
+.accordion {
+  background-color: white;
+  border-width: 1px;
+  border: 1px solid #bbbbbb;
+}
+
+.accordionPanel {
+}
+
+/* Accordion Title */
+.accordionTitle {
+  padding: 1.25rem; /* Tailwind's p-5 */
+  text-align: left;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  border-radius: 0.5rem;
+}
+
+.accordionTitle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.accordionTitle:hover {
+  background-color: #fff;
+}
+
+/* Accordion Content */
+.accordionContent {
+  background-color: white;
+  color: #374151; /* Tailwind's text-gray-800 */
+  padding-bottom: 16px;
+}
+
+.listItem:last-child {
+  border-bottom: 0px solid white;
+  margin-bottom: 0px;
+}
+
+/* Bold Title */
+.boldTitle {
+  font-weight: bold;
+  display: block;
 }
 
 .title {
