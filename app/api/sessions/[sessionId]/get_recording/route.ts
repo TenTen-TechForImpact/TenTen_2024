@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/component";
 
-const supabase = createClient();
+//const supabase = createClient();
+
+import { createBrowserClient } from "@supabase/ssr";
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+  {
+    global: {
+      fetch: (url: any, options = {}) => {
+        return fetch(url, { ...options, cache: "no-store" });
+      },
+    },
+  }
+);
 
 export async function GET(
   req: NextRequest,
@@ -24,11 +37,5 @@ export async function GET(
   }
 
   //캐싱 방지
-  return NextResponse.json(data, {
-    headers: {
-      "Cache-Control": "no-store, max-age=0",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-  });
+  return NextResponse.json(data);
 }
