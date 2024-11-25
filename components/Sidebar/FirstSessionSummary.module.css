@@ -2,7 +2,7 @@
   background-color: #fff;
   border: 1px solid var(--secondary-color);
   border-radius: 8px;
-  padding: 16px;
+  padding: 16px 12px 16px 16px;
   width: 360px;
 }
 
@@ -86,4 +86,24 @@
 
 .value {
   font-weight: normal;
+}
+
+/* scrollableContent class for enabling scroll */
+.scrollableContent {
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+/* Optional: Styling the scrollbar for modern browsers */
+.scrollableContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
 }
