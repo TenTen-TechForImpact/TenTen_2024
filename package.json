@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"next dev\"",
+    "dev": "next dev",
     "prebuild": "npm install",
     "build": "next build",
     "scheduler": "node scheduler.js"
