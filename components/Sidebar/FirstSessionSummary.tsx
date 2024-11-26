@@ -28,14 +28,10 @@ interface FirstSessionSummaryProps {
   topics: any[];
 }
 
-const question = {
-  question_time: "51분 10초~51분 49초",
-  question_no: 0,
-  question: "간염 약의 부작용과 복용 시 주의사항은 무엇인가요?",
-};
-
 const session_summary = [
   {
+    question_time: "51분 10초~51분 49초",
+    question: "간염 약의 부작용과 복용 시 주의사항은 무엇인가요?",
     patient_statement:
       "환자는 간염 보유자로서 장기간 약을 복용 중이며, 약의 부작용과 복용 시 주의사항에 대해 궁금해함.",
     pharmacist_response: [
@@ -173,7 +169,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
               </Accordion>
 
               {/* 사전 상담 질문 */}
-              <Accordion alwaysOpen={true} className={styles.accordion}>
+              <Accordion alwaysOpen={false} className={styles.accordion}>
                 <Accordion.Panel>
                   <Accordion.Title className={styles.accordionTitle}>
                     사전 상담 질문
@@ -187,47 +183,71 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                 </Accordion.Panel>
               </Accordion>
 
-              {/* 상담 녹음 요약 */}
-              <Accordion alwaysOpen={true}>
-                {session_summary.map((entry, idx) => (
-                  <Accordion.Panel key={idx}>
-                    <Accordion.Title>
-                      <strong>{entry.question}</strong>
-                    </Accordion.Title>
-                    <Accordion.Content>
-                      <div>
-                        {/* 환자 발언 요약 */}
-                        <div className={styles.questionSection}>
-                          <p>{entry.patient_statement}</p>
-                          {entry.pharmacist_response[0].quotes.map(
-                            (quote, idx) => (
-                              <div key={idx} className={styles.quoteBox}>
-                                <blockquote className={styles.quoteText}>
-                                  "{quote.content}"
-                                </blockquote>
-                                <span className={styles.timestamp}>
-                                  {quote.time}
-                                </span>
+              <Accordion alwaysOpen={false} className={styles.accordion}>
+                <Accordion.Panel alwaysOpen={false}>
+                  <Accordion.Title className={styles.outerAccordionTitle}>
+                    상담 녹음 요약
+                  </Accordion.Title>
+                  {/* 상담 녹음 요약 */}
+                  <Accordion.Content className={styles.outerAccordionContent}>
+                    {session_summary.map((entry, idx) => (
+                      <Accordion
+                        alwaysOpen={false}
+                        className={styles.innerAccordion}
+                      >
+                        <Accordion.Panel
+                          key={idx}
+                          className={styles.innerAccordionPanel}
+                        >
+                          <Accordion.Title
+                            className={styles.innerAccordionTitle}
+                          >
+                            {`Q : ${entry.question}`}
+                          </Accordion.Title>
+                          <Accordion.Content>
+                            <div>
+                              {/* 환자 발언 요약 */}
+                              <div className={styles.questionSection}>
+                                <p>{entry.patient_statement}</p>
+                                {entry.pharmacist_response[0].quotes.map(
+                                  (quote, idx) => (
+                                    <div key={idx} className={styles.quoteBox}>
+                                      <blockquote className={styles.quoteText}>
+                                        "{quote.content}"
+                                      </blockquote>
+                                      <span className={styles.timestamp}>
+                                        {quote.time}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
                               </div>
-                            )
-                          )}
-                        </div>
 
-                        {/* 약사 답변 요약 */}
-                        <div className={styles.answerSummary}>
-                          <p className={styles.boldLabel}>약사 답변 요약:</p>
-                          <ol className={styles.orderedList}>
-                            {entry.pharmacist_response.map((response, idx) => (
-                              <li key={idx} className={styles.answerPoint}>
-                                {response.summary}
-                              </li>
-                            ))}
-                          </ol>
-                        </div>
-                      </div>
-                    </Accordion.Content>
-                  </Accordion.Panel>
-                ))}
+                              {/* 약사 답변 요약 */}
+                              <div className={styles.answerSummary}>
+                                <p className={styles.boldLabel}>
+                                  약사 답변 요약:
+                                </p>
+                                <ol className={styles.orderedList}>
+                                  {entry.pharmacist_response.map(
+                                    (response, idx) => (
+                                      <li
+                                        key={idx}
+                                        className={styles.answerPoint}
+                                      >
+                                        {response.summary}
+                                      </li>
+                                    )
+                                  )}
+                                </ol>
+                              </div>
+                            </div>
+                          </Accordion.Content>
+                        </Accordion.Panel>
+                      </Accordion>
+                    ))}
+                  </Accordion.Content>
+                </Accordion.Panel>
               </Accordion>
             </div>
           </div>
