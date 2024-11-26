@@ -63,7 +63,7 @@
 
 - **최종 발표 자료**: 
 - **펠로우 조직 사이트**: 
-- **프로젝트 슬랙 페이지**: 
+- **프로젝트 노션 페이지**: 
 - **늘픔약국 홈페이지**:
   
 ---
@@ -172,7 +172,7 @@ TenTen assists with tasks during and after visit consultations, offering the fol
 
 - **Final Presentation**: 
 - **Fellow Organization Website**: 
-- **Project Introduction (Slack page)**: 
+- **Project Introduction (Notion page)**: 
 
 ---
 
