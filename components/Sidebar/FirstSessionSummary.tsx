@@ -2,9 +2,73 @@ import React from "react";
 import styles from "./FirstSessionSummary.module.css";
 
 import { Tabs } from "flowbite-react";
+import type { CustomFlowbiteTheme } from "flowbite-react";
+import { Flowbite } from "flowbite-react";
 import { Accordion, ListGroup } from "flowbite-react";
 import { HiUserCircle, HiClipboardList, HiAdjustments } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
+
+const customTab: CustomFlowbiteTheme = {
+  tabs: {
+    base: "flex flex-col gap-2",
+    tablist: {
+      base: "flex text-center",
+      variant: {
+        default: "flex-wrap border-b border-gray-200 dark:border-gray-700",
+        underline:
+          "-mb-px flex-wrap border-b border-gray-200 dark:border-gray-700",
+        pills:
+          "flex-wrap space-x-2 text-sm font-medium text-gray-500 dark:text-gray-400",
+        fullWidth:
+          "grid w-full grid-flow-col divide-x divide-gray-200 rounded-none text-sm font-medium shadow dark:divide-gray-700 dark:text-gray-400",
+      },
+      tabitem: {
+        base: "flex items-center justify-center rounded-t-lg p-4 text-sm font-medium first:ml-0 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:text-gray-400 disabled:dark:text-gray-500",
+        variant: {
+          default: {
+            base: "rounded-t-lg",
+            active: {
+              on: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-500",
+              off: "text-gray-500 hover:bg-gray-50 hover:text-gray-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300",
+            },
+          },
+          underline: {
+            base: "rounded-t-lg",
+            active: {
+              on: "active rounded-t-lg border-b-2 border-cyan-600 text-cyan-600 dark:border-cyan-500 dark:text-gray-500",
+              off: "border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300",
+            },
+          },
+          pills: {
+            base: "",
+            active: {
+              on: "rounded-lg bg-gray-600 text-white",
+              off: "rounded-lg hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white",
+            },
+          },
+          fullWidth: {
+            base: "ml-0 flex w-full rounded-none first:ml-0",
+            active: {
+              on: "active rounded-none bg-gray-100 p-4 text-gray-900 dark:bg-gray-700 dark:text-white",
+              off: "rounded-none bg-white hover:bg-gray-50 hover:text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-white",
+            },
+          },
+        },
+        icon: "mr-2 h-5 w-5",
+      },
+    },
+    tabitemcontainer: {
+      base: "",
+      variant: {
+        default: "",
+        underline: "",
+        pills: "",
+        fullWidth: "",
+      },
+    },
+    tabpanel: "my-3",
+  },
+};
 
 interface PreQuestions {
   questions?: {
@@ -133,132 +197,172 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
 }) => {
   return (
     <div className={styles.summaryContainer}>
-      <Tabs aria-label="Tabs with icons" variant="underline">
-        <Tabs.Item active title="상담 요약" icon={HiUserCircle}>
-          <div className={styles.scrollableContent}>
-            <div className="flex flex-col gap-4">
-              {/* 환자 개인 정보 */}
-              <Accordion alwaysOpen={true} className={styles.accordion}>
-                <Accordion.Panel className={styles.accordionPanel}>
-                  <Accordion.Title className={styles.accordionTitle}>
-                    환자 개인 정보
-                  </Accordion.Title>
-                  <Accordion.Content className={styles.accordionContent}>
-                    <div className={styles.listItem}>
-                      <span className={styles.boldTitle}>질병 종류:</span>
-                      <span>없음</span>
-                    </div>
-                    <div className={styles.listItem}>
-                      <span className={styles.boldTitle}>기타:</span>
-                      <span>없음</span>
-                    </div>
-                    <div className={styles.listItem}>
-                      <span className={styles.boldTitle}>
-                        과거 질병 및 수술 이력:
-                      </span>
-                      <span>없음</span>
-                    </div>
-                    <div className={styles.listItem}>
-                      <span className={styles.boldTitle}>
-                        주요 불편한 증상:
-                      </span>
-                      <span>없음</span>
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Panel>
-              </Accordion>
+      <Flowbite theme={{ theme: customTab }}>
+        <Tabs aria-label="Tabs with icons" variant="underline">
+          <Tabs.Item
+            active
+            title="상담 요약"
+            icon={HiUserCircle}
+            className={styles.summaryTab}
+          >
+            <div className={styles.scrollableContent}>
+              <div className="flex flex-col gap-4">
+                {/* 환자 개인 정보 */}
+                <Accordion alwaysOpen={false} className={styles.accordion}>
+                  <Accordion.Panel
+                    className={styles.accordionPanel}
+                    isOpen={false}
+                  >
+                    <Accordion.Title className={styles.accordionTitle}>
+                      환자 개인 정보
+                    </Accordion.Title>
+                    <Accordion.Content className={styles.accordionContent}>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>질병 종류:</span>
+                        <span>없음</span>
+                      </div>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>기타:</span>
+                        <span>없음</span>
+                      </div>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>
+                          과거 질병 및 수술 이력:
+                        </span>
+                        <span>없음</span>
+                      </div>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>
+                          주요 불편한 증상:
+                        </span>
+                        <span>없음</span>
+                      </div>
+                    </Accordion.Content>
+                  </Accordion.Panel>
+                </Accordion>
 
-              {/* 사전 상담 질문 */}
-              <Accordion alwaysOpen={false} className={styles.accordion}>
-                <Accordion.Panel>
-                  <Accordion.Title className={styles.accordionTitle}>
-                    사전 상담 질문
-                  </Accordion.Title>
-                  <Accordion.Content className={styles.accordionContent}>
-                    <div className={styles.listItem}>
-                      <span className={styles.boldTitle}>질문:</span>
-                      <span>질문 없음</span>
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Panel>
-              </Accordion>
+                {/* 사전 상담 질문 */}
+                <Accordion alwaysOpen={true} className={styles.accordion}>
+                  <Accordion.Panel isOpen={false}>
+                    <Accordion.Title className={styles.accordionTitle}>
+                      사전 상담 질문
+                    </Accordion.Title>
+                    <Accordion.Content className={styles.accordionContent}>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>질문:</span>
+                        <span>질문 없음</span>
+                      </div>
+                    </Accordion.Content>
+                  </Accordion.Panel>
+                </Accordion>
 
-              <Accordion alwaysOpen={false} className={styles.accordion}>
-                <Accordion.Panel alwaysOpen={false}>
-                  <Accordion.Title className={styles.outerAccordionTitle}>
-                    상담 녹음 요약
-                  </Accordion.Title>
-                  {/* 상담 녹음 요약 */}
-                  <Accordion.Content className={styles.outerAccordionContent}>
-                    {session_summary.map((entry, idx) => (
-                      <Accordion
-                        alwaysOpen={false}
-                        className={styles.innerAccordion}
-                      >
-                        <Accordion.Panel
-                          key={idx}
-                          className={styles.innerAccordionPanel}
+                <Accordion alwaysOpen={true} className={styles.accordion}>
+                  <Accordion.Panel alwaysOpen={true}>
+                    <Accordion.Title className={styles.outerAccordionTitle}>
+                      상담 녹음 요약
+                    </Accordion.Title>
+                    {/* 상담 녹음 요약 */}
+                    <Accordion.Content className={styles.outerAccordionContent}>
+                      {session_summary.map((entry, idx) => (
+                        <Accordion
+                          alwaysOpen={true}
+                          className={styles.innerAccordion}
                         >
-                          <Accordion.Title
-                            className={styles.innerAccordionTitle}
+                          <Accordion.Panel
+                            key={idx}
+                            className={styles.innerAccordionPanel}
                           >
-                            {`Q : ${entry.question}`}
-                          </Accordion.Title>
-                          <Accordion.Content>
-                            <div>
-                              {/* 환자 발언 요약 */}
-                              <div className={styles.questionSection}>
-                                <p>{entry.patient_statement}</p>
-                                {entry.pharmacist_response[0].quotes.map(
-                                  (quote, idx) => (
-                                    <div key={idx} className={styles.quoteBox}>
-                                      <blockquote className={styles.quoteText}>
-                                        "{quote.content}"
-                                      </blockquote>
-                                      <span className={styles.timestamp}>
-                                        {quote.time}
-                                      </span>
-                                    </div>
-                                  )
-                                )}
-                              </div>
+                            <Accordion.Title
+                              className={styles.innerAccordionTitle}
+                            >
+                              {`Q : ${entry.question}`}
+                            </Accordion.Title>
+                            <Accordion.Content>
+                              <div>
+                                {/* 환자 발언 요약 */}
+                                <div className={styles.questionSection}>
+                                  <p>{entry.patient_statement}</p>
+                                  <div className={styles.quoteContainer}>
+                                    {entry.pharmacist_response[0].quotes.map(
+                                      (quote, idx) => (
+                                        <div
+                                          key={idx}
+                                          className={styles.quoteBox}
+                                        >
+                                          <blockquote
+                                            className={styles.quoteText}
+                                          >
+                                            "{quote.content}"
+                                          </blockquote>
+                                          <span className={styles.timestamp}>
+                                            {quote.time}
+                                          </span>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
 
-                              {/* 약사 답변 요약 */}
-                              <div className={styles.answerSummary}>
-                                <p className={styles.boldLabel}>
-                                  약사 답변 요약:
-                                </p>
-                                <ol className={styles.orderedList}>
+                                {/* 약사 답변 요약 */}
+                                <div className={`${styles.answerSummary} mt-4`}>
+                                  <p className={styles.boldLabel}>
+                                    약사 답변 요약:
+                                  </p>
                                   {entry.pharmacist_response.map(
                                     (response, idx) => (
-                                      <li
+                                      <div
                                         key={idx}
                                         className={styles.answerPoint}
                                       >
                                         {response.summary}
-                                      </li>
+                                        {response.quotes && (
+                                          <div
+                                            className={styles.quoteContainer}
+                                          >
+                                            {response.quotes.map(
+                                              (quote, quoteIdx) => (
+                                                <div
+                                                  key={quoteIdx}
+                                                  className={styles.quoteBox}
+                                                >
+                                                  <blockquote
+                                                    className={styles.quoteText}
+                                                  >
+                                                    "{quote.content}"
+                                                  </blockquote>
+                                                  <span
+                                                    className={styles.timestamp}
+                                                  >
+                                                    {quote.time}
+                                                  </span>
+                                                </div>
+                                              )
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
                                     )
                                   )}
-                                </ol>
+                                </div>
                               </div>
-                            </div>
-                          </Accordion.Content>
-                        </Accordion.Panel>
-                      </Accordion>
-                    ))}
-                  </Accordion.Content>
-                </Accordion.Panel>
-              </Accordion>
+                            </Accordion.Content>
+                          </Accordion.Panel>
+                        </Accordion>
+                      ))}
+                    </Accordion.Content>
+                  </Accordion.Panel>
+                </Accordion>
+              </div>
             </div>
-          </div>
-        </Tabs.Item>
+          </Tabs.Item>
 
-        <Tabs.Item title="대화 내용" icon={MdDashboard}>
-          <div className={styles.scrollableContent}>
-            <p>대화 내용 준비 중...</p>
-          </div>
-        </Tabs.Item>
-      </Tabs>
+          <Tabs.Item title="대화 내용" icon={MdDashboard}>
+            <div className={styles.scrollableContent}>
+              <p>대화 내용 준비 중...</p>
+            </div>
+          </Tabs.Item>
+        </Tabs>
+      </Flowbite>
     </div>
   );
 };

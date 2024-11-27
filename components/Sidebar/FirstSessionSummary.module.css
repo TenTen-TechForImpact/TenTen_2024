@@ -7,6 +7,20 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.summaryTab {
+  border: 0px;
+}
+
+.summaryTab:focus {
+  outline: 0px;
+  box-shadow: none;
+}
+
+.summaryTab:hover {
+  border-color: #d1d5db; /* hover:border-gray-300 */
+  color: #374151; /* hover:text-gray-600 */
+}
+
 .listItem {
   border-bottom: 1px solid #e5e7eb; /* Equivalent to border-gray-200 */
   padding-bottom: 0.5rem; /* Tailwind's pb-2 */
@@ -24,8 +38,20 @@
 
 .innerAccordion {
   background-color: white;
-  border-width: 0px;
-  border: 0px solid #bbbbbb;
+  border-top: 1px solid #e5e7eb;
+  border-left: 0px;
+  border-right: 0px;
+  border-bottom: 0px;
+  border-radius: 0;
+}
+
+.innerAccordion:first-child {
+  border-top: 0px;
+}
+
+.innerAccordion:last-child {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 .accordionPanel {
@@ -36,6 +62,7 @@
 .outerAccordionTitle,
 .innerAccordionTitle {
   padding: 1.25rem; /* Tailwind's p-5 */
+  padding-bottom: 0.75rem;
   text-align: left;
   background-color: white;
   color: black;
@@ -45,14 +72,13 @@
 
 .innerAccordionPanel {
   border-radius: 0px;
-  border: 0px;
 }
 
 .innerAccordionTitle {
-  border: 0px;
   gap: 8px;
   font-weight: 600;
   color: rgb(65, 65, 65);
+  border-top: 1px solid rbga(0, 0, 0, 0.1);
 }
 
 .accordionTitle:focus,
@@ -125,11 +151,35 @@
   font-weight: normal;
 }
 
+/*타임라인 박스*/
+
+.answerPoint {
+  margin-top: 8px;
+}
+
+.quoteContainer {
+  margin-top: 12px;
+}
+
+.quoteBox {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  margin: 6px 0 6px 12px;
+  border-radius: 8px;
+  padding: 8px;
+  color: #57595c;
+}
+
+.timestamp {
+  display: block; /* 블록 레벨로 설정하여 라인 끝으로 이동 */
+  text-align: right; /* 오른쪽 정렬 */
+}
+
 /* scrollableContent class for enabling scroll */
 .scrollableContent {
   max-height: calc(100vh - 250px);
   overflow-y: auto;
   padding-right: 0.3rem;
+  border-radius: 8px;
 }
 /* Optional: Styling the scrollbar for modern browsers */
 .scrollableContent::-webkit-scrollbar {
