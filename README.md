@@ -103,7 +103,7 @@
 
 - **유지현**  
   - **소속**: 카이스트 전산학부 
-  - **이메일**: yoojihyun@kaist.ac.kr  
+  - **이메일**: yoojihyun6933@kaist.ac.kr  
   - **역할**: AI 개발
 
 ---
@@ -211,7 +211,7 @@ TenTen assists with tasks during and after visit consultations, offering the fol
 
 - **Yoo Jihyun**  
   - **Affiliation**: KAIST School of Computing  
-  - **Email**: yoojihyun@kaist.ac.kr  
+  - **Email**: yoojihyun6933@kaist.ac.kr  
   - **Role**: AI Developer  
 
 ---
