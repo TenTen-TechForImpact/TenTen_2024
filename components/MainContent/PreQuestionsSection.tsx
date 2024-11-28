@@ -70,7 +70,7 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
       <ul className={styles.questionList}>
         {preQuestions.questions?.list.map((question, index) => (
           <li key={question} className={styles.questionItem}>
-            {question}
+            <span>{question}</span>
             <button
               className={styles.deleteButton}
               onClick={() => handleDeleteQuestion(index)}

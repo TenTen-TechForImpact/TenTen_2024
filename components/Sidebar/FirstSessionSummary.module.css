@@ -5,6 +5,7 @@
   padding: 16px 12px 16px 16px;
   width: 620px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
 }
 
 .summaryTab {
@@ -190,4 +191,27 @@
 
 .scrollableContent::-webkit-scrollbar-thumb:hover {
   background-color: #9ca3af;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.addButton {
+  display: inline-block;
+  background-color: none;
+  color: rgb(14 116 144);
+  border: 1px solid rgb(14 116 144);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  color: rgb(31, 187, 211);
+  border: 1px solid rgb(31, 187, 211);
 }

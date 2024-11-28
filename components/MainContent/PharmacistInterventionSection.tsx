@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar";
 import styles from "./PharmacistInterventionSection.module.css";
 
@@ -23,6 +24,8 @@ interface PharmacistInterventionSectionProps {
   sessionId: string;
   onAddContent: (content: string) => void;
   topics: Topics;
+  pharmacistComment: string;
+  setPharmacistComment: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const PharmacistInterventionSection: React.FC<
@@ -31,52 +34,86 @@ const PharmacistInterventionSection: React.FC<
   pharmacistIntervention,
   setPharmacistIntervention,
   sessionId,
+  pharmacistComment,
+  setPharmacistComment,
   onAddContent,
   topics,
 }) => {
-  const handleBlur = () => {
-    const updatedField = {
-      pharmacist_comments: pharmacistIntervention.pharmacist_comments,
-    };
-    console.log("Field updated:", JSON.stringify(updatedField));
-
-    // Server PATCH request
-    fetch(`/api/sessions/${sessionId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedField),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Data updated successfully:", data.temp);
-      })
-      .catch((error) => {
-        console.error("Error updating data:", error);
+  const updateCommentsOnServer = async (updatedComments: string[]) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pharmacist_comments: updatedComments }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to update pharmacist comments");
+      }
+      console.log("Pharmacist comments updated successfully");
+    } catch (error) {
+      console.error("Error updating pharmacist comments:", error);
+    }
   };
+
+  const handleAddComment = () => {
+    if (pharmacistComment.trim() !== "") {
+      const currentComments = pharmacistIntervention.pharmacist_comments || [];
+      if (currentComments.includes(pharmacistComment.trim())) {
+        alert("이미 존재하는 중재 내용입니다.");
+        setPharmacistComment("");
+        return;
+      }
+      const updatedComments = [...currentComments, pharmacistComment];
+      setPharmacistIntervention({ pharmacist_comments: updatedComments });
+      setPharmacistComment(""); // 입력창 초기화
+      updateCommentsOnServer(updatedComments);
+    }
+  };
+
+  const handleDeleteComment = (index: number) => {
+    const currentComments = pharmacistIntervention.pharmacist_comments || [];
+    const updatedComments = currentComments.filter((_, i) => i !== index);
+    setPharmacistIntervention({ pharmacist_comments: updatedComments });
+    updateCommentsOnServer(updatedComments);
+  };
+
   return (
     <div className={styles.section}>
       <h3 className={styles.title}>약사 중재 내용</h3>
+      <ul className={styles.interventionList}>
+        {pharmacistIntervention.pharmacist_comments.map((comment, index) => (
+          <li key={index} className={styles.interventionItem}>
+            <span>{comment}</span>
+            <button
+              className={styles.deleteButton}
+              onClick={() => {
+                const updatedComments = [
+                  ...pharmacistIntervention.pharmacist_comments,
+                ];
+                updatedComments.splice(index, 1);
+                setPharmacistIntervention({
+                  pharmacist_comments: updatedComments,
+                });
+              }}
+            >
+              삭제
+            </button>
+          </li>
+        ))}
+      </ul>
       <textarea
-        value={pharmacistIntervention.pharmacist_comments}
-        onChange={(e) =>
-          setPharmacistIntervention({
-            ...pharmacistIntervention,
-            pharmacist_comments: e.target.value,
-          })
-        }
-        onBlur={handleBlur} // Save notes on blur only
         className={styles.textarea}
+        value={pharmacistComment}
+        onChange={(e) => setPharmacistComment(e.target.value)}
         placeholder="약사 중재 내용을 입력하세요."
       />
-      <ConsultationSummaryBar
+      <button className={styles.addButton} onClick={handleAddComment}>
+        추가하기
+      </button>
+      {/* <ConsultationSummaryBar
         sessionSummary={
           topics
             ? topics
@@ -107,7 +144,7 @@ const PharmacistInterventionSection: React.FC<
           });
           onAddContent(content);
         }}
-      />
+      /> */}
     </div>
   );
 };

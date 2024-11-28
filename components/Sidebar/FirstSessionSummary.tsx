@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./FirstSessionSummary.module.css";
 
-import { Tabs } from "flowbite-react";
+import { Button, Tabs } from "flowbite-react";
 import type { CustomFlowbiteTheme } from "flowbite-react";
 import { Flowbite } from "flowbite-react";
 import { Accordion, ListGroup } from "flowbite-react";
@@ -89,7 +89,8 @@ interface FirstSessionSummaryProps {
   preQuestions: PreQuestions;
   sessionSummaryData: { topic_id: number; content: string }[];
   recentRecording: RecordingItem;
-  topics: any[];
+  pharmacistComment: string;
+  setPharmacistComment: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const session_summary = [
@@ -194,7 +195,27 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
   patientInfo,
   preQuestions,
   sessionSummaryData,
+  pharmacistComment,
+  setPharmacistComment,
 }) => {
+  const formatSessionSummary = (entry) => {
+    const { question, pharmacist_response } = entry;
+    const formattedSummary = [
+      question,
+      ...pharmacist_response.map((response) => `- ${response.summary}`),
+    ].join("\n");
+
+    return formattedSummary;
+  };
+
+  const handleAddToComment = (text: string) => {
+    if (text.trim()) {
+      setPharmacistComment((prev) =>
+        prev ? `${prev}\n${text.trim()}` : text.trim()
+      );
+    }
+  };
+
   return (
     <div className={styles.summaryContainer}>
       <Flowbite theme={{ theme: customTab }}>
@@ -343,6 +364,30 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                                       </div>
                                     )
                                   )}
+                                </div>
+
+                                {/*추가 버튼*/}
+                                <div className={styles.buttonRow}>
+                                  <button
+                                    onClick={() => {
+                                      const formattedText =
+                                        formatSessionSummary(entry);
+                                      handleAddToComment(formattedText);
+                                    }}
+                                    className={styles.addButton}
+                                  >
+                                    + 중재노트
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const formattedText =
+                                        formatSessionSummary(entry);
+                                      handleAddToComment(formattedText);
+                                    }}
+                                    className={styles.addButton}
+                                  >
+                                    + 돌봄노트
+                                  </button>
                                 </div>
                               </div>
                             </Accordion.Content>

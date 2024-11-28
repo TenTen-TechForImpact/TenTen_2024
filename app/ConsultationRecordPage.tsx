@@ -127,6 +127,9 @@ const ConsultationRecordPage: React.FC = () => {
       },
     },
   });
+  const [pharmacistComment, setPharmacistComment] = useState("");
+  const [careNoteComment, setCareNoteComment] = useState("");
+
   const [preQuestions, setPreQuestions] = useState({ questions: { list: [] } });
   const [sessionSummaryData, setSessionSummaryData] = useState([
     {
@@ -139,10 +142,11 @@ const ConsultationRecordPage: React.FC = () => {
     },
   ]);
   const [pharmacistIntervention, setPharmacistIntervention] = useState({
-    pharmacist_comments: "",
+    pharmacist_comments: [] as string[],
   });
+
   const [careNote, setCareNote] = useState({
-    care_note: "",
+    care_note: [] as string[],
   });
 
   function updateStatesFromData(updatedData) {
@@ -159,11 +163,11 @@ const ConsultationRecordPage: React.FC = () => {
     });
 
     setPharmacistIntervention({
-      pharmacist_comments: updatedData.pharmacist_comments,
+      pharmacist_comments: updatedData.pharmacist_comments || [], // Ensure it defaults to an array
     });
 
     setCareNote({
-      care_note: updatedData.care_note,
+      care_note: updatedData.care_note || [], // Ensure it defaults to an array
     });
     setPreQuestions({
       questions: updatedData.questions,
@@ -179,8 +183,8 @@ const ConsultationRecordPage: React.FC = () => {
     medication_management: patientInfo.medication_management,
     current_medications: medicationList.current_medications,
     questions: preQuestions.questions,
-    pharmacist_comments: pharmacistIntervention.pharmacist_comments,
-    care_note: careNote.care_note,
+    pharmacist_comments: pharmacistIntervention.pharmacist_comments, // Now an array
+    care_note: careNote.care_note, // Now an array
   });
 
   // PUT 요청 함수
@@ -507,7 +511,15 @@ const ConsultationRecordPage: React.FC = () => {
       filteredData.care_note = data.care_note || "";
     }
 
-    //console.log(filteredData);
+    if (!Array.isArray(data.pharmacist_comments)) {
+      filteredData.pharmacist_comments = [];
+    }
+
+    if (!Array.isArray(data.care_note)) {
+      filteredData.care_note = [];
+    }
+
+    console.log(filteredData);
     return filteredData;
   };
 
@@ -612,6 +624,14 @@ const ConsultationRecordPage: React.FC = () => {
       //   temp.care_note,
       //   temp.questions
       // );
+      return true;
+    }
+
+    //리스트인지 확인
+    if (
+      !Array.isArray(temp.pharmacist_comments) ||
+      !Array.isArray(temp.care_note)
+    ) {
       return true;
     }
 
@@ -735,6 +755,8 @@ const ConsultationRecordPage: React.FC = () => {
               setCareNote={setCareNote}
               pharmacistIntervention={pharmacistIntervention}
               setPharmacistIntervention={setPharmacistIntervention}
+              pharmacistComment={pharmacistComment}
+              setPharmacistComment={setPharmacistComment}
               sessionId={sessionId}
               topics={topics}
             />
@@ -749,7 +771,8 @@ const ConsultationRecordPage: React.FC = () => {
               preQuestions={preQuestions}
               sessionSummaryData={sessionSummaryData}
               recentRecording={recentRecording}
-              topics={topics}
+              pharmacistComment={pharmacistComment}
+              setPharmacistComment={setPharmacistComment}
             />
           )}
         </aside>

@@ -42,6 +42,8 @@ interface MainContentProps {
   setCareNote: React.Dispatch<React.SetStateAction<any>>;
   pharmacistIntervention: any;
   setPharmacistIntervention: React.Dispatch<React.SetStateAction<any>>;
+  pharmacistComment: string;
+  setPharmacistComment: React.Dispatch<React.SetStateAction<string>>;
   topics: Topics;
 }
 
@@ -60,6 +62,8 @@ const MainContent: React.FC<MainContentProps> = ({
   setCareNote,
   pharmacistIntervention,
   setPharmacistIntervention,
+  pharmacistComment,
+  setPharmacistComment,
   topics,
 }) => {
   const handleAddContent = (content: string) => {
@@ -155,6 +159,8 @@ const MainContent: React.FC<MainContentProps> = ({
               setPharmacistIntervention={setPharmacistIntervention}
               sessionId={sessionId}
               onAddContent={handleAddContent}
+              pharmacistComment={pharmacistComment}
+              setPharmacistComment={setPharmacistComment}
               topics={topics}
             />
           </section>
