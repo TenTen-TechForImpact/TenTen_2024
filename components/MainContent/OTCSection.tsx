@@ -188,7 +188,6 @@ const OTCSection: React.FC<Props> = ({
           {drugs.length > 0 ? (
             drugs.map((drug, index) => (
               <tr key={index}>
-                <td>{index + 1}</td>
                 <td>{drug.name}</td>
                 <td>{drug.unit}</td>
                 <td>{drug.purpose}</td>

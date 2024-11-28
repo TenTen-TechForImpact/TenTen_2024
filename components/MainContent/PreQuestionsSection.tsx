@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
 import styles from "./PreQuestionsSection.module.css";
+
+import { Textarea } from "flowbite-react";
 
 interface PreQuestions {
   questions?: {
@@ -72,19 +75,19 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
               className={styles.deleteButton}
               onClick={() => handleDeleteQuestion(index)}
             >
-              삭제
+              <FaTrashAlt />
             </button>
           </li>
         ))}
       </ul>
-      <textarea
+      <Textarea
         className={styles.textarea}
         value={newQuestion}
         onChange={(e) => setNewQuestion(e.target.value)}
         placeholder="질문을 입력하세요"
       />
       <button className={styles.saveButton} onClick={handleAddQuestion}>
-        저장하기
+        추가하기
       </button>
     </div>
   );
