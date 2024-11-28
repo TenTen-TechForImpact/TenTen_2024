@@ -60,6 +60,17 @@ const SupplementsSection: React.FC<Props> = ({
   });
 
   const handleAddSupplement = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!newSupplement.name) {
+      newErrors.name = "상품명을 입력하세요";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     if (newSupplement.name) {
       const updatedSupplements = [...supplements, newSupplement];
       const updatedList = {
@@ -156,85 +167,129 @@ const SupplementsSection: React.FC<Props> = ({
       });
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setNewSupplement({ name: "", unit: "", purpose: "", status: "상시 복용" });
+  };
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   return (
-    <div className={styles.section}>
+    <div>
       <h3 className={styles.sectionTitle}>건강기능식품</h3>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>#</th>
             <th>상품명</th>
             <th>제품 단위</th>
             <th>약물 사용 목적</th>
             <th>사용 상태</th>
-            <th>삭제</th>
+            <th onClick={handleOpenModal} className={styles.addButton}>
+              +
+            </th>
           </tr>
         </thead>
         <tbody>
-          {supplements.map((supplement, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{supplement.name}</td>
-              <td>{supplement.unit}</td>
-              <td>{supplement.purpose}</td>
-              <td>{supplement.status}</td>
-              <td>
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => handleDeleteSupplement(index)}
-                >
-                  <FaTrashAlt />
-                </button>
+          {supplements.length > 0 ? (
+            supplements.map((supplement, index) => (
+              <tr key={index}>
+                <td>{supplement.name}</td>
+                <td>{supplement.unit}</td>
+                <td>{supplement.purpose}</td>
+                <td>{supplement.status}</td>
+                <td>
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => handleDeleteSupplement(index)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5} className={styles.emptyMessage}>
+                + 버튼을 눌러 항목을 추가해주세요.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
 
-      <div className={styles.inputContainer}>
-        <input
-          type="text"
-          placeholder="상품명"
-          value={newSupplement.name}
-          onChange={(e) =>
-            setNewSupplement({ ...newSupplement, name: e.target.value })
-          }
-          className={styles.inputField}
-        />
-        <input
-          type="text"
-          placeholder="제품 단위"
-          value={newSupplement.unit}
-          onChange={(e) =>
-            setNewSupplement({ ...newSupplement, unit: e.target.value })
-          }
-          className={styles.inputField}
-        />
-        <input
-          type="text"
-          placeholder="약물 사용 목적"
-          value={newSupplement.purpose}
-          onChange={(e) =>
-            setNewSupplement({ ...newSupplement, purpose: e.target.value })
-          }
-          className={styles.inputField}
-        />
-        <select
-          value={newSupplement.status}
-          onChange={(e) =>
-            setNewSupplement({ ...newSupplement, status: e.target.value })
-          }
-          className={styles.selectField}
-        >
-          <option value="상시 복용">상시 복용</option>
-          <option value="필요 시 복용">필요 시 복용</option>
-          <option value="복용 중단">복용 중단</option>
-          <option value="기타">기타</option>
-        </select>
-        <button className={styles.addButton} onClick={handleAddSupplement}>
-          저장하기
-        </button>
-      </div>
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2>새 건강기능식품 추가</h2>
+
+            <input
+              id="drug-name"
+              placeholder="상품명 *"
+              value={newSupplement.name}
+              onChange={(e) =>
+                setNewSupplement({ ...newSupplement, name: e.target.value })
+              }
+              className={styles.modalInputField}
+            />
+            {errors.name && (
+              <div className={styles.errorMessage}>{errors.name}</div>
+            )}
+
+            <input
+              id="drug-days"
+              type="number"
+              placeholder="제품 단위"
+              value={newSupplement.unit}
+              onChange={(e) =>
+                setNewSupplement({ ...newSupplement, unit: e.target.value })
+              }
+              className={styles.modalInputField}
+            />
+
+            <input
+              id="drug-purpose"
+              placeholder="약물 사용 목적"
+              value={newSupplement.purpose}
+              onChange={(e) =>
+                setNewSupplement({ ...newSupplement, purpose: e.target.value })
+              }
+              className={styles.modalInputField}
+            />
+
+            <select
+              id="drug-status"
+              value={newSupplement.status}
+              onChange={(e) =>
+                setNewSupplement({ ...newSupplement, status: e.target.value })
+              }
+              className={styles.modalInputField}
+            >
+              <option value="상시 복용">상시 복용</option>
+              <option value="필요 시 복용">필요 시 복용</option>
+              <option value="복용 중단">복용 중단</option>
+              <option value="기타">기타</option>
+            </select>
+
+            <button
+              onClick={() => {
+                handleAddSupplement();
+                setIsModalOpen(true);
+              }}
+              className={styles.primaryButton}
+            >
+              추가
+            </button>
+            <button
+              onClick={handleCloseModal}
+              className={styles.secondaryButton}
+            >
+              완료
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

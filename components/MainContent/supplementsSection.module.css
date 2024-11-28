@@ -1,4 +1,4 @@
-/* src/components/MainContent/OTCAndSupplementsSection.module.css */
+/* src/components/MainContent/PrescriptionDrugsSection.module.css */
 .section {
   margin-bottom: var(--padding-medium);
   padding: var(--padding-medium);
@@ -16,6 +16,9 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: var(--padding-medium);
+  background-color: white;
+  table-layout: fixed;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .table th,
@@ -23,6 +26,32 @@
   padding: 8px;
   text-align: left;
   border-bottom: 1px solid #ccc;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 16px;
+  width: 200px;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 200px;
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 300px;
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 200px;
+}
+
+.table th:last-child,
+.table td:last-child {
+  width: 50px;
 }
 
 .table th {
@@ -39,7 +68,7 @@
 
 .inputContainer {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: var(--padding-small);
 }
@@ -61,11 +90,74 @@
 }
 
 .addButton {
-  padding: 12px;
-  background: var(--primary-color);
-  color: #fff;
+  padding: 8px;
+  color: rgb(135, 135, 135);
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.addButton:hover {
+  color: #ff0000;
+}
+
+/*modal*/
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px; /* 모달 너비 */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalInputField {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%; /* 모든 입력 필드 너비 100% */
+  box-sizing: border-box; /* 패딩과 테두리를 포함하여 전체 너비 계산 */
+}
+
+.errorMessage {
+  font-size: 12px;
+  color: red;
+  margin-top: -8px;
+}
+
+.primaryButton {
+  padding: 10px;
+  font-size: 14px;
   border: none;
   border-radius: 4px;
+  background-color: #4caf50;
+  color: #fff;
   cursor: pointer;
-  font-size: var(--font-size-medium);
+}
+
+.secondaryButton {
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  color: #333;
+  cursor: pointer;
 }
