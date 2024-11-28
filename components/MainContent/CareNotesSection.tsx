@@ -1,6 +1,8 @@
 import React from "react";
-import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar"; // Summary Bar 임포트
+import { FaTrashAlt } from "react-icons/fa";
 import styles from "./CareNotesSection.module.css";
+
+import { Textarea } from "flowbite-react";
 
 interface RelatedScript {
   time: string;
@@ -17,85 +19,97 @@ interface SessionSummaryItem {
 
 type Topics = SessionSummaryItem[];
 
-interface CareNotesSectionProps {
+interface CareNotesInterventionSectionProps {
   careNote: any;
   setCareNote: React.Dispatch<React.SetStateAction<any>>;
   sessionId: string;
   onAddContent: (content: string) => void;
   topics: Topics;
+  careNoteComment: string;
+  setCareNoteComment: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const CareNotesSection: React.FC<CareNotesSectionProps> = ({
+const CareNotesInterventionSection: React.FC<
+  CareNotesInterventionSectionProps
+> = ({
   careNote,
   setCareNote,
   sessionId,
+  careNoteComment,
+  setCareNoteComment,
   onAddContent,
   topics,
 }) => {
-  const handleBlur = () => {
-    const updatedField = { care_note: careNote.care_note };
-    console.log("Care Note 저장됨:", JSON.stringify(updatedField));
-
-    // Server PATCH request
-    fetch(`/api/sessions/${sessionId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedField),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Data updated successfully:", data.temp);
-      })
-      .catch((error) => {
-        console.error("Error updating data:", error);
+  const updateCommentsOnServer = async (updatedComments: string[]) => {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ care_note: updatedComments }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to update care note comments");
+      }
+      console.log("Care note comments updated successfully");
+    } catch (error) {
+      console.error("Error updating care note comments:", error);
+    }
+  };
+
+  const handleAddComment = () => {
+    if (careNoteComment.trim() !== "") {
+      const currentComments = careNote.care_note || [];
+      if (currentComments.includes(careNoteComment)) {
+        alert("이미 존재하는 중재 내용입니다.");
+        setCareNoteComment("");
+        return;
+      }
+      const updatedComments = [...currentComments, careNoteComment];
+      setCareNote({ care_note: updatedComments });
+      setCareNoteComment(""); // 입력창 초기화
+      updateCommentsOnServer(updatedComments);
+    }
+  };
+
+  const handleDeleteComment = (index: number) => {
+    const currentComments = careNote.care_note || [];
+    const updatedComments = currentComments.filter((_, i) => i !== index);
+    setCareNote({ care_note: updatedComments });
+    updateCommentsOnServer(updatedComments);
   };
 
   return (
-    <div className={styles.section}>
-      <h3 className={styles.title}>돌봄 노트</h3>
-      <textarea
-        value={careNote.care_note}
-        onChange={(e) => setCareNote({ care_note: e.target.value })}
-        onBlur={handleBlur} // Save notes on blur
-        className={styles.textarea}
-        placeholder="돌봄 노트를 입력하세요."
-      />
-      <ConsultationSummaryBar
-        sessionSummary={[
-          {
-            topic_id: 1,
-            start_time: "0분 0초",
-            end_time: "1분 50초",
-            content: "미구현 상태입니다.",
-            related_scripts: [
-              {
-                time: "1분 24초",
-                content: "일단은 주간에 햇빛을 쐬고 운동을 많이 해주셔야 돼요",
-              },
-              {
-                time: "1분 34초",
-                content: "햇빛이 생체시계를 깨우는 역할을 하거든요.",
-              },
-            ],
-          },
-        ]}
-        onAddContent={(content) => {
-          setCareNote({
-            care_note: `${careNote.care_notes}\n${content}`,
-          });
-          onAddContent(content);
-        }}
-      />
-    </div>
+    <>
+      <h3 className={styles.sectionTitle}>돌봄 노트</h3>
+      <div className={styles.section}>
+        <ul className={styles.interventionList}>
+          {careNote.care_note.map((comment, index) => (
+            <li key={index} className={styles.interventionItem}>
+              <span style={{ whiteSpace: "pre-wrap" }}>{comment}</span>
+              <button
+                className={styles.deleteButton}
+                onClick={() => handleDeleteComment(index)}
+              >
+                <FaTrashAlt />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <Textarea
+          className={styles.textarea}
+          value={careNoteComment}
+          onChange={(e) => setCareNoteComment(e.target.value)}
+          placeholder="돌봄 노트 내용을 입력하세요."
+        />
+        <button className={styles.addButton} onClick={handleAddComment}>
+          추가하기
+        </button>
+      </div>
+    </>
   );
 };
 
-export default CareNotesSection;
+export default CareNotesInterventionSection;

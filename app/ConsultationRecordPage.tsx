@@ -757,6 +757,8 @@ const ConsultationRecordPage: React.FC = () => {
               setPharmacistIntervention={setPharmacistIntervention}
               pharmacistComment={pharmacistComment}
               setPharmacistComment={setPharmacistComment}
+              careNoteComment={careNoteComment}
+              setCareNoteComment={setCareNoteComment}
               sessionId={sessionId}
               topics={topics}
             />
@@ -773,6 +775,8 @@ const ConsultationRecordPage: React.FC = () => {
               recentRecording={recentRecording}
               pharmacistComment={pharmacistComment}
               setPharmacistComment={setPharmacistComment}
+              careNoteComment={careNoteComment}
+              setCareNoteComment={setCareNoteComment}
             />
           )}
         </aside>

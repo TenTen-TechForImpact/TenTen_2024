@@ -66,7 +66,7 @@ const PreQuestionsSection: React.FC<PreQuestionsSectionProps> = ({
 
   return (
     <div className={styles.section}>
-      <h3 className={styles.sectionTitle}>상담 전 질문</h3>
+      <h3 className={styles.sectionTitle}>사전 상담 질문</h3>
       <ul className={styles.questionList}>
         {preQuestions.questions?.list.map((question, index) => (
           <li key={question} className={styles.questionItem}>

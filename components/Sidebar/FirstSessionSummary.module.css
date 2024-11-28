@@ -31,6 +31,14 @@
   gap: 0.4rem; /* Adds spacing between title and content */
 }
 
+.questionList {
+  border-bottom: 1px solid #e5e7eb; /* Equivalent to border-gray-200 */
+  padding-bottom: 0.5rem; /* Tailwind's pb-2 */
+  margin-bottom: 0.5rem; /* Tailwind's mb-2 */
+  display: flex;
+  flex-direction: column; /* Makes the children stack vertically */
+}
+
 .accordion {
   background-color: white;
   border-width: 1px;

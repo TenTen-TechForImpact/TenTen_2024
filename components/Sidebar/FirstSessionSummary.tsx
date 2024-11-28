@@ -91,6 +91,8 @@ interface FirstSessionSummaryProps {
   recentRecording: RecordingItem;
   pharmacistComment: string;
   setPharmacistComment: React.Dispatch<React.SetStateAction<string>>;
+  careNoteComment: string;
+  setCareNoteComment: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const session_summary = [
@@ -197,6 +199,8 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
   sessionSummaryData,
   pharmacistComment,
   setPharmacistComment,
+  careNoteComment,
+  setCareNoteComment,
 }) => {
   const formatSessionSummary = (entry) => {
     const { question, pharmacist_response } = entry;
@@ -209,11 +213,17 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
     return formattedSummary;
   };
 
-  const handleAddToComment = (text: string) => {
+  const handleAddToComment = (text: string, isCareNote: boolean) => {
     if (text.trim()) {
-      setPharmacistComment((prev) =>
-        prev ? `${prev}\n${text.trim()}` : text.trim()
-      );
+      if (isCareNote) {
+        setCareNoteComment((prev) =>
+          prev ? `${prev}\n${text.trim()}` : text.trim()
+        );
+      } else {
+        setPharmacistComment((prev) =>
+          prev ? `${prev}\n${text.trim()}` : text.trim()
+        );
+      }
     }
   };
 
@@ -240,24 +250,105 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                     </Accordion.Title>
                     <Accordion.Content className={styles.accordionContent}>
                       <div className={styles.listItem}>
-                        <span className={styles.boldTitle}>질병 종류:</span>
-                        <span>없음</span>
-                      </div>
-                      <div className={styles.listItem}>
-                        <span className={styles.boldTitle}>기타:</span>
-                        <span>없음</span>
+                        <span className={styles.boldTitle}>질병 목록:</span>
+                        <span>
+                          {Array.isArray(
+                            patientInfo.medical_conditions.chronic_diseases
+                              .disease_names
+                          ) &&
+                          patientInfo.medical_conditions.chronic_diseases
+                            .disease_names.length > 0
+                            ? patientInfo.medical_conditions.chronic_diseases.disease_names.join(
+                                ", "
+                              )
+                            : "없음"}
+                        </span>
                       </div>
                       <div className={styles.listItem}>
                         <span className={styles.boldTitle}>
                           과거 질병 및 수술 이력:
                         </span>
-                        <span>없음</span>
+                        <span>
+                          {patientInfo.medical_conditions.medical_history ||
+                            "없음"}
+                        </span>
                       </div>
                       <div className={styles.listItem}>
                         <span className={styles.boldTitle}>
                           주요 불편한 증상:
                         </span>
-                        <span>없음</span>
+                        <span>
+                          {patientInfo.medical_conditions.symptoms || "없음"}
+                        </span>
+                      </div>
+                      {patientInfo.medical_conditions.allergies
+                        .has_allergies === "예" && (
+                        <div className={styles.listItem}>
+                          <span className={styles.boldTitle}>알러지:</span>
+                          <span>
+                            {patientInfo.medical_conditions.allergies
+                              .has_allergies === "예"
+                              ? `의심 항목: ${patientInfo.medical_conditions.allergies.suspected_items}`
+                              : "없음"}
+                          </span>
+                        </div>
+                      )}
+                      {patientInfo.medical_conditions.adverse_drug_reactions
+                        .has_adverse_drug_reactions === "예" && (
+                        <div className={styles.listItem}>
+                          <span className={styles.boldTitle}>약물 부작용:</span>
+                          <span>
+                            {patientInfo.medical_conditions
+                              .adverse_drug_reactions
+                              .has_adverse_drug_reactions === "예"
+                              ? `의심 약물: ${patientInfo.medical_conditions.adverse_drug_reactions.suspected_medications}, 증상: ${patientInfo.medical_conditions.adverse_drug_reactions.reaction_details}`
+                              : "없음"}
+                          </span>
+                        </div>
+                      )}
+                      {patientInfo.lifestyle.smoking.is_smoking === "예" && (
+                        <div className={styles.listItem}>
+                          <span className={styles.boldTitle}>흡연:</span>
+                          <span>
+                            {patientInfo.lifestyle.smoking.is_smoking === "예"
+                              ? `흡연 기간: ${patientInfo.lifestyle.smoking.duration_in_years}년, 평균 흡연량: ${patientInfo.lifestyle.smoking.pack_per_day}갑`
+                              : "비흡연"}
+                          </span>
+                        </div>
+                      )}
+                      {patientInfo.lifestyle.alcohol.is_drinking === "예" && (
+                        <div className={styles.listItem}>
+                          <span className={styles.boldTitle}>음주:</span>
+                          <span>
+                            {patientInfo.lifestyle.alcohol.is_drinking === "예"
+                              ? `주 ${patientInfo.lifestyle.alcohol.drinks_per_week}회, 음주량: ${patientInfo.lifestyle.alcohol.amount_per_drink}`
+                              : "비음주"}
+                          </span>
+                        </div>
+                      )}
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>운동:</span>
+                        <span>
+                          {patientInfo.lifestyle.exercise.is_exercising === "예"
+                            ? `${
+                                patientInfo.lifestyle.exercise
+                                  .exercise_frequency
+                              }, 운동 종류: ${
+                                patientInfo.lifestyle.exercise.exercise_types
+                                  ? patientInfo.lifestyle.exercise
+                                      .exercise_types
+                                  : "없음"
+                              }`
+                            : "운동 안 함"}
+                        </span>
+                      </div>
+                      <div className={styles.listItem}>
+                        <span className={styles.boldTitle}>영양:</span>
+                        <span>
+                          {patientInfo.lifestyle.diet.is_balanced_meal === "예"
+                            ? `균형 잡힌 식사 ${patientInfo.lifestyle.diet.balanced_meals_per_day}`
+                            : "불규칙한 식사"}
+                        </span>
                       </div>
                     </Accordion.Content>
                   </Accordion.Panel>
@@ -270,10 +361,16 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                       사전 상담 질문
                     </Accordion.Title>
                     <Accordion.Content className={styles.accordionContent}>
-                      <div className={styles.listItem}>
-                        <span className={styles.boldTitle}>질문:</span>
-                        <span>질문 없음</span>
-                      </div>
+                      {Array.isArray(preQuestions.questions.list) &&
+                      preQuestions.questions.list.length > 0 ? (
+                        preQuestions.questions.list.map((question, index) => (
+                          <p key={index} className={styles.questionList}>
+                            {question}
+                          </p>
+                        ))
+                      ) : (
+                        <p>질문 없음</p>
+                      )}
                     </Accordion.Content>
                   </Accordion.Panel>
                 </Accordion>
@@ -373,7 +470,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                                     onClick={() => {
                                       const formattedText =
                                         formatSessionSummary(entry);
-                                      handleAddToComment(formattedText);
+                                      handleAddToComment(formattedText, false);
                                     }}
                                     className={styles.addButton}
                                   >
@@ -383,7 +480,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                                     onClick={() => {
                                       const formattedText =
                                         formatSessionSummary(entry);
-                                      handleAddToComment(formattedText);
+                                      handleAddToComment(formattedText, true);
                                     }}
                                     className={styles.addButton}
                                   >
