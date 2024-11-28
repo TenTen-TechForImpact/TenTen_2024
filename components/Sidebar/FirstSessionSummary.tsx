@@ -201,8 +201,9 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
   const formatSessionSummary = (entry) => {
     const { question, pharmacist_response } = entry;
     const formattedSummary = [
-      question,
-      ...pharmacist_response.map((response) => `- ${response.summary}`),
+      `Q : ${question}`, // "Q : "를 추가
+      "", // 한 줄 띄우기
+      ...pharmacist_response.map((response) => `A : ${response.summary}`), // "A : "를 추가
     ].join("\n");
 
     return formattedSummary;

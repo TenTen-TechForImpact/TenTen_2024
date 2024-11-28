@@ -1,7 +1,7 @@
 import React from "react";
-import { useState } from "react";
-import ConsultationSummaryBar from "../SummaryBar/ConsultationSummaryBar";
+import { FaTrashAlt } from "react-icons/fa";
 import styles from "./PharmacistInterventionSection.module.css";
+import { Textarea } from "flowbite-react";
 
 interface RelatedScript {
   time: string;
@@ -61,7 +61,7 @@ const PharmacistInterventionSection: React.FC<
   const handleAddComment = () => {
     if (pharmacistComment.trim() !== "") {
       const currentComments = pharmacistIntervention.pharmacist_comments || [];
-      if (currentComments.includes(pharmacistComment.trim())) {
+      if (currentComments.includes(pharmacistComment)) {
         alert("이미 존재하는 중재 내용입니다.");
         setPharmacistComment("");
         return;
@@ -86,25 +86,17 @@ const PharmacistInterventionSection: React.FC<
       <ul className={styles.interventionList}>
         {pharmacistIntervention.pharmacist_comments.map((comment, index) => (
           <li key={index} className={styles.interventionItem}>
-            <span>{comment}</span>
+            <span style={{ whiteSpace: "pre-wrap" }}>{comment}</span>
             <button
               className={styles.deleteButton}
-              onClick={() => {
-                const updatedComments = [
-                  ...pharmacistIntervention.pharmacist_comments,
-                ];
-                updatedComments.splice(index, 1);
-                setPharmacistIntervention({
-                  pharmacist_comments: updatedComments,
-                });
-              }}
+              onClick={() => handleDeleteComment(index)} // 삭제 로직 함수로 분리
             >
-              삭제
+              <FaTrashAlt />
             </button>
           </li>
         ))}
       </ul>
-      <textarea
+      <Textarea
         className={styles.textarea}
         value={pharmacistComment}
         onChange={(e) => setPharmacistComment(e.target.value)}
@@ -113,38 +105,6 @@ const PharmacistInterventionSection: React.FC<
       <button className={styles.addButton} onClick={handleAddComment}>
         추가하기
       </button>
-      {/* <ConsultationSummaryBar
-        sessionSummary={
-          topics
-            ? topics
-            : [
-                {
-                  topic_id: 1,
-                  start_time: "0분 0초",
-                  end_time: "1분 50초",
-                  content: "미구현 상태입니다.",
-                  related_scripts: [
-                    {
-                      time: "1분 24초",
-                      content:
-                        "그래서 사실 당뇨약을 줄이는 게 제일 현실적인 것 같아요.",
-                    },
-                    {
-                      time: "1분 38초",
-                      content:
-                        "줄이시는 게 발생한 문제를 해소하는 데 큰 도움이 될 거거든요.",
-                    },
-                  ],
-                },
-              ]
-        }
-        onAddContent={(content) => {
-          setPharmacistIntervention({
-            pharmacist_comments: `${pharmacistIntervention.pharmacist_comments}\n${content}`,
-          });
-          onAddContent(content);
-        }}
-      /> */}
     </div>
   );
 };
