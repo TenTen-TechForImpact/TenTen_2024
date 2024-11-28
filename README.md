@@ -182,7 +182,7 @@ This is the webpage for TenTen. The recording upload and analysis features have 
   - **Email**: soyoon1015@kaist.ac.kr  
   - **Role**: Backend Developer  
 
-- **Kim Yelim**  
+- **Kim Yerim**  
   - **Affiliation**: KAIST School of Computing  
   - **Email**: lilyblue@kaist.ac.kr  
   - **Role**: Backend Developer  
