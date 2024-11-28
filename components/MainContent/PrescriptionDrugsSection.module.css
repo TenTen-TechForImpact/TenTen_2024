@@ -16,6 +16,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: var(--padding-medium);
+  background-color: white;
 }
 
 .table th,
