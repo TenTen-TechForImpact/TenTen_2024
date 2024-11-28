@@ -184,7 +184,7 @@ TenTen assists with tasks during and after visit consultations, offering the fol
   - **Email**: hohoho4u4me@kaist.ac.kr  
   - **Role**: Team Leader, Frontend Developer  
 
-- **Kim Myungcheol**  
+- **Kim Myeongcheol**  
   - **Affiliation**: KAIST Department of Mathematical Sciences  
   - **Email**: dayforday@kaist.ac.kr  
   - **Role**: Frontend Developer  
