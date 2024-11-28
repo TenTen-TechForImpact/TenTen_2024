@@ -253,7 +253,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                         <span className={styles.boldTitle}>질병 목록:</span>
                         <span>
                           {Array.isArray(
-                            patientInfo.medical_conditions.chronic_diseases
+                            patientInfo.medical_conditions?.chronic_diseases
                               .disease_names
                           ) &&
                           patientInfo.medical_conditions.chronic_diseases
@@ -269,7 +269,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                           과거 질병 및 수술 이력:
                         </span>
                         <span>
-                          {patientInfo.medical_conditions.medical_history ||
+                          {patientInfo.medical_conditions?.medical_history ||
                             "없음"}
                         </span>
                       </div>
@@ -278,10 +278,10 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                           주요 불편한 증상:
                         </span>
                         <span>
-                          {patientInfo.medical_conditions.symptoms || "없음"}
+                          {patientInfo.medical_conditions?.symptoms || "없음"}
                         </span>
                       </div>
-                      {patientInfo.medical_conditions.allergies
+                      {patientInfo.medical_conditions?.allergies
                         .has_allergies === "예" && (
                         <div className={styles.listItem}>
                           <span className={styles.boldTitle}>알러지:</span>
@@ -293,7 +293,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                           </span>
                         </div>
                       )}
-                      {patientInfo.medical_conditions.adverse_drug_reactions
+                      {patientInfo.medical_conditions?.adverse_drug_reactions
                         .has_adverse_drug_reactions === "예" && (
                         <div className={styles.listItem}>
                           <span className={styles.boldTitle}>약물 부작용:</span>
@@ -306,7 +306,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                           </span>
                         </div>
                       )}
-                      {patientInfo.lifestyle.smoking.is_smoking === "예" && (
+                      {patientInfo.lifestyle?.smoking.is_smoking === "예" && (
                         <div className={styles.listItem}>
                           <span className={styles.boldTitle}>흡연:</span>
                           <span>
@@ -316,7 +316,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                           </span>
                         </div>
                       )}
-                      {patientInfo.lifestyle.alcohol.is_drinking === "예" && (
+                      {patientInfo.lifestyle?.alcohol.is_drinking === "예" && (
                         <div className={styles.listItem}>
                           <span className={styles.boldTitle}>음주:</span>
                           <span>
@@ -329,7 +329,8 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                       <div className={styles.listItem}>
                         <span className={styles.boldTitle}>운동:</span>
                         <span>
-                          {patientInfo.lifestyle.exercise.is_exercising === "예"
+                          {patientInfo.lifestyle?.exercise.is_exercising ===
+                          "예"
                             ? `${
                                 patientInfo.lifestyle.exercise
                                   .exercise_frequency
@@ -345,7 +346,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                       <div className={styles.listItem}>
                         <span className={styles.boldTitle}>영양:</span>
                         <span>
-                          {patientInfo.lifestyle.diet.is_balanced_meal === "예"
+                          {patientInfo.lifestyle?.diet.is_balanced_meal === "예"
                             ? `균형 잡힌 식사 ${patientInfo.lifestyle.diet.balanced_meals_per_day}`
                             : "불규칙한 식사"}
                         </span>
@@ -361,7 +362,7 @@ const FirstSessionSummary: React.FC<FirstSessionSummaryProps> = ({
                       사전 상담 질문
                     </Accordion.Title>
                     <Accordion.Content className={styles.accordionContent}>
-                      {Array.isArray(preQuestions.questions.list) &&
+                      {Array.isArray(preQuestions.questions?.list) &&
                       preQuestions.questions.list.length > 0 ? (
                         preQuestions.questions.list.map((question, index) => (
                           <p key={index} className={styles.questionList}>

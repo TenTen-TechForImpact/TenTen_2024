@@ -75,8 +75,8 @@ const defaultTemp = {
     over_the_counter_drugs: { count: 0, list: [] },
     health_functional_foods: { count: 0, list: [] },
   },
-  pharmacist_comments: "",
-  care_note: "",
+  pharmacist_comments: [],
+  care_note: [],
 };
 
 // Post: create new session card for a patient
@@ -122,11 +122,19 @@ export async function POST(
       .limit(1)
       .single();
 
-    // 이전 상담카드가 없으면 defaultTemp 사용
-    const tempFromLastSession = lastSession ? lastSession.temp : defaultTemp;
+    // 이전 상담카드가 없으면 defaultTemp 사용 // 잠시 막아둠
+    //const tempFromLastSession = lastSession ? lastSession.temp : defaultTemp;
 
     // 새로운 상담카드의 temp 생성
     const updatedTemp = {
+      ...defaultTemp,
+      personal_info: {
+        name: patient.name,
+        date_of_birth: patient.date_of_birth,
+        phone_number: patient.phone_number,
+      },
+    };
+    /* {
       ...defaultTemp,
       personal_info: {
         name: patient.name,
@@ -145,7 +153,7 @@ export async function POST(
       current_medications: tempFromLastSession.current_medications,
       pharmacist_comments: "", // 초기화
       care_note: "", // 초기화
-    };
+    };*/
 
     // Session 테이블에 데이터 삽입
     const { data: session, error: sessionError } = await supabase
