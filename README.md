@@ -22,6 +22,11 @@
 2. **AI 기반 상담 요약**: LLM을 활용하여 상담 내용을 요약하고 키워드 및 대주제를 추천합니다.
 3. **상담 활용성 극대화**: 환자들은 복약 상담 내용을 인쇄물 또는 디지털 방식으로 제공받아 활용할 수 있습니다.
 
+### 유사 솔루션 대비 특장점
+- 기존 앱들은 상담 내용을 자세히 기록하지 않아, 그 내용을 복기하고 공유하기 어렵다. 우리 앱은 상세한 상담 기록으로 이를 보완했다.
+- 기존 앱들은 환자의 편의에 치우쳐진 기능만 있지만, 우리 앱은 상담을 하는 약사들의 편의도 고려하여 많은 상담을 할 수 있도록 도움을 준다.
+- 상담결과를 다양한 형태(문자, 상담안내문)으로 받아볼 수 있어, 디지털 환경에 낯선 취약계층을 배려했다.
+
 ### 기대 효과
 - 약사의 상담 기록 작업 시간 단축 및 상담 품질 향상.
 - 환자의 복약 정보 활용성 증대.
@@ -123,6 +128,11 @@ TenTen assists with tasks during and after visit consultations, offering the fol
 1. **Digitalization of patient consultation records**: Accumulating data to support patient management and follow-up consultations.
 2. **AI-based consultation summarization**: Using LLM to summarize consultation content and suggest keywords and main topics.
 3. **Maximizing consultation usability**: Patients can receive consultation information in either printed or digital form for easy use.
+
+### Key Advantages Compared to Similar Solutions
+- Existing apps often fail to provide detailed consultation records, making it difficult to review and share the contents of consultations. Our app addresses this by offering comprehensive consultation records.
+- Most existing apps are focused solely on the convenience of patients, whereas our app also prioritizes the convenience of pharmacists, enabling them to handle a larger volume of consultations more efficiently.
+- Consultation results can be delivered in various formats (e.g., text messages, consultation summary documents), ensuring inclusivity for vulnerable populations who may be unfamiliar with digital environments.
 
 ### Expected Benefits
 - Reduced time spent on consultation record-keeping and improved consultation quality for pharmacists.
