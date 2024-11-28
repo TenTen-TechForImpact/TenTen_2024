@@ -48,7 +48,7 @@
 ## 📦 설치 및 실행 방법
 
 ### https://inspiring-monstera-4be922.netlify.app/
-텐텐의 배포용 페이지입니다. 비용 관련 문제로 인해 녹음본 업로드 및 분석 기능은 막아두었습니다.
+텐텐의 배포용 페이지입니다. api 비용 문제로 녹음본 업로드 및 분석 기능은 비활성화 해두었습니다.
 
 
 ---
@@ -150,7 +150,8 @@ TenTen assists with tasks during and after visit consultations, offering the fol
 ## 📦 Installation & Setup
 
 ### https://inspiring-monstera-4be922.netlify.app/
-This is the webpage for TenTen. Due to cost-related issues, the upload and analysis functions for audio recordings have been disabled.
+This is the webpage for TenTen. The recording upload and analysis features have been disabled due to API cost issues.
+
 
 ---
 
@@ -166,7 +167,7 @@ This is the webpage for TenTen. Due to cost-related issues, the upload and analy
 ## 👥 Team Introduction
 
 ### Team Members
-- **Lee Jungho**  
+- **Lee Jeongho**  
   - **Affiliation**: KAIST School of Computing  
   - **Email**: hohoho4u4me@kaist.ac.kr  
   - **Role**: Team Leader, Frontend Developer  
