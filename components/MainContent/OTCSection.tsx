@@ -230,7 +230,6 @@ const OTCSection: React.FC<Props> = ({
 
             <input
               id="drug-days"
-              type="number"
               placeholder="제품 단위"
               value={newDrug.unit}
               onChange={(e) => setNewDrug({ ...newDrug, unit: e.target.value })}

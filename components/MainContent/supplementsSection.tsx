@@ -239,7 +239,6 @@ const SupplementsSection: React.FC<Props> = ({
 
             <input
               id="drug-days"
-              type="number"
               placeholder="제품 단위"
               value={newSupplement.unit}
               onChange={(e) =>
