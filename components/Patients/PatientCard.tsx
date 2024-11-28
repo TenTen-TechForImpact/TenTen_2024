@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./PatientCard.module.css";
 
 interface Patient {
@@ -21,8 +21,14 @@ interface PatientCardProps {
   onEdit: (patient: Patient) => void;
 }
 
-const PatientCard: React.FC<PatientCardProps> = ({ patient, onViewDetails, onDelete, onEdit }) => {
+const PatientCard: React.FC<PatientCardProps> = ({
+  patient,
+  onViewDetails,
+  onDelete,
+  onEdit,
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleDeleteClick = () => {
     onDelete(patient);
@@ -37,11 +43,33 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onViewDetails, onDel
   const handleViewDetailsClick = () => {
     onViewDetails(patient);
     setShowDropdown(false);
-  }
+  };
 
   const toggleDropdown = () => {
     setShowDropdown((prev) => !prev);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
 
   return (
     <div className={styles.patientContainer}>
@@ -58,20 +86,23 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, onViewDetails, onDel
           ⋮
         </button>
         {showDropdown && (
-          <div className={styles.dropdownMenu}>
+          <div className={styles.dropdownMenu} ref={dropdownRef}>
             <div className={styles.dropdownItem} onClick={handleEditClick}>
               수정
             </div>
             <div className={styles.dropdownItem} onClick={handleDeleteClick}>
               삭제
             </div>
-            <div className={styles.dropdownItem} onClick={handleViewDetailsClick}>
+            <div
+              className={styles.dropdownItem}
+              onClick={handleViewDetailsClick}
+            >
               상담 보기
             </div>
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 };
 
