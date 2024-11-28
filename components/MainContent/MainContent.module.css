@@ -19,3 +19,7 @@
   font-size: var(--font-size-medium);
   margin-top: var(--padding-medium);
 }
+
+.section {
+  margin-bottom: 32px;
+}

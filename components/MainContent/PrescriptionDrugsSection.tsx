@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, TextInput, Select, Label } from "flowbite-react";
-
 import { FaTrashAlt } from "react-icons/fa";
 import styles from "./PrescriptionDrugsSection.module.css";
 
@@ -60,6 +58,17 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
   }, [medicationList]);
 
   const handleAddDrug = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!newDrug.name) {
+      newErrors.name = "상품명을 입력하세요";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     if (newDrug.name) {
       const updatedDrugs = [...drugs, newDrug];
       const updatedList = {
@@ -161,6 +170,8 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
     setNewDrug({ name: "", days: "", purpose: "", status: "상시 복용" });
   };
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   return (
     <div>
       <h3 className={styles.sectionTitle}>처방 의약품</h3>
@@ -197,71 +208,80 @@ const PrescriptionDrugsSection: React.FC<Props> = ({
           ) : (
             <tr>
               <td colSpan={5} className={styles.emptyMessage}>
-                '+'를 눌러 항목을 추가해주세요.
+                + 버튼을 눌러 항목을 추가해주세요.
               </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      <Modal show={isModalOpen} size="md" onClose={handleCloseModal}>
-        <Modal.Header>약물 추가</Modal.Header>
-        <Modal.Body>
-          <div className={styles.inputContainer}>
-            <Label htmlFor="drug-name" value="상품명" />
-            <TextInput
+      {isModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2>새 처방의약품 추가</h2>
+
+            <input
               id="drug-name"
-              placeholder="상품명"
+              placeholder="상품명 *"
               value={newDrug.name}
               onChange={(e) => setNewDrug({ ...newDrug, name: e.target.value })}
+              className={styles.modalInputField}
             />
-            <Label htmlFor="drug-days" value="처방 일수" />
-            <TextInput
+            {errors.name && (
+              <div className={styles.errorMessage}>{errors.name}</div>
+            )}
+
+            <input
               id="drug-days"
               type="number"
               placeholder="처방 일수"
               value={newDrug.days}
               onChange={(e) => setNewDrug({ ...newDrug, days: e.target.value })}
+              className={styles.modalInputField}
             />
-            <Label htmlFor="drug-purpose" value="약물 사용 목적" />
-            <TextInput
+
+            <input
               id="drug-purpose"
               placeholder="약물 사용 목적"
               value={newDrug.purpose}
               onChange={(e) =>
                 setNewDrug({ ...newDrug, purpose: e.target.value })
               }
+              className={styles.modalInputField}
             />
-            <Label htmlFor="drug-status" value="사용 상태" />
-            <Select
+
+            <select
               id="drug-status"
               value={newDrug.status}
               onChange={(e) =>
                 setNewDrug({ ...newDrug, status: e.target.value })
               }
+              className={styles.modalInputField}
             >
               <option value="상시 복용">상시 복용</option>
               <option value="필요 시 복용">필요 시 복용</option>
               <option value="복용 중단">복용 중단</option>
               <option value="기타">기타</option>
-            </Select>
+            </select>
+
+            <button
+              onClick={() => {
+                handleAddDrug();
+                setIsModalOpen(true);
+              }}
+              className={styles.primaryButton}
+            >
+              추가
+            </button>
+            <button
+              onClick={handleCloseModal}
+              className={styles.secondaryButton}
+            >
+              완료
+            </button>
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            className={styles.addButton}
-            onClick={() => {
-              handleAddDrug();
-              setIsModalOpen(true); // Reset for consecutive input
-            }}
-          >
-            추가
-          </Button>
-          <Button color="gray" onClick={handleCloseModal}>
-            취소
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        </div>
+      )}
     </div>
   );
 };
