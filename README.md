@@ -48,7 +48,7 @@
 ## 📦 설치 및 실행 방법
 
 ### https://inspiring-monstera-4be922.netlify.app/
-텐텐의 배포용 페이지입니다.
+텐텐의 배포용 페이지입니다. 비용 관련 문제로 인해 녹음본 업로드 및 분석 기능은 막아두었습니다.
 
 
 ---
@@ -56,7 +56,6 @@
 ## 📚 연관 자료
 
 - **최종 발표 자료**: 
-- **펠로우 조직 사이트**: 
 - **프로젝트 노션 페이지**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb
 - **늘픔약국 홈페이지**: http://healthnppa.or.kr/introduction/nppa-pharmacy/
   
@@ -150,23 +149,17 @@ TenTen assists with tasks during and after visit consultations, offering the fol
 
 ## 📦 Installation & Setup
 
-### Prerequisites
-
-
-### Installation
-
----
-
-## 🎥 Demo Video
-
+### https://inspiring-monstera-4be922.netlify.app/
+This is the webpage for TenTen. Due to cost-related issues, the upload and analysis functions for audio recordings have been disabled.
 
 ---
 
 ## 📚 Related References
 
-- **Final Presentation**: 
-- **Fellow Organization Website**: 
-- **Project Introduction (Notion page)**: 
+- **Final Presentation**:
+- **Project Introduction (Notion page)**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb
+- **Fellow Organization Website**: http://healthnppa.or.kr/introduction/nppa-pharmacy/
+
 
 ---
 
