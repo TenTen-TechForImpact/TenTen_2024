@@ -8,7 +8,8 @@ import SupplementsSection from "./supplementsSection";
 import OTCSection from "./OTCSection";
 import CareNotesSection from "./CareNotesSection";
 import PharmacistInterventionSection from "./PharmacistInterventionSection";
-import RecordingSection from "./RecordingSection";
+// import RecordingSection from "./RecordingSection";
+import FakeRecordingSection from "./FakeRecordingSection";
 import styles from "./MainContent.module.css";
 
 interface RelatedScript {
@@ -35,8 +36,8 @@ interface MainContentProps {
   preQuestions: any;
   setPreQuestions: React.Dispatch<React.SetStateAction<any>>;
   sessionId: string | null;
-  medicationList: any; // 나중에 타입 제대로 지정
-  setMedicationList: React.Dispatch<React.SetStateAction<any>>; // 나중에 타입 제대로 지정
+  medicationList: any;
+  setMedicationList: React.Dispatch<React.SetStateAction<any>>;
   careNote: any;
   setCareNote: React.Dispatch<React.SetStateAction<any>>;
   pharmacistIntervention: any;
@@ -62,7 +63,7 @@ const MainContent: React.FC<MainContentProps> = ({
   topics,
 }) => {
   const handleAddContent = (content: string) => {
-    //console.log("추가된 content:", content);
+    // console.log("추가된 content:", content);
   };
 
   return (
@@ -85,22 +86,22 @@ const MainContent: React.FC<MainContentProps> = ({
           </section>
           <section id="prescriptionDrugs" className={styles.section}>
             <PrescriptionDrugsSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>
           <section id="otc" className={styles.section}>
             <OTCSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>
           <section id="supplements" className={styles.section}>
             <SupplementsSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>
@@ -115,30 +116,36 @@ const MainContent: React.FC<MainContentProps> = ({
 
       {isFollowUp && (
         <>
+          {/* 기존 RecordingSection 주석 처리 */}
+          {/* 
           <section id="recording" className={styles.section}>
             <RecordingSection
               onRecordingStatusChange={onRecordingStatusChange}
               sessionId={sessionId ?? "임시ID"}
             />
           </section>
+          */}
+          <section id="recording" className={styles.section}>
+            <FakeRecordingSection />
+          </section>
           <section id="prescriptionDrugs" className={styles.section}>
             <PrescriptionDrugsSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>
           <section id="otc" className={styles.section}>
             <OTCSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>
           <section id="supplements" className={styles.section}>
             <SupplementsSection
-              medicationList={medicationList} // 전달된 약물 목록 상태
-              setMedicationList={setMedicationList} // 상태 변경 함수 전달
+              medicationList={medicationList}
+              setMedicationList={setMedicationList}
               sessionId={sessionId}
             />
           </section>

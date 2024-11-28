@@ -1,19 +1,23 @@
-/* src/components/MainContent/PrescriptionDrugsSection.module.css */
+/* PrescriptionDrugsSection.module.css */
 .section {
-  margin-bottom: var(--padding-medium);
-  padding: var(--padding-medium);
-  background: #fff;
-  border-radius: var(--border-medium);
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sectionTitle {
-  font-size: var(--font-size-large);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--padding-small);
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 16px;
 }
 
-.table {
-  width: 100%;
+.tableContainer {
+  overflow-x: auto;
+}
+
+.tableBody {
   border-collapse: collapse;
   margin-bottom: var(--padding-medium);
   background-color: white;
@@ -21,11 +25,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.table th,
-.table td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ccc;
+.tableRow {
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
 }
 
 .table th:first-child,
@@ -63,7 +65,16 @@
   border: none;
   color: #d9534f;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.deleteButton:hover {
+  color: #a94442;
+}
+
+.inputRow {
+  background-color: #f9f9f9;
 }
 
 .inputContainer {
@@ -71,22 +82,28 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: var(--padding-small);
+
 }
 
 .inputField {
-  padding: 8px;
-  font-size: var(--font-size-medium);
-  border: 1px solid #ccc;
-  border-radius: 4px;
   flex: 1;
+  padding: 8px;
+  border: 0px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.inputCell {
+  padding: 0px;
 }
 
 .selectField {
-  padding: 8px;
-  font-size: var(--font-size-medium);
-  border: 1px solid #ccc;
-  border-radius: 4px;
   flex: 1;
+  padding: 8px;
+  border: 0px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
 .addButton {
@@ -161,3 +178,4 @@
   color: #333;
   cursor: pointer;
 }
+

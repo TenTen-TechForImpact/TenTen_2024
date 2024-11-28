@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+import { Table } from "flowbite-react"
 import styles from "./PrescriptionDrugsSection.module.css";
 
 interface PrescriptionDrug {
