@@ -1,9 +1,8 @@
 .section {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  background-color: #f9f9f9;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
 }
 
 .title {
@@ -11,6 +10,12 @@
   font-weight: bold;
   margin-bottom: 12px;
   color: #333;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--padding-small);
 }
 
 .textarea {

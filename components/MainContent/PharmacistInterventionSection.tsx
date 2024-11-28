@@ -81,31 +81,33 @@ const PharmacistInterventionSection: React.FC<
   };
 
   return (
-    <div className={styles.section}>
-      <h3 className={styles.title}>약사 중재 내용</h3>
-      <ul className={styles.interventionList}>
-        {pharmacistIntervention.pharmacist_comments.map((comment, index) => (
-          <li key={index} className={styles.interventionItem}>
-            <span style={{ whiteSpace: "pre-wrap" }}>{comment}</span>
-            <button
-              className={styles.deleteButton}
-              onClick={() => handleDeleteComment(index)} // 삭제 로직 함수로 분리
-            >
-              <FaTrashAlt />
-            </button>
-          </li>
-        ))}
-      </ul>
-      <Textarea
-        className={styles.textarea}
-        value={pharmacistComment}
-        onChange={(e) => setPharmacistComment(e.target.value)}
-        placeholder="약사 중재 내용을 입력하세요."
-      />
-      <button className={styles.addButton} onClick={handleAddComment}>
-        추가하기
-      </button>
-    </div>
+    <>
+      <h3 className={styles.sectionTitle}>약사 중재 내용</h3>
+      <div className={styles.section}>
+        <ul className={styles.interventionList}>
+          {pharmacistIntervention.pharmacist_comments.map((comment, index) => (
+            <li key={index} className={styles.interventionItem}>
+              <span style={{ whiteSpace: "pre-wrap" }}>{comment}</span>
+              <button
+                className={styles.deleteButton}
+                onClick={() => handleDeleteComment(index)} // 삭제 로직 함수로 분리
+              >
+                <FaTrashAlt />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <Textarea
+          className={styles.textarea}
+          value={pharmacistComment}
+          onChange={(e) => setPharmacistComment(e.target.value)}
+          placeholder="약사 중재 내용을 입력하세요."
+        />
+        <button className={styles.addButton} onClick={handleAddComment}>
+          추가하기
+        </button>
+      </div>
+    </>
   );
 };
 
