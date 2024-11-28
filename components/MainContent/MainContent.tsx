@@ -8,7 +8,7 @@ import SupplementsSection from "./supplementsSection";
 import OTCSection from "./OTCSection";
 import CareNotesSection from "./CareNotesSection";
 import PharmacistInterventionSection from "./PharmacistInterventionSection";
-// import RecordingSection from "./RecordingSection";
+import RecordingSection from "./RecordingSection";
 import FakeRecordingSection from "./FakeRecordingSection";
 import styles from "./MainContent.module.css";
 
@@ -125,14 +125,14 @@ const MainContent: React.FC<MainContentProps> = ({
       {isFollowUp && (
         <>
           {/* 기존 RecordingSection 주석 처리 */}
-          {/* 
-          <section id="recording" className={styles.section}>
+
+          {/* <section id="recording" className={styles.section}>
             <RecordingSection
               onRecordingStatusChange={onRecordingStatusChange}
               sessionId={sessionId ?? "임시ID"}
             />
-          </section>
-          */}
+          </section> */}
+
           <section id="recording" className={styles.section}>
             <FakeRecordingSection />
           </section>
