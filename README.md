@@ -58,7 +58,7 @@
 
 ## 📚 연관 자료  
 
-- **최종 발표 자료**:  
+- **최종 발표 자료**:  https://www.figma.com/deck/5JmUpYSZwY0HpgPMCA4DsH/%EC%B5%9C%EC%A2%85%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C?node-id=21-110&t=OrO2H2FNT0XX1aSz-1
 - **프로젝트 노션 페이지**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb  
 - **늘픔약국 홈페이지**: http://healthnppa.or.kr/introduction/nppa-pharmacy/  
 
@@ -178,7 +178,7 @@ This is the webpage for TenTen. The recording upload and analysis features have 
 
 ## 📚 Related References
 
-- **Final Presentation**:
+- **Final Presentation**: https://www.figma.com/deck/5JmUpYSZwY0HpgPMCA4DsH/%EC%B5%9C%EC%A2%85%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C?node-id=21-110&t=OrO2H2FNT0XX1aSz-1
 - **Project Introduction (Notion page)**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb
 - **Fellow Organization Website**: http://healthnppa.or.kr/introduction/nppa-pharmacy/
 
