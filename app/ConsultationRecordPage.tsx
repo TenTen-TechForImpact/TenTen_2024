@@ -766,7 +766,9 @@ const ConsultationRecordPage: React.FC = () => {
         </main>
         <aside className={styles.rightSidebar}>
           {loading ? (
-            <h2>상담 내용 로딩 중...</h2> // 로딩 메시지
+            <h2 className="font-bold text-lg text-gray-700 mt-4">
+              상담 내용 로딩 중...
+            </h2>
           ) : (
             <FirstSessionSummary
               patientInfo={patientInfo}

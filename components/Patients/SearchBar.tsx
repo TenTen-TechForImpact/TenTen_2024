@@ -54,7 +54,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         onChange={(e) => onSearch(e.target.value)}
         className={styles.searchBar}
       />
-      {searchTerm.trim() !== "" && (
+      {searchTerm.trim() !== "" && filteredPatients.length > 0 && (
         <div className={styles.filteredResults}>
           {filteredPatients.map((patient) => (
             <div key={patient.id} className={styles.resultItem}>
