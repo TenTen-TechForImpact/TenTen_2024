@@ -14,6 +14,11 @@
   flex-shrink: 0;
 }
 
+.loadingTitle {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
 .profileImage {
   width: 100px;
   height: 100px;

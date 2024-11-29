@@ -37,6 +37,7 @@ interface SessionAddModalProps {
   isEditMode?: boolean;
   onClose: () => void;
   onSubmit: (sessionData: Session) => void;
+  sessionCount: number;
 }
 
 const SessionAddModal: React.FC<SessionAddModalProps> = ({
@@ -45,11 +46,10 @@ const SessionAddModal: React.FC<SessionAddModalProps> = ({
   isEditMode = false,
   onClose,
   onSubmit,
+  sessionCount,
 }) => {
   const [title, setTitle] = useState("");
   const [dateTime, setDateTime] = useState<Date>(new Date());
-
-
 
   useEffect(() => {
     if (isEditMode && session) {
@@ -57,7 +57,7 @@ const SessionAddModal: React.FC<SessionAddModalProps> = ({
       setDateTime(session.session_datetime);
     } else {
       const now = new Date();
-      setTitle(`${now.toISOString().slice(0, 16)} - ${patient.name}`);
+      setTitle(`${sessionCount}회차 상담`);
       setDateTime(now);
     }
   }, [isEditMode, session, patient.name]);

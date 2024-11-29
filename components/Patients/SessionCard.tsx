@@ -1,6 +1,7 @@
 // SessionCard.tsx
 
 import React, { useState } from "react";
+import { Spinner } from "flowbite-react";
 import styles from "./SessionCard.module.css";
 
 interface Session {
@@ -22,12 +23,13 @@ interface Session {
   temp: string | null;
 }
 
-
 interface SessionCardProps {
   session: Session;
   onViewDetails: (session: Session) => void;
   onDelete: (session: Session) => void;
   onEdit: (session: Session) => void;
+  isLoading: boolean;
+  isZero: boolean;
 }
 
 const SessionCard: React.FC<SessionCardProps> = ({
@@ -35,7 +37,35 @@ const SessionCard: React.FC<SessionCardProps> = ({
   onViewDetails,
   onDelete,
   onEdit,
+  isLoading,
+  isZero,
 }) => {
+  if (isZero) {
+    return (
+      <div className={styles.sessionContainer}>
+        <div className={styles.sessionRow}>
+          <div className={styles.sessionField}>{session.title}</div>
+          <div className={styles.sessionField}></div>
+          <div className={styles.sessionField}></div>
+          <button className={styles.actionButton}></button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className={styles.sessionContainer}>
+        <div className={`${styles.sessionRow} gap-4`}>
+          <Spinner className={styles.sessionField} color="gray"></Spinner>
+          <div className={styles.sessionField}>상담 정보를 로딩 중입니다.</div>
+          <div className={styles.sessionField}></div>
+          <button className={styles.actionButton}></button>
+        </div>
+      </div>
+    );
+  }
+
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleDeleteClick = () => {
@@ -51,7 +81,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
   const handleViewDetailsClick = () => {
     onViewDetails(session);
     setShowDropdown(false);
-  }
+  };
 
   const toggleDropdown = () => {
     setShowDropdown((prev) => !prev);
@@ -66,14 +96,17 @@ const SessionCard: React.FC<SessionCardProps> = ({
     hour12: false,
   });
 
-  const formattedModifiedDateTime = session.modified_at.toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  const formattedModifiedDateTime = session.modified_at.toLocaleString(
+    "ko-KR",
+    {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }
+  );
 
   return (
     <div className={styles.sessionContainer}>
@@ -92,7 +125,10 @@ const SessionCard: React.FC<SessionCardProps> = ({
             <div className={styles.dropdownItem} onClick={handleDeleteClick}>
               삭제
             </div>
-            <div className={styles.dropdownItem} onClick={handleViewDetailsClick}>
+            <div
+              className={styles.dropdownItem}
+              onClick={handleViewDetailsClick}
+            >
               상담 보기
             </div>
           </div>

@@ -97,14 +97,16 @@ const PatientDetailPage: React.FC = () => {
     return await response.json();
   };
 
-
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedSession(null);
   };
 
   // 상담 추가 함수
-  const handleAddSession = async (sessionData: { title: string; session_datetime: Date }) => {
+  const handleAddSession = async (sessionData: {
+    title: string;
+    session_datetime: Date;
+  }) => {
     setLoading(true);
     try {
       const formattedSessionData = {
@@ -137,7 +139,7 @@ const PatientDetailPage: React.FC = () => {
   const handleDeleteSession = async () => {
     setLoading(true);
     try {
-      console.log(selectedSession.id)
+      console.log(selectedSession.id);
       const response = await fetch(
         `/api/patients/${patientId}/sessions/${selectedSession.id}`,
         {
@@ -159,7 +161,10 @@ const PatientDetailPage: React.FC = () => {
   };
 
   // 상담 수정 함수
-  const handleUpdateSession = async (sessionData: { title: string; session_datetime: Date }) => {
+  const handleUpdateSession = async (sessionData: {
+    title: string;
+    session_datetime: Date;
+  }) => {
     setLoading(true);
     try {
       if (!selectedSession) {
@@ -210,18 +215,50 @@ const PatientDetailPage: React.FC = () => {
   // 상담 내용 보기 핸들러
   const handleViewDetails = (session: Session) => {
     setSelectedSession(session);
-    router.push(`../sessions/${session.id}`)
+    router.push(`../sessions/${session.id}`);
   };
 
+  //스켈레톤 코드 용 페이크 데이터
+  const fakePatient: Patient = {
+    id: "fakePatient001",
+    name: "환자 정보를 로딩 중입니다",
+    date_of_birth: new Date("1111-11-11"), // 임의의 과거 날짜
+    gender: "로딩",
+    phone_number: "01011111111", // 가짜 번호
+    organization: "",
+    created_at: new Date("1111-11-11"), // 임의 생성 날짜
+    modified_at: new Date("1111-11-11"), // 임의 수정 날짜
+  };
 
+  const fakeSession = {
+    id: "fakeId12345",
+    patient_id: "patient001",
+    session_datetime: new Date(),
+    title: "상담이 없습니다. +를 눌러 새 상담을 추가해 주세요.",
+    status: "pending", // or "completed", "cancelled"
+    pharmacist_summary: null,
+    patient_summary: null,
+    form_type: null,
+    form_content: null,
+    created_at: null,
+    modified_at: null,
+    former_questions: null,
+    prescription_drugs: null,
+    other_drugs: null,
+    pharmacist_note: null,
+    temp: null,
+  };
 
   return (
     <div className={styles.Page}>
       <Header />
       {patientInfo ? (
-        <PatientProfile patient={patientInfo}></PatientProfile>
+        <PatientProfile
+          patient={patientInfo}
+          isLoading={false}
+        ></PatientProfile>
       ) : (
-        <p>환자 정보 로딩 중...</p>
+        <PatientProfile patient={fakePatient} isLoading={true}></PatientProfile>
       )}
 
       {error && <div className={styles.errorMessage}>{error}</div>}
@@ -232,17 +269,38 @@ const PatientDetailPage: React.FC = () => {
           isEditMode={!!selectedSession}
           onClose={handleCloseModal}
           onSubmit={selectedSession ? handleUpdateSession : handleAddSession}
+          sessionCount={
+            !sessions || sessions.length === 0 ? 1 : sessions.length + 1
+          }
         />
       )}
       {showDeleteModal && (
         <DeleteModal
           onConfirm={handleDeleteSession}
           onCancel={() => setShowDeleteModal(false)}
-          deleteName={`상담 제목: "${selectedSession?.title}"`}
+          deleteName={`"${selectedSession?.title}"`}
         />
       )}
       {loading ? (
-        <p>상담 목록 로딩 중...</p>
+        <div className={styles.sessionContainer}>
+          <div className={styles.tableHeader}>
+            <div className={styles.tableHeaderItem}>이름</div>
+            <div className={styles.tableHeaderItem}>상담 날짜</div>
+            <div className={styles.tableHeaderItem}>최근 수정 날짜</div>
+            <button className={styles.actionButton}>+</button>
+          </div>
+          <div className={styles.cardList}>
+            <SessionCard
+              key={fakeSession.id}
+              session={fakeSession}
+              onViewDetails={() => {}}
+              onDelete={() => {}}
+              onEdit={() => {}}
+              isLoading={true}
+              isZero={false}
+            />
+          </div>
+        </div>
       ) : (
         <div className={styles.sessionContainer}>
           <div className={styles.tableHeader}>
@@ -257,17 +315,33 @@ const PatientDetailPage: React.FC = () => {
             </button>
           </div>
           <div className={styles.cardList}>
-            {sessions
-              .sort((a, b) => b.modified_at.getTime() - a.modified_at.getTime())
-              .map((session) => (
-                <SessionCard
-                  key={session.id}
-                  session={session}
-                  onViewDetails={handleViewDetails}
-                  onDelete={handleDeleteConfirm}
-                  onEdit={handleEditSession}
-                />
-              ))}
+            {sessions.length > 0 ? (
+              sessions
+                .sort(
+                  (a, b) => b.modified_at.getTime() - a.modified_at.getTime()
+                )
+                .map((session) => (
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    onViewDetails={handleViewDetails}
+                    onDelete={handleDeleteConfirm}
+                    onEdit={handleEditSession}
+                    isLoading={false}
+                    isZero={false}
+                  />
+                ))
+            ) : (
+              <SessionCard
+                key={fakeSession.id}
+                session={fakeSession}
+                onViewDetails={() => {}}
+                onDelete={() => {}}
+                onEdit={() => {}}
+                isLoading={false}
+                isZero={true}
+              />
+            )}
           </div>
         </div>
       )}
