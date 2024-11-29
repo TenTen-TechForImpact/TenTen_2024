@@ -21,7 +21,7 @@ const FakeRecordingSection: React.FC = () => {
   };
 
   const handleRecordClick = () => {
-    if (isRecording) {
+    /*if (isRecording) {
       // Stop recording
       setIsRecording(false);
       if (intervalId) {
@@ -39,7 +39,8 @@ const FakeRecordingSection: React.FC = () => {
         setTimeElapsed((prev) => prev + 1);
       }, 1000);
       setIntervalId(id);
-    }
+    }*/
+    alert("녹음 기능은 배포 환경에서 사용하실 수 없습니다.");
   };
 
   return (
