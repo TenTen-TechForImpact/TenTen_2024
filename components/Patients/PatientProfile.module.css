@@ -121,3 +121,9 @@
   width: 100%; /* 부모 너비에 맞춤 */
   height: 100%; /* 부모 높이에 맞춤 */
 }
+
+.hwpImage {
+  object-fit: contain;
+  width: 960px;
+  height: 1041px;
+}

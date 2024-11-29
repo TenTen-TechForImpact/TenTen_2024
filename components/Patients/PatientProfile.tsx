@@ -153,12 +153,19 @@ const PatientProfile: React.FC<PatientProfileProps> = ({
       </div>
 
       {/* 모달 */}
-      <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
+      <Modal
+        dismissible
+        show={openModal}
+        onClose={() => setOpenModal(false)}
+        className={styles.modal}
+      >
         <Modal.Header>
           {modalContent === "문자 전송" && (
             <p>상담 회차 선택 후 문자로 전송할 pdf 파일의 예시입니다.</p>
           )}
-          {modalContent === "한글 출력" && <p>기능 개발 중</p>}
+          {modalContent === "한글 출력" && (
+            <p>한글 출력 기능은 현재 개발중입니다.</p>
+          )}
           {modalContent === "히스토리" && <p>기능 개발 중</p>}
         </Modal.Header>
         {modalContent === "문자 전송" && (
@@ -180,10 +187,19 @@ const PatientProfile: React.FC<PatientProfileProps> = ({
           </Modal.Body>
         )}
         {modalContent === "한글 출력" && (
-          <Modal.Body>
-            <p>한글 출력 기능이 현재 개발중입니다. 추후 업데이트 예정입니다.</p>
+          <Modal.Body className={styles.modalBody}>
+            <div className={styles.carouselContainer}>
+              <Carousel slide={false}>
+                <img
+                  src="/images/hwpFile.png"
+                  alt="Hwp slide"
+                  className={styles.hwpImage}
+                />
+              </Carousel>
+            </div>
           </Modal.Body>
         )}
+
         {modalContent === "히스토리" && (
           <Modal.Body>
             <p>
