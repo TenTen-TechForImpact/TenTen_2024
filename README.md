@@ -111,15 +111,10 @@
   - **역할**: 펠로우 및 자문  
   - **기여**: 약사의 업무 흐름 및 상담 문제에 대한 통찰을 제공하여 솔루션이 실제 요구사항에 부합하도록 도움.  
 
-- **[자문 교수 이름]**  
-  - **소속**: KAIST [학과명]  
-  - **역할**: 학문적 자문  
-  - **기여**: AI 및 소프트웨어 엔지니어링에 대한 전문성을 바탕으로 기술 개발 방향을 지도.  
-
-- **[추가 자문자 이름]**  
-  - **소속**: [기관/조직 이름]  
-  - **역할**: [역할, 예: 헬스케어 컨설턴트, 기술 자문]  
-  - **기여**: [프로젝트에 대한 특정 기여 내용].  
+- **에릭**  
+  - **소속**: 카카오
+  - **역할**: 기술 자문
+  - **기여**: 서비스를 개발하는데 필요한 기술에 대한 컨설팅 제공
 
 ---
 
@@ -181,8 +176,66 @@ This is the webpage for TenTen. The recording upload and analysis features have 
 
 ---  
 
-## 📚 Related References  
+## 📚 Related References
 
-- **Final Presentation**:  
-- **Project Introduction (Notion page)**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb  
-- **Fellow Organization Website
+- **Final Presentation**:
+- **Project Introduction (Notion page)**: https://www.notion.so/1-4-a3c99e9e723c456f9bea80df649ff8eb
+- **Fellow Organization Website**: http://healthnppa.or.kr/introduction/nppa-pharmacy/
+
+---  
+
+## 👥 Team Introduction  
+
+### Team Members  
+- **Lee Jungho**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: hohoho4u4me@kaist.ac.kr  
+  - **Role**: Team Leader, Frontend Development  
+
+- **Kim Myungcheol**  
+  - **Affiliation**: KAIST, Department of Mathematical Sciences  
+  - **Email**: dayforday@kaist.ac.kr  
+  - **Role**: Frontend Development  
+
+- **Kim Soyoon**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: soyoon1015@kaist.ac.kr  
+  - **Role**: Backend Development  
+
+- **Kim Yerim**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: lilyblue@kaist.ac.kr  
+  - **Role**: Backend Development  
+
+- **Seong Ahyoung**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: seongahyoung@kaist.ac.kr  
+  - **Role**: UI Design  
+
+- **Yoon Jaehun**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: yoonjay99@kaist.ac.kr  
+  - **Role**: UI Design  
+
+- **Yoo Jihyun**  
+  - **Affiliation**: KAIST, School of Computing  
+  - **Email**: yoojihyun6933@kaist.ac.kr  
+  - **Role**: AI Development  
+
+---  
+
+## 🌟 External Advisors  
+
+- **Park Sangwon**  
+  - **Affiliation**: Neulpoom Pharmacy  
+  - **Role**: Fellow and Advisor  
+  - **Contribution**: Provided insights into pharmacists' workflow and consultation challenges to ensure the solution meets real-world requirements.  
+
+- **Eric**  
+  - **Affiliation**: Kakao
+  - **Role**:  Technical Advisor
+  - **Contribution**: Provided consulting on technologies required for service development.   
+
+---  
+
+**Made with ❤️ by the TenTen_2024 Team**
