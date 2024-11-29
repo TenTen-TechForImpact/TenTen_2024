@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import PersonalInfoSection from "./PersonalInfoSection";
 import PreQuestionsSection from "./PreQuestionsSection";
 import PrescriptionDrugsSection from "./PrescriptionDrugsSection";
@@ -73,6 +73,11 @@ const MainContent: React.FC<MainContentProps> = ({
   const handleAddContent = (content: string) => {
     // console.log("추가된 content:", content);
   };
+
+  useEffect(() => {
+    // isFollowUp이 변경될 때 스크롤 위치를 맨 위로 이동
+    window.scrollTo(0, 0);
+  }, [isFollowUp]);
 
   return (
     <div className={styles.mainContent}>
