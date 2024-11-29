@@ -1,6 +1,6 @@
 // SessionCard.tsx
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Spinner } from "flowbite-react";
 import styles from "./SessionCard.module.css";
 
@@ -108,6 +108,30 @@ const SessionCard: React.FC<SessionCardProps> = ({
     }
   );
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
+
   return (
     <div className={styles.sessionContainer}>
       <div className={styles.sessionRow}>
@@ -118,7 +142,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
           ⋮
         </button>
         {showDropdown && (
-          <div className={styles.dropdownMenu}>
+          <div className={styles.dropdownMenu} ref={dropdownRef}>
             <div className={styles.dropdownItem} onClick={handleEditClick}>
               수정
             </div>
