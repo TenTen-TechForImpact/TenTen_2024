@@ -103,3 +103,21 @@
 .buttonIcon {
   font-size: 1.2rem;
 }
+
+.modalBody {
+  background-color: gray;
+}
+/* 부모 컨테이너 스타일 */
+.carouselContainer {
+  width: 100%; /* 전체 너비 */
+  height: 500px; /* 고정 높이 */
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  position: relative; /* 자식 요소 위치 기준 */
+}
+
+/* 이미지 스타일 */
+.carouselImage {
+  object-fit: contain; /* 이미지 비율 유지하며 컨테이너에 맞춤 */
+  width: 100%; /* 부모 너비에 맞춤 */
+  height: 100%; /* 부모 높이에 맞춤 */
+}
